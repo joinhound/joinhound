@@ -1,0 +1,20 @@
+{
+  "name": "joinhound",
+  "version": "0.0.1",
+  "description": "Official Joinhound package for the upcoming TypeScript client and MCP wrapper.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joinhound/joinhound.git"
+  },
+  "homepage": "https://joinhound.dev",
+  "bugs": {
+    "url": "https://github.com/joinhound/joinhound/issues"
+  },
+  "files": [
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
