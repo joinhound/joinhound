@@ -27,4 +27,13 @@ uv run joinhound --help
 uv run jh --help
 ```
 
+Local data services are defined in `docker-compose.yml`. The development passwords in that file are only for this local stack.
+
+```console
+docker compose up --wait
+scripts/load_pagila.sh
+```
+
+`kg-postgres` listens on port 55432, the Pagila source on port 55433, and MinIO on port 59000.
+
 The published `0.0.1` package reserves the project name. Application commands are still being built.
