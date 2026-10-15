@@ -85,6 +85,11 @@ class ColumnProfile(BaseModel):
     collection_id: str
     column_name: str
     type_class: str
+    n_distinct: float | None = None
+    null_ratio: float | None = None
+    uniqueness: float | None = None
+    pattern: str | None = None
+    minhash: bytes | None = None
 
 
 class CollectionProfile(BaseModel):
