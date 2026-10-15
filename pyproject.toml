@@ -19,10 +19,14 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
+    "datasketch==2.0.0",
+    "psycopg-pool==3.3.0",
+    "psycopg[binary]==3.3.6",
     "pydantic==2.14.1",
     "pydantic-settings==2.16.0",
     "pyyaml==6.0.3",
     "typer==0.27.3",
+    "yoyo-migrations==9.0.0",
 ]
 
 [project.urls]
@@ -37,6 +41,13 @@ jh = "joinhound.cli:app"
 [project.entry-points."joinhound.judges"]
 none = "joinhound.llm.none:NoneJudge"
 
+[project.entry-points."joinhound.connectors"]
+postgres = "joinhound.connectors.postgres:PostgresSource"
+
+[tool.hatch.build.targets.wheel.force-include]
+"migrations/0001.kg.sql" = "joinhound/migrations/0001.kg.sql"
+"migrations/0001.kg.rollback.sql" = "joinhound/migrations/0001.kg.rollback.sql"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
@@ -47,6 +58,7 @@ dev = [
     "pip-licenses==5.5.5",
     "pytest==9.1.1",
     "ruff==0.17.0",
+    "testcontainers==4.15.0",
     "types-pyyaml==6.0.12.20260906",
 ]
 

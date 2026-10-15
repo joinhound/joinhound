@@ -9,6 +9,7 @@ import subprocess
 import sys
 
 ALLOWED = {
+    "apache software license",
     "apache-2.0",
     "bsd",
     "bsd license",
@@ -26,8 +27,13 @@ ALLOWED = {
     "psf-2.0",
 }
 
-# mypy depends on pathspec, which is MPL-2.0. See docs/decisions/0001-mpl-pathspec.md.
+# Unmodified libraries pulled in by required tools, outside the base allow list.
+# pathspec: mypy. certifi: testcontainers via requests.
+# numpy: datasketch. Its declaration is a conjunction of permissive terms.
+# See docs/decisions/0001-mpl-pathspec.md, 0004-mpl-certifi.md, and 0008-numpy-license.md.
 TRANSITIVE_EXCEPTIONS = {
+    ("certifi", "mozilla public license 2.0 (mpl 2.0)"),
+    ("numpy", "bsd-3-clause and 0bsd and mit and zlib and cc0-1.0"),
     ("pathspec", "mozilla public license 2.0 (mpl 2.0)"),
 }
 
