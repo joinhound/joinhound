@@ -18,6 +18,9 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
 ]
+dependencies = [
+    "typer==0.27.3",
+]
 
 [project.urls]
 Homepage = "https://joinhound.dev"
@@ -25,5 +28,13 @@ Repository = "https://github.com/joinhound/joinhound"
 Issues = "https://github.com/joinhound/joinhound/issues"
 
 [project.scripts]
-joinhound = "joinhound.cli:main"
-jh = "joinhound.cli:main"
+joinhound = "joinhound.cli:app"
+jh = "joinhound.cli:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+]
