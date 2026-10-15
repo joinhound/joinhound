@@ -1,0 +1,485 @@
+{
+  "constraints": [
+    {
+      "schema": "public",
+      "table": "address",
+      "name": "address_city_id_fkey",
+      "columns": [
+        "city_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "city",
+      "ref_columns": [
+        "city_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "city",
+      "name": "city_country_id_fkey",
+      "columns": [
+        "country_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "country",
+      "ref_columns": [
+        "country_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "customer",
+      "name": "customer_address_id_fkey",
+      "columns": [
+        "address_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "address",
+      "ref_columns": [
+        "address_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "customer",
+      "name": "customer_store_id_fkey",
+      "columns": [
+        "store_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "store",
+      "ref_columns": [
+        "store_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "film",
+      "name": "film_language_id_fkey",
+      "columns": [
+        "language_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "language",
+      "ref_columns": [
+        "language_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "film",
+      "name": "film_original_language_id_fkey",
+      "columns": [
+        "original_language_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "language",
+      "ref_columns": [
+        "language_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "film_actor",
+      "name": "film_actor_actor_id_fkey",
+      "columns": [
+        "actor_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "actor",
+      "ref_columns": [
+        "actor_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "film_actor",
+      "name": "film_actor_film_id_fkey",
+      "columns": [
+        "film_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "film",
+      "ref_columns": [
+        "film_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "film_category",
+      "name": "film_category_category_id_fkey",
+      "columns": [
+        "category_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "category",
+      "ref_columns": [
+        "category_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "film_category",
+      "name": "film_category_film_id_fkey",
+      "columns": [
+        "film_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "film",
+      "ref_columns": [
+        "film_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "film_embedding",
+      "name": "film_embedding_film_id_fkey",
+      "columns": [
+        "film_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "film",
+      "ref_columns": [
+        "film_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "inventory",
+      "name": "inventory_film_id_fkey",
+      "columns": [
+        "film_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "film",
+      "ref_columns": [
+        "film_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "inventory",
+      "name": "inventory_store_id_fkey",
+      "columns": [
+        "store_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "store",
+      "ref_columns": [
+        "store_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_01",
+      "name": "payment_p2022_01_customer_id_fkey",
+      "columns": [
+        "customer_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "customer",
+      "ref_columns": [
+        "customer_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_01",
+      "name": "payment_p2022_01_rental_id_fkey",
+      "columns": [
+        "rental_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "rental",
+      "ref_columns": [
+        "rental_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_01",
+      "name": "payment_p2022_01_staff_id_fkey",
+      "columns": [
+        "staff_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "staff",
+      "ref_columns": [
+        "staff_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_02",
+      "name": "payment_p2022_02_customer_id_fkey",
+      "columns": [
+        "customer_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "customer",
+      "ref_columns": [
+        "customer_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_02",
+      "name": "payment_p2022_02_rental_id_fkey",
+      "columns": [
+        "rental_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "rental",
+      "ref_columns": [
+        "rental_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_02",
+      "name": "payment_p2022_02_staff_id_fkey",
+      "columns": [
+        "staff_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "staff",
+      "ref_columns": [
+        "staff_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_03",
+      "name": "payment_p2022_03_customer_id_fkey",
+      "columns": [
+        "customer_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "customer",
+      "ref_columns": [
+        "customer_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_03",
+      "name": "payment_p2022_03_rental_id_fkey",
+      "columns": [
+        "rental_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "rental",
+      "ref_columns": [
+        "rental_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_03",
+      "name": "payment_p2022_03_staff_id_fkey",
+      "columns": [
+        "staff_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "staff",
+      "ref_columns": [
+        "staff_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_04",
+      "name": "payment_p2022_04_customer_id_fkey",
+      "columns": [
+        "customer_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "customer",
+      "ref_columns": [
+        "customer_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_04",
+      "name": "payment_p2022_04_rental_id_fkey",
+      "columns": [
+        "rental_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "rental",
+      "ref_columns": [
+        "rental_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_04",
+      "name": "payment_p2022_04_staff_id_fkey",
+      "columns": [
+        "staff_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "staff",
+      "ref_columns": [
+        "staff_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_05",
+      "name": "payment_p2022_05_customer_id_fkey",
+      "columns": [
+        "customer_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "customer",
+      "ref_columns": [
+        "customer_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_05",
+      "name": "payment_p2022_05_rental_id_fkey",
+      "columns": [
+        "rental_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "rental",
+      "ref_columns": [
+        "rental_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_05",
+      "name": "payment_p2022_05_staff_id_fkey",
+      "columns": [
+        "staff_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "staff",
+      "ref_columns": [
+        "staff_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_06",
+      "name": "payment_p2022_06_customer_id_fkey",
+      "columns": [
+        "customer_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "customer",
+      "ref_columns": [
+        "customer_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_06",
+      "name": "payment_p2022_06_rental_id_fkey",
+      "columns": [
+        "rental_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "rental",
+      "ref_columns": [
+        "rental_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "payment_p2022_06",
+      "name": "payment_p2022_06_staff_id_fkey",
+      "columns": [
+        "staff_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "staff",
+      "ref_columns": [
+        "staff_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "rental",
+      "name": "rental_customer_id_fkey",
+      "columns": [
+        "customer_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "customer",
+      "ref_columns": [
+        "customer_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "rental",
+      "name": "rental_inventory_id_fkey",
+      "columns": [
+        "inventory_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "inventory",
+      "ref_columns": [
+        "inventory_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "rental",
+      "name": "rental_staff_id_fkey",
+      "columns": [
+        "staff_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "staff",
+      "ref_columns": [
+        "staff_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "staff",
+      "name": "staff_address_id_fkey",
+      "columns": [
+        "address_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "address",
+      "ref_columns": [
+        "address_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "staff",
+      "name": "staff_store_id_fkey",
+      "columns": [
+        "store_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "store",
+      "ref_columns": [
+        "store_id"
+      ]
+    },
+    {
+      "schema": "public",
+      "table": "store",
+      "name": "store_address_id_fkey",
+      "columns": [
+        "address_id"
+      ],
+      "ref_schema": "public",
+      "ref_table": "address",
+      "ref_columns": [
+        "address_id"
+      ]
+    }
+  ]
+}
