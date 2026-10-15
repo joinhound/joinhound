@@ -14,7 +14,10 @@ def commit_range() -> str:
     event = os.environ.get("GITHUB_EVENT_NAME", "")
     if event == "pull_request":
         base = os.environ["GITHUB_BASE_REF"]
-        return f"origin/{base}..HEAD"
+        # GitHub checks out a temporary merge commit. Inspect the pull request head
+        # so that merge commit is not required to carry a sign-off.
+        head = os.environ.get("PR_HEAD_SHA") or "HEAD"
+        return f"origin/{base}..{head}"
     before = os.environ.get("GITHUB_EVENT_BEFORE", "")
     if before and set(before) != {"0"}:
         return f"{before}..HEAD"
