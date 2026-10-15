@@ -19,6 +19,9 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
+    "pydantic==2.14.1",
+    "pydantic-settings==2.16.0",
+    "pyyaml==6.0.3",
     "typer==0.27.3",
 ]
 
@@ -31,10 +34,91 @@ Issues = "https://github.com/joinhound/joinhound/issues"
 joinhound = "joinhound.cli:app"
 jh = "joinhound.cli:app"
 
+[project.entry-points."joinhound.judges"]
+none = "joinhound.llm.none:NoneJudge"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "import-linter==2.15",
+    "mypy==2.4.0",
+    "pip-licenses==5.5.5",
     "pytest==9.1.1",
+    "ruff==0.17.0",
+    "types-pyyaml==6.0.12.20260906",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+explicit_package_bases = true
+strict = true
+
+[tool.importlinter]
+root_packages = ["joinhound"]
+
+[[tool.importlinter.contracts]]
+name = "Core does not depend on other components"
+type = "forbidden"
+source_modules = ["joinhound.core"]
+forbidden_modules = [
+    "joinhound.cli",
+    "joinhound.connectors",
+    "joinhound.engine",
+    "joinhound.formats",
+    "joinhound.index",
+    "joinhound.llm",
+    "joinhound.matchers",
+    "joinhound.profiler",
+    "joinhound.server",
+]
+
+[[tool.importlinter.contracts]]
+name = "Connectors, index, and profiler are independent"
+type = "independence"
+modules = [
+    "joinhound.connectors",
+    "joinhound.index",
+    "joinhound.profiler",
+]
+
+[[tool.importlinter.contracts]]
+name = "Connectors, index, and profiler depend only on core"
+type = "forbidden"
+source_modules = [
+    "joinhound.connectors",
+    "joinhound.index",
+    "joinhound.profiler",
+]
+forbidden_modules = [
+    "joinhound.cli",
+    "joinhound.engine",
+    "joinhound.formats",
+    "joinhound.llm",
+    "joinhound.matchers",
+    "joinhound.server",
+]
+
+[[tool.importlinter.contracts]]
+name = "Engine depends only on core and index"
+type = "forbidden"
+source_modules = ["joinhound.engine"]
+forbidden_modules = [
+    "joinhound.cli",
+    "joinhound.connectors",
+    "joinhound.formats",
+    "joinhound.llm",
+    "joinhound.matchers",
+    "joinhound.profiler",
+    "joinhound.server",
 ]

@@ -1,0 +1,49 @@
+name: joinhound
+
+services:
+  kg-postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: joinhound
+      POSTGRES_PASSWORD: joinhound
+      POSTGRES_DB: joinhound
+    ports:
+      - "55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U joinhound -d joinhound"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  source-postgres:
+    # Current Pagila uses uuidv7() and the vector extension.
+    image: pgvector/pgvector:pg18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pagila
+    ports:
+      - "55433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pagila"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  minio:
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: joinhound
+      MINIO_ROOT_PASSWORD: joinhound-dev
+    ports:
+      - "59000:9000"
+      - "59001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
