@@ -27,11 +27,13 @@ ALLOWED = {
     "psf-2.0",
 }
 
-# Unmodified MPL-2.0 libraries pulled in by required tools.
+# Unmodified libraries pulled in by required tools, outside the base allow list.
 # pathspec: mypy. certifi: testcontainers via requests.
-# See docs/decisions/0001-mpl-pathspec.md and docs/decisions/0004-mpl-certifi.md.
+# numpy: datasketch. Its declaration is a conjunction of permissive terms.
+# See docs/decisions/0001-mpl-pathspec.md, 0004-mpl-certifi.md, and 0008-numpy-license.md.
 TRANSITIVE_EXCEPTIONS = {
     ("certifi", "mozilla public license 2.0 (mpl 2.0)"),
+    ("numpy", "bsd-3-clause and 0bsd and mit and zlib and cc0-1.0"),
     ("pathspec", "mozilla public license 2.0 (mpl 2.0)"),
 }
 
