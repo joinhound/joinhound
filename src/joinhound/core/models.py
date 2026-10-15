@@ -102,6 +102,7 @@ class ProfileContext(BaseModel):
     """Inputs available to a matcher while it looks for candidate relationships."""
 
     sample_values: int = 10000
+    containment_threshold: float = 0.5
 
 
 class QueryContext(BaseModel):
