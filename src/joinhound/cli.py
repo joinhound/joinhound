@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import cast
 
 import typer
+import yaml
 
 from joinhound import __version__
 from joinhound.connectors.postgres import PostgresSource
@@ -15,8 +16,16 @@ from joinhound.core.config import PostgresSourceConfig, load_config
 from joinhound.core.protocols import LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.evaluate import precision_recall
+from joinhound.formats.ossie import (
+    ModelError,
+    OssieFormat,
+    apply_links,
+    links_from_document,
+    parse_document,
+)
 from joinhound.index.columns import save_column_profiles
 from joinhound.index.links import ColumnLink, save_links, stored_links
+from joinhound.index.model import model_links, model_text, store_model
 from joinhound.index.schema import apply_schema
 from joinhound.profiler.profile import propose_links
 
@@ -95,6 +104,70 @@ def profile(
     """Write column fingerprints and relationship proposals."""
     written = _profile_sources(Path(config), auto_approve)
     typer.echo(f"links {written}")
+
+
+@app.command(name="import")
+def import_(
+    format_name: str = typer.Argument(help="Model format. Only ossie is supported."),
+    path: str = typer.Argument(help="Ossie YAML or JSON file."),
+    config: str = typer.Option(
+        "joinhound.yaml",
+        "--config",
+        help="Path to the YAML configuration.",
+    ),
+) -> None:
+    """Replace kg.links with the relationships in an Ossie model."""
+    _require_ossie(format_name)
+    try:
+        written = _import_ossie(Path(config), Path(path))
+    except ModelError as error:
+        raise typer.BadParameter(str(error)) from error
+    typer.echo(f"links {written}")
+
+
+@app.command()
+def export(
+    format_name: str = typer.Argument(help="Model format. Only ossie is supported."),
+    out: str = typer.Option(..., "--out", help="File to write."),
+    config: str = typer.Option(
+        "joinhound.yaml",
+        "--config",
+        help="Path to the YAML configuration.",
+    ),
+) -> None:
+    """Write the stored Ossie model, including links changed since import."""
+    _require_ossie(format_name)
+    try:
+        text = _export_ossie(Path(config))
+    except ModelError as error:
+        raise typer.BadParameter(str(error)) from error
+    Path(out).write_text(text, encoding="utf-8")
+
+
+def _require_ossie(format_name: str) -> None:
+    if format_name != "ossie":
+        raise typer.BadParameter("format must be ossie")
+
+
+def _import_ossie(config_path: Path, model_path: Path) -> int:
+    settings = load_config(config_path)
+    text = model_path.read_text(encoding="utf-8")
+    document = parse_document(text)
+    drafts = links_from_document(document)
+    store_model(settings.kg_database, text, [draft for draft in drafts if draft is not None])
+    return len(drafts)
+
+
+def _export_ossie(config_path: Path) -> str:
+    settings = load_config(config_path)
+    text = model_text(settings.kg_database)
+    if text is None:
+        raise ModelError("No Ossie model has been imported")
+    document = parse_document(text)
+    updated = apply_links(document, model_links(settings.kg_database))
+    if updated == document:
+        return text
+    return OssieFormat().dump(yaml.safe_dump(updated))
 
 
 def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
