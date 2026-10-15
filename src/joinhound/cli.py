@@ -3,15 +3,22 @@
 """Command-line entry point."""
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
+from typing import cast
 
 import typer
 
 from joinhound import __version__
-from joinhound.core.config import load_config
+from joinhound.connectors.postgres import PostgresSource
+from joinhound.core.config import PostgresSourceConfig, load_config
+from joinhound.core.protocols import LinkMatcher, TabularSource
+from joinhound.core.registry import load_plugins
 from joinhound.engine.evaluate import precision_recall
-from joinhound.index.links import ColumnLink, stored_links
+from joinhound.index.columns import save_column_profiles
+from joinhound.index.links import ColumnLink, save_links, stored_links
 from joinhound.index.schema import apply_schema
+from joinhound.profiler.profile import propose_links
 
 app = typer.Typer(
     name="joinhound",
@@ -70,6 +77,51 @@ def evaluate(
     precision, recall = precision_recall(stored_links(settings.kg_database), _load_gold(gold))
     typer.echo(f"precision {precision:.3f}")
     typer.echo(f"recall {recall:.3f}")
+
+
+@app.command()
+def profile(
+    config: str = typer.Option(
+        "joinhound.yaml",
+        "--config",
+        help="Path to the YAML configuration.",
+    ),
+    auto_approve: float | None = typer.Option(
+        None,
+        "--auto-approve",
+        help="Approve proposals whose confidence is at least this value.",
+    ),
+) -> None:
+    """Write column fingerprints and relationship proposals."""
+    written = _profile_sources(Path(config), auto_approve)
+    typer.echo(f"links {written}")
+
+
+def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
+    settings = load_config(config_path)
+    approve_at = settings.profiler.auto_approve if auto_approve is None else auto_approve
+    written = 0
+    for name, source_config in settings.sources.items():
+        if not isinstance(source_config, PostgresSourceConfig):
+            continue
+        source = PostgresSource(name, source_config)
+        with source:
+            profiles, drafts = propose_links(source, settings.profiler, _matchers(source))
+        save_column_profiles(settings.kg_database, name, profiles)
+        save_links(settings.kg_database, drafts, approve_at)
+        written += len(drafts)
+    return written
+
+
+def _matchers(source: TabularSource) -> Mapping[str, LinkMatcher]:
+    plugins = load_plugins("joinhound.matchers")
+    matchers: dict[str, LinkMatcher] = {}
+    for name in ("declared_fk", "exact"):
+        factory = plugins[name]
+        if not callable(factory):
+            raise TypeError(f"Matcher {name} is not callable")
+        matchers[name] = cast(LinkMatcher, factory(source))
+    return matchers
 
 
 def _load_gold(path: str) -> list[ColumnLink]:

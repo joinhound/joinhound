@@ -40,7 +40,11 @@ class DeclaredFkMatcher:
                 and link.src_columns == [src.column_name]
                 and link.dst_columns == [dst.column_name]
             ):
-                return Candidate(match_type=self.match_type, confidence=1.0)
+                return Candidate(
+                    match_type=self.match_type,
+                    confidence=1.0,
+                    evidence={"catalog": True},
+                )
         return None
 
     def resolve(self, link: Link, values: list[str], ctx: QueryContext) -> list[Match]:

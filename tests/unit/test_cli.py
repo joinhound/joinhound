@@ -17,6 +17,13 @@ def test_help_exits_successfully() -> None:
     assert "joinhound" in result.output
 
 
+def test_profile_help_includes_auto_approve() -> None:
+    result = runner.invoke(app, ["profile", "--help"])
+
+    assert result.exit_code == 0
+    assert "--auto-approve" in result.output
+
+
 def test_version_prints_package_version() -> None:
     result = runner.invoke(app, ["--version"])
 
