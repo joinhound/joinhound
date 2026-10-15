@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from collections import Counter
 
+import numpy as np
 import psycopg
 from datasketch import MinHash
 
@@ -51,10 +52,24 @@ def value_pattern(value: str) -> str:
 
 def minhash_bytes(values: list[str]) -> bytes:
     """Return the 128-permutation MinHash of the normalized values."""
+    return _sketch(values).hashvalues.astype("<u4").tobytes()
+
+
+def sketch_from_bytes(payload: bytes) -> MinHash:
+    """Restore a MinHash written by minhash_bytes."""
+    restored = np.frombuffer(payload, dtype="<u4").copy()
+    if restored.size != _MINHASH_PERMUTATIONS:
+        raise ValueError("MinHash must contain 128 permutations")
+    sketch = MinHash(num_perm=_MINHASH_PERMUTATIONS, seed=_MINHASH_SEED)
+    sketch.hashvalues = restored
+    return sketch
+
+
+def _sketch(values: list[str]) -> MinHash:
     sketch = MinHash(num_perm=_MINHASH_PERMUTATIONS, seed=_MINHASH_SEED)
     for value in values:
         sketch.update(_normalize(value).encode())
-    return sketch.hashvalues.astype("<u4").tobytes()
+    return sketch
 
 
 def _profile(
