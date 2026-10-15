@@ -9,6 +9,7 @@ import subprocess
 import sys
 
 ALLOWED = {
+    "apache software license",
     "apache-2.0",
     "bsd",
     "bsd license",
@@ -26,8 +27,11 @@ ALLOWED = {
     "psf-2.0",
 }
 
-# mypy depends on pathspec, which is MPL-2.0. See docs/decisions/0001-mpl-pathspec.md.
+# Unmodified MPL-2.0 libraries pulled in by required tools.
+# pathspec: mypy. certifi: testcontainers via requests.
+# See docs/decisions/0001-mpl-pathspec.md and docs/decisions/0004-mpl-certifi.md.
 TRANSITIVE_EXCEPTIONS = {
+    ("certifi", "mozilla public license 2.0 (mpl 2.0)"),
     ("pathspec", "mozilla public license 2.0 (mpl 2.0)"),
 }
 

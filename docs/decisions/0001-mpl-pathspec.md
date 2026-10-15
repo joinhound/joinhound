@@ -6,7 +6,7 @@ The license policy allows Apache-2.0, MIT, BSD, ISC, PostgreSQL, PSF, and LGPL u
 
 ## Decision
 
-The license check accepts pathspec's MPL-2.0 declaration. MPL-2.0 is file-level weak copyleft and applies only because mypy needs the library unchanged. Any other MPL dependency still fails the check.
+The license check accepts pathspec's MPL-2.0 declaration. MPL-2.0 is file-level weak copyleft and applies only because mypy needs the library unchanged. Other MPL dependencies fail the check unless a later decision names them.
 
 ## Alternatives
 

@@ -2,9 +2,13 @@
 
 """Command-line entry point."""
 
+from pathlib import Path
+
 import typer
 
 from joinhound import __version__
+from joinhound.core.config import load_config
+from joinhound.index.schema import apply_schema
 
 app = typer.Typer(
     name="joinhound",
@@ -31,6 +35,18 @@ def callback(
     ),
 ) -> None:
     """Joinhound command-line interface."""
+
+
+@app.command()
+def init(
+    config: str = typer.Option(
+        "joinhound.yaml",
+        "--config",
+        help="Path to the YAML configuration.",
+    ),
+) -> None:
+    """Create the kg schema."""
+    apply_schema(load_config(Path(config)).kg_database)
 
 
 if __name__ == "__main__":
