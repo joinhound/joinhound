@@ -253,7 +253,15 @@ class PostgresSource:
         plan = self._key_plan(schema, table)
         estimate = self._row_estimate(schema, table)
         if estimate <= 0 or estimate <= _SMALL_TABLE_ROWS:
-            rows = self._query_rows(schema, table, plan, sql.SQL("TRUE"), [], order=True, limit=n)
+            rows = self._query_rows(
+                schema,
+                table,
+                plan,
+                sql.SQL("TRUE"),
+                [],
+                order=not plan.unstable,
+                limit=n,
+            )
         else:
             percent = min(100.0, max(1.0, (n / estimate) * 100 * 5))
             rows = self._query_rows(
