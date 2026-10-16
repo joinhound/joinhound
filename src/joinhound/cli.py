@@ -32,6 +32,7 @@ from joinhound.index.documents import sync_documents
 from joinhound.index.links import ColumnLink, save_links, stored_links
 from joinhound.index.model import model_links, model_text, store_model
 from joinhound.index.schema import apply_schema
+from joinhound.index.values import sync_values
 from joinhound.profiler.profile import link_id, propose_links
 from joinhound.server import create_server, runtime_from_config
 
@@ -128,8 +129,10 @@ def sync(
         help="Path to the YAML configuration.",
     ),
 ) -> None:
-    """Index documents that changed since the last sync."""
-    typer.echo(f"documents {_sync_sources(load_config(Path(config)))}")
+    """Index changed documents and approved fuzzy or semantic column values."""
+    documents, values = _sync_sources(load_config(Path(config)))
+    typer.echo(f"documents {documents}")
+    typer.echo(f"values {values}")
 
 
 @app.command(name="import")
@@ -227,21 +230,25 @@ def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
     return written
 
 
-def _sync_sources(settings: AppConfig) -> int:
+def _sync_sources(settings: AppConfig) -> tuple[int, int]:
     parsers = _document_parsers()
     embedder = _embedder(settings)
-    written = 0
+    documents = 0
+    values = 0
     for name, source_config in settings.sources.items():
-        if not isinstance(source_config, S3SourceConfig):
-            continue
-        written += sync_documents(
-            settings.kg_database,
-            name,
-            S3Source(name, source_config),
-            embedder,
-            lambda mime, data: _parse(parsers, mime, data),
-        )
-    return written
+        if isinstance(source_config, S3SourceConfig):
+            documents += sync_documents(
+                settings.kg_database,
+                name,
+                S3Source(name, source_config),
+                embedder,
+                lambda mime, data: _parse(parsers, mime, data),
+            )
+        elif isinstance(source_config, PostgresSourceConfig):
+            source = PostgresSource(name, source_config)
+            with source:
+                values += sync_values(settings.kg_database, name, source)
+    return documents, values
 
 
 def _parse(parsers: Mapping[str, DocumentParser], mime: str, data: bytes) -> list[TextBlock]:

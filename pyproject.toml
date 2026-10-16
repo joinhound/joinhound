@@ -74,6 +74,8 @@ ossie = "joinhound.formats:OssieFormat"
 [tool.hatch.build.targets.wheel.force-include]
 "migrations/0001.kg.sql" = "joinhound/migrations/0001.kg.sql"
 "migrations/0001.kg.rollback.sql" = "joinhound/migrations/0001.kg.rollback.sql"
+"migrations/0002.value_sync.sql" = "joinhound/migrations/0002.value_sync.sql"
+"migrations/0002.value_sync.rollback.sql" = "joinhound/migrations/0002.value_sync.rollback.sql"
 "src/joinhound/formats/ossie-schema.json" = "joinhound/formats/ossie-schema.json"
 
 [tool.pytest.ini_options]

@@ -59,7 +59,7 @@ def test_sync_with_no_document_source_prints_zero(tmp_path: Path) -> None:
     result = runner.invoke(app, ["sync", "--config", str(config)])
 
     assert result.exit_code == 0, result.output
-    assert result.output.strip() == "documents 0"
+    assert result.output.strip() == "documents 0\nvalues 0"
 
 
 def test_version_prints_package_version() -> None:
