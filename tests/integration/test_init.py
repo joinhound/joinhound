@@ -18,6 +18,7 @@ _TABLES = {
     "collections",
     "columns",
     "documents",
+    "embedding_model",
     "judge_cache",
     "links",
     "sources",
@@ -97,4 +98,4 @@ def test_init_is_idempotent_and_enables_extensions(tmp_path: Path) -> None:
         assert {row[0] for row in tables} == _TABLES
         assert _INDEXES <= {row[0] for row in indexes}
         assert embedding == ("vector(1024)",)
-        assert applied == (3,)
+        assert applied == (4,)

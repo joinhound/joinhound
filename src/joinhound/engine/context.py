@@ -31,7 +31,7 @@ from joinhound.engine.response import (
 from joinhound.engine.score import content_tokens, path_score, relevance
 
 _EXACT = frozenset({"declared_fk", "exact"})
-_WALK = _EXACT | {"normalized", "fuzzy"}
+_WALK = _EXACT | {"normalized", "fuzzy", "semantic"}
 _DOCUMENTS = "column_documents"
 
 
