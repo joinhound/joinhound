@@ -111,11 +111,34 @@ class QueryContext(BaseModel):
     limit: int = 50
 
 
+EvidenceValue = str | int | float | bool | None | list[str]
+
+
 class Candidate(BaseModel):
     """A proposed relationship that has not yet been stored."""
 
     match_type: str
     confidence: float
+    evidence: dict[str, EvidenceValue] = Field(default_factory=dict)
+
+
+class LinkDraft(BaseModel):
+    """A relationship ready to be written to kg.links."""
+
+    link_id: str
+    src_collection: str
+    src_column: str
+    dst_collection: str
+    dst_column: str | None = None
+    match_type: str
+    origin: str
+    threshold: float | None = None
+    confidence: float
+    cardinality: str | None = None
+    normalize_sql: str | None = None
+    relation_name: str | None = None
+    status: str
+    evidence: dict[str, EvidenceValue] = Field(default_factory=dict)
 
 
 class Link(BaseModel):

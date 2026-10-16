@@ -45,10 +45,20 @@ class ExactMatcher:
             limit=len(values),
         )
         found = {match.value for match in matches}
-        containment = len(found & set(values)) / len(values)
+        matched = [value for value in values if value in found]
+        missed = [value for value in values if value not in found]
+        containment = len(matched) / len(values)
         if containment < ctx.containment_threshold:
             return None
-        return Candidate(match_type=self.match_type, confidence=containment)
+        return Candidate(
+            match_type=self.match_type,
+            confidence=containment,
+            evidence={
+                "containment": containment,
+                "matches": matched[:10],
+                "misses": missed[:5],
+            },
+        )
 
     def resolve(self, link: Link, values: list[str], ctx: QueryContext) -> list[Match]:
         """Find destination rows equal to the given values."""
