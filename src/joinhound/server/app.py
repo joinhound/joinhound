@@ -4,14 +4,19 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from typing import cast
+
 from mcp.server.mcpserver import MCPServer
 
-from joinhound.core.models import LinkDraft
+from joinhound.core.models import IndexedPassage, LinkDraft
 from joinhound.core.protocols import LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.context import expand, get_context, read_record
 from joinhound.engine.response import ContextResponse, RecordResult
 from joinhound.engine.score import text_tokens, truncate_text
+from joinhound.index.documents import read_passages
+from joinhound.matchers.documents import Passage
 from joinhound.server.runtime import Runtime
 
 _SUMMARY_TOKENS = 2000
@@ -51,16 +56,18 @@ def create_server(runtime: Runtime) -> MCPServer:
         max_depth: int = 3,
     ) -> ContextResponse:
         with runtime.session() as (sources, links):
+            passages = _stored_passages(runtime)
             parts = [
                 get_context(
                     query,
                     source,
                     _links_for(name, source, links),
-                    _matchers(source),
+                    _matchers(source, passages),
                     runtime.engine,
                     budget_tokens=budget_tokens,
                     max_depth=max_depth,
                     scope=scope,
+                    passages=passages,
                 )
                 for name, source in sources
             ]
@@ -74,6 +81,7 @@ def create_server(runtime: Runtime) -> MCPServer:
         links: list[str] | None = None,
     ) -> ContextResponse:
         with runtime.session() as (sources, stored):
+            passages = _stored_passages(runtime)
             parts = []
             for name, source in sources:
                 owned = [uri for uri in node_uris if _owned(name, source, uri)]
@@ -84,7 +92,7 @@ def create_server(runtime: Runtime) -> MCPServer:
                         owned,
                         source,
                         _links_for(name, source, stored),
-                        _matchers(source),
+                        _matchers(source, passages),
                         runtime.engine,
                         depth=depth,
                         budget_tokens=budget_tokens,
@@ -115,14 +123,27 @@ def create_server(runtime: Runtime) -> MCPServer:
     return server
 
 
-def _matchers(source: TabularSource) -> dict[str, LinkMatcher]:
+def _stored_passages(runtime: Runtime) -> list[IndexedPassage]:
+    if runtime.settings is None:
+        return []
+    return read_passages(runtime.settings.kg_database)
+
+
+def _matchers(source: TabularSource, passages: Sequence[IndexedPassage]) -> dict[str, LinkMatcher]:
     plugins = load_plugins("joinhound.matchers")
     matchers: dict[str, LinkMatcher] = {}
-    for name in ("declared_fk", "exact"):
-        factory = plugins[name]
+    for name in ("declared_fk", "exact", "column_documents"):
+        factory = plugins.get(name)
         if not callable(factory):
-            raise TypeError(f"Matcher {name} is not callable")
-        matchers[name] = factory(source)
+            continue
+        if name == "column_documents":
+            converted = [
+                Passage(passage.collection_id, {"uri": passage.uri}, passage.text)
+                for passage in passages
+            ]
+            matchers[name] = cast(LinkMatcher, factory(source, converted))
+            continue
+        matchers[name] = cast(LinkMatcher, factory(source))
     return matchers
 
 

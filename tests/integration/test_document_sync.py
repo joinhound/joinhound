@@ -9,7 +9,7 @@ import psycopg
 from testcontainers.community.postgres import PostgresContainer
 
 from joinhound.core.models import AccessInfo, Capabilities, CollectionInfo, Cursor, DocRef
-from joinhound.index.documents import sync_documents
+from joinhound.index.documents import read_passages, sync_documents
 from joinhound.index.schema import apply_schema
 from joinhound.llm.none import NoneEmbedder
 from joinhound.parsers import HtmlParser
@@ -90,6 +90,10 @@ def test_changed_document_is_reindexed_and_deleted_document_is_removed() -> None
         assert len(row[1]) == 4
         assert row[2] is not None
         assert row[3] == {"roles": ["legal"]}
+        stored = read_passages(dsn)
+        assert [passage.text for passage in stored] == ["beta report"]
+        assert stored[0].roles == ("legal",)
+        assert stored[0].page == 1
 
 
 def _sync(dsn: str, source: _Docs) -> int:

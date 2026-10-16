@@ -68,6 +68,18 @@ class TextBlock(BaseModel):
     bbox: tuple[float, float, float, float]
 
 
+class IndexedPassage(BaseModel):
+    """One stored fragment the query engine can rank and return."""
+
+    uri: str
+    collection_id: str
+    text: str
+    page: int
+    bbox: tuple[float, float, float, float]
+    roles: tuple[str, ...] = ()
+    embedding: tuple[float, ...] | None = None
+
+
 class DocRef(BaseModel):
     """A document that a document source can read."""
 

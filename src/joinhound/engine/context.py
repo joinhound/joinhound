@@ -8,13 +8,19 @@ import json
 import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal, cast
 
 from joinhound.core.config import EngineConfig
-from joinhound.core.models import Link, LinkDraft, Match, QueryContext, Record
-from joinhound.core.protocols import LinkMatcher, TabularSource
+from joinhound.core.models import IndexedPassage, Link, LinkDraft, Match, QueryContext, Record
+from joinhound.core.protocols import Embedder, LinkMatcher, TabularSource
 from joinhound.core.uri import PgUri, S3Uri, parse_uri
 from joinhound.engine.dictionary import ValueDictionary, build_dictionary
+from joinhound.engine.passages import (
+    lexical_rank,
+    reciprocal_rank_fusion,
+    semantic_rank,
+    visible_passages,
+)
 from joinhound.engine.response import (
     ContextEdge,
     ContextNode,
@@ -25,6 +31,7 @@ from joinhound.engine.response import (
 from joinhound.engine.score import content_tokens, path_score, relevance
 
 _EXACT = frozenset({"declared_fk", "exact"})
+_DOCUMENTS = "column_documents"
 
 
 @dataclass
@@ -47,6 +54,7 @@ class _Node:
     edge: _Edge | None
     edge_scores: tuple[float, ...]
     clipped: bool = False
+    kind: Literal["row", "passage"] = "row"
     children: list[_Node] = field(default_factory=list)
 
 
@@ -62,14 +70,36 @@ def get_context(
     scope: Sequence[str] | None = None,
     dictionary: ValueDictionary | None = None,
     clock: Callable[[], float] | None = None,
+    passages: Sequence[IndexedPassage] = (),
+    roles: Sequence[str] | None = None,
+    embedder: Embedder | None = None,
 ) -> ContextResponse:
-    """Return the highest-scoring rows reachable from values mentioned in the query."""
+    """Return the highest-scoring rows and passages reachable from the query."""
     config = settings or EngineConfig()
     budget = config.budget_tokens if budget_tokens is None else budget_tokens
     depth_limit = config.max_depth if max_depth is None else max_depth
-    approved = [link for link in links if link.status == "approved" and link.dst_column is not None]
-    words = dictionary if dictionary is not None else build_dictionary(source, approved)
-    seeds = _seed_nodes(query, source, words, config.seeds_k, scope, config.depth_decay)
+    tabular = [link for link in links if link.status == "approved" and link.dst_column is not None]
+    documents = [
+        link for link in links if link.status == "approved" and link.match_type == _DOCUMENTS
+    ]
+    dictionary_links = [*tabular, *documents]
+    words = dictionary if dictionary is not None else build_dictionary(source, dictionary_links)
+    readable = [
+        passage
+        for passage in visible_passages(passages, roles)
+        if _in_scope(passage.collection_id, scope)
+    ]
+    seeds = _seed_nodes(
+        query,
+        source,
+        words,
+        config.seeds_k,
+        scope,
+        config.depth_decay,
+        readable,
+        embedder,
+    )
+    approved = [*tabular, *documents]
     return _walk(
         query,
         source,
@@ -82,6 +112,8 @@ def get_context(
         scope=scope,
         scoring_query=query,
         clock=clock,
+        passages=readable,
+        roles=roles,
     )
 
 
@@ -145,6 +177,8 @@ def _walk(
     scope: Sequence[str] | None,
     scoring_query: str,
     clock: Callable[[], float] | None,
+    passages: Sequence[IndexedPassage] = (),
+    roles: Sequence[str] | None = None,
 ) -> ContextResponse:
     now = clock or time.monotonic
     started = now()
@@ -168,6 +202,8 @@ def _walk(
             scope,
             scoring_query,
             config.depth_decay,
+            passages,
+            roles,
         )
         discovered.extend(expanded)
         depth += 1
@@ -203,9 +239,55 @@ def _seed_nodes(
     seeds_k: int,
     scope: Sequence[str] | None,
     decay: float,
+    passages: Sequence[IndexedPassage],
+    embedder: Embedder | None,
 ) -> list[_Node]:
     if seeds_k <= 0:
         return []
+    records = _ranked_records(query, source, dictionary, scope)
+    by_uri = {record.uri: record for record in records}
+    passage_by_uri = {passage.uri: passage for passage in passages}
+    semantic: list[str] = []
+    if embedder is not None and passages:
+        vector = embedder.embed([query])
+        if vector:
+            semantic = semantic_rank(vector[0], passages)
+    fused = reciprocal_rank_fusion(
+        [
+            [record.uri for record in records],
+            lexical_rank(query, passages),
+            semantic,
+        ]
+    )
+    nodes: list[_Node] = []
+    for uri in fused:
+        if uri in by_uri:
+            nodes.append(
+                _make_node(by_uri[uri], query, (), decay, seed=True, parent=None, edge=None)
+            )
+        elif uri in passage_by_uri:
+            nodes.append(
+                _make_passage(
+                    passage_by_uri[uri],
+                    query,
+                    (),
+                    decay,
+                    seed=True,
+                    parent=None,
+                    edge=None,
+                )
+            )
+        if len(nodes) >= seeds_k:
+            break
+    return nodes
+
+
+def _ranked_records(
+    query: str,
+    source: TabularSource,
+    dictionary: ValueDictionary,
+    scope: Sequence[str] | None,
+) -> list[Record]:
     grouped: dict[tuple[str, str], list[str]] = {}
     rank: dict[tuple[str, str, str], tuple[int, int]] = {}
     for mention in dictionary.mentions(query):
@@ -223,7 +305,7 @@ def _seed_nodes(
             column,
             values,
             "exact",
-            limit=seeds_k * len(values),
+            limit=max(len(values), 1) * 50,
         )
         records = {
             _pk_key(record.pk): record
@@ -237,16 +319,14 @@ def _seed_nodes(
             length, start = place
             ranked.append(((-length, start, record.uri), record))
     ranked.sort(key=lambda item: item[0])
-    nodes: list[_Node] = []
+    chosen: list[Record] = []
     seen: set[str] = set()
     for _key, record in ranked:
         if record.uri in seen:
             continue
         seen.add(record.uri)
-        nodes.append(_make_node(record, query, (), decay, seed=True, parent=None, edge=None))
-        if len(nodes) >= seeds_k:
-            break
-    return nodes
+        chosen.append(record)
+    return chosen
 
 
 def _expand(
@@ -259,10 +339,29 @@ def _expand(
     scope: Sequence[str] | None,
     query: str,
     decay: float,
+    passages: Sequence[IndexedPassage],
+    roles: Sequence[str] | None,
 ) -> list[_Node]:
     ordered = sorted(beam, key=lambda node: node.uri)
     found: list[_Node] = []
     for link in links:
+        if link.match_type == _DOCUMENTS:
+            found.extend(
+                _follow_documents(
+                    ordered,
+                    link,
+                    matchers,
+                    source,
+                    fanout,
+                    visited,
+                    scope,
+                    query,
+                    decay,
+                    passages,
+                    roles,
+                )
+            )
+            continue
         if link.match_type not in _EXACT or link.dst_column is None:
             continue
         found.extend(
@@ -384,6 +483,167 @@ def _follow(
     return created
 
 
+def _follow_documents(
+    nodes: Sequence[_Node],
+    link: LinkDraft,
+    matchers: Mapping[str, LinkMatcher],
+    source: TabularSource,
+    fanout: int,
+    visited: set[str],
+    scope: Sequence[str] | None,
+    query: str,
+    decay: float,
+    passages: Sequence[IndexedPassage],
+    roles: Sequence[str] | None,
+) -> list[_Node]:
+    matcher = matchers.get(link.match_type)
+    if matcher is None or fanout <= 0:
+        return []
+    return [
+        *_documents_from_rows(
+            nodes, link, matcher, fanout, visited, scope, query, decay, passages, roles
+        ),
+        *_rows_from_passages(nodes, link, matcher, source, fanout, visited, scope, query, decay),
+    ]
+
+
+def _documents_from_rows(
+    nodes: Sequence[_Node],
+    link: LinkDraft,
+    matcher: LinkMatcher,
+    fanout: int,
+    visited: set[str],
+    scope: Sequence[str] | None,
+    query: str,
+    decay: float,
+    passages: Sequence[IndexedPassage],
+    roles: Sequence[str] | None,
+) -> list[_Node]:
+    if not _in_scope(link.dst_collection, scope):
+        return []
+    grouped: dict[str, list[_Node]] = {}
+    for node in nodes:
+        if node.kind != "row" or node.record.collection_id != link.src_collection:
+            continue
+        raw = node.record.values.get(link.src_column)
+        if raw is None:
+            continue
+        grouped.setdefault(str(raw), []).append(node)
+    if not grouped:
+        return []
+    matches = matcher.resolve(
+        _as_link(link),
+        list(grouped),
+        QueryContext(limit=fanout * len(grouped)),
+    )
+    by_value: dict[str, list[Match]] = {}
+    for match in matches:
+        by_value.setdefault(match.value, []).append(match)
+    allowed = {passage.uri: passage for passage in visible_passages(passages, roles)}
+    created: list[_Node] = []
+    for value, parents in grouped.items():
+        chosen = by_value.get(value, [])[:fanout]
+        for match in chosen:
+            uri = match.pk.get("uri")
+            passage = allowed.get(uri) if isinstance(uri, str) else None
+            if passage is None or passage.uri in visited:
+                continue
+            if not _in_scope(passage.collection_id, scope):
+                continue
+            visited.add(passage.uri)
+            parent = parents[0]
+            edge_score = match.score * link.confidence
+            edge = _Edge(link.link_id, link.relation_name or "", link.match_type, edge_score)
+            child = _make_passage(
+                passage,
+                query,
+                parent.edge_scores + (edge_score,),
+                decay,
+                seed=False,
+                parent=parent,
+                edge=edge,
+            )
+            parent.children.append(child)
+            created.append(child)
+    return created
+
+
+def _rows_from_passages(
+    nodes: Sequence[_Node],
+    link: LinkDraft,
+    matcher: LinkMatcher,
+    source: TabularSource,
+    fanout: int,
+    visited: set[str],
+    scope: Sequence[str] | None,
+    query: str,
+    decay: float,
+) -> list[_Node]:
+    mentions = getattr(matcher, "mentions", None)
+    if not callable(mentions) or not _in_scope(link.src_collection, scope):
+        return []
+    created: list[_Node] = []
+    for node in nodes:
+        if node.kind != "passage" or node.record.collection_id != link.dst_collection:
+            continue
+        text = node.record.values.get("text")
+        if not isinstance(text, str) or not text:
+            continue
+        matches = cast(
+            list[Match],
+            mentions(_as_link(link), text, QueryContext(limit=fanout)),
+        )
+        records = {
+            _pk_key(record.pk): record
+            for record in source.fetch_by_keys(
+                link.src_collection,
+                [dict(match.pk) for match in matches],
+            )
+        }
+        for match in matches[:fanout]:
+            record = records.get(_pk_key(match.pk))
+            if record is None or record.uri in visited:
+                continue
+            if not _in_scope(record.collection_id, scope):
+                continue
+            visited.add(record.uri)
+            edge_score = match.score * link.confidence
+            edge = _Edge(link.link_id, link.relation_name or "", link.match_type, edge_score)
+            child = _make_node(
+                record,
+                query,
+                node.edge_scores + (edge_score,),
+                decay,
+                seed=False,
+                parent=node,
+                edge=edge,
+            )
+            node.children.append(child)
+            created.append(child)
+    return created
+
+
+def _make_passage(
+    passage: IndexedPassage,
+    query: str,
+    edge_scores: tuple[float, ...],
+    decay: float,
+    *,
+    seed: bool,
+    parent: _Node | None,
+    edge: _Edge | None,
+) -> _Node:
+    record = Record(
+        uri=passage.uri,
+        collection_id=passage.collection_id,
+        pk={"uri": passage.uri},
+        values={"text": passage.text, "page": passage.page, "bbox": list(passage.bbox)},
+    )
+    node = _make_node(record, query, edge_scores, decay, seed=seed, parent=parent, edge=edge)
+    node.kind = "passage"
+    return node
+
+
 def _make_node(
     record: Record,
     query: str,
@@ -440,7 +700,7 @@ def _assemble(
         ContextNode(
             id=id_by_uri[node.uri],
             uri=node.uri,
-            kind="row",
+            kind=node.kind,
             collection=node.record.collection_id,
             content=node.content,
             score=node.score,
