@@ -42,6 +42,9 @@ TRANSITIVE_EXCEPTIONS = {
     ("numpy", "bsd-3-clause and 0bsd and mit and zlib and cc0-1.0"),
     ("pathspec", "mozilla public license 2.0 (mpl 2.0)"),
     ("pypdfium2", "bsd-3-clause, apache-2.0, dependency licenses"),
+    # openai SDK. sniffio is Apache or MIT. tqdm is MPL-2.0 and MIT.
+    ("sniffio", "apache software license; mit license"),
+    ("tqdm", "mpl-2.0 and mit"),
 }
 
 

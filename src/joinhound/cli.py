@@ -16,7 +16,7 @@ from joinhound.connectors.postgres import PostgresSource
 from joinhound.connectors.s3 import S3Source
 from joinhound.core.config import AppConfig, PostgresSourceConfig, S3SourceConfig, load_config
 from joinhound.core.models import LinkDraft, TextBlock
-from joinhound.core.protocols import DocumentParser, Embedder, LinkMatcher, TabularSource
+from joinhound.core.protocols import DocumentParser, Embedder, Judge, LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.evaluate import precision_recall
 from joinhound.engine.questions import load_questions, score_questions
@@ -224,7 +224,10 @@ def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
         source = PostgresSource(name, source_config)
         with source:
             profiles, drafts = propose_links(
-                source, settings.profiler, _matchers(source, settings.kg_database)
+                source,
+                settings.profiler,
+                _matchers(source, settings.kg_database),
+                _judge(settings),
             )
         save_column_profiles(settings.kg_database, name, profiles)
         save_links(settings.kg_database, drafts, approve_at)
@@ -289,6 +292,25 @@ def _embedder(settings: AppConfig) -> Embedder:
     if not callable(factory):
         raise typer.BadParameter(f"Unknown embeddings provider: {settings.embeddings.provider}")
     return cast(Embedder, factory(dim=settings.embeddings.dim))
+
+
+def _judge(settings: AppConfig) -> Judge:
+    factory = load_plugins("joinhound.judges").get(settings.judge.provider)
+    if not callable(factory):
+        raise typer.BadParameter(f"Unknown judge provider: {settings.judge.provider}")
+    if settings.judge.provider == "none":
+        return cast(Judge, factory())
+    return cast(
+        Judge,
+        factory(
+            base_url=settings.judge.base_url,
+            api_key=settings.judge.api_key,
+            model=settings.judge.model,
+            redact=settings.judge.redact,
+            sensitive_columns=settings.judge.sensitive_columns,
+            dsn=settings.kg_database,
+        ),
+    )
 
 
 def _matchers(source: TabularSource, index_dsn: str | None = None) -> Mapping[str, LinkMatcher]:
