@@ -28,6 +28,8 @@ dependencies = [
     "pyahocorasick==2.2.0",
     "pydantic==2.14.1",
     "pydantic-settings==2.16.0",
+    "pypdfium2==5.14.0",
+    "pytesseract==0.3.13",
     "pyyaml==6.0.3",
     "tiktoken==0.12.0",
     "typer==0.27.3",
@@ -45,6 +47,14 @@ jh = "joinhound.cli:app"
 
 [project.entry-points."joinhound.judges"]
 none = "joinhound.llm.none:NoneJudge"
+
+[project.entry-points."joinhound.ocr"]
+tesseract = "joinhound.ocr:TesseractOcrEngine"
+
+[project.entry-points."joinhound.parsers"]
+docx = "joinhound.parsers:DocxParser"
+html = "joinhound.parsers:HtmlParser"
+pdf = "joinhound.parsers:PdfParser"
 
 [project.entry-points."joinhound.connectors"]
 postgres = "joinhound.connectors.postgres:PostgresSource"
@@ -105,6 +115,8 @@ forbidden_modules = [
     "joinhound.index",
     "joinhound.llm",
     "joinhound.matchers",
+    "joinhound.ocr",
+    "joinhound.parsers",
     "joinhound.profiler",
     "joinhound.server",
 ]
@@ -132,6 +144,25 @@ forbidden_modules = [
     "joinhound.formats",
     "joinhound.llm",
     "joinhound.matchers",
+    "joinhound.server",
+]
+
+[[tool.importlinter.contracts]]
+name = "Parsers and OCR depend only on core"
+type = "forbidden"
+source_modules = [
+    "joinhound.ocr",
+    "joinhound.parsers",
+]
+forbidden_modules = [
+    "joinhound.cli",
+    "joinhound.connectors",
+    "joinhound.engine",
+    "joinhound.formats",
+    "joinhound.index",
+    "joinhound.llm",
+    "joinhound.matchers",
+    "joinhound.profiler",
     "joinhound.server",
 ]
 
