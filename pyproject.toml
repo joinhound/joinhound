@@ -22,6 +22,7 @@ dependencies = [
     "datasketch==2.0.0",
     "jsonschema==4.26.0",
     "mcp==2.3.0",
+    "obstore==0.12.0",
     "psycopg-pool==3.3.0",
     "psycopg[binary]==3.3.6",
     "pyahocorasick==2.2.0",
@@ -47,6 +48,7 @@ none = "joinhound.llm.none:NoneJudge"
 
 [project.entry-points."joinhound.connectors"]
 postgres = "joinhound.connectors.postgres:PostgresSource"
+s3 = "joinhound.connectors.s3:S3Source"
 
 [project.entry-points."joinhound.matchers"]
 declared_fk = "joinhound.matchers:DeclaredFkMatcher"

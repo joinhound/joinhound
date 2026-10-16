@@ -65,6 +65,7 @@ class DocRef(BaseModel):
 
     uri: str
     etag: str | None = None
+    deleted: bool = False
 
 
 class AccessInfo(BaseModel):
