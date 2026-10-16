@@ -20,6 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "datasketch==2.0.0",
+    "jsonschema==4.26.0",
     "psycopg-pool==3.3.0",
     "psycopg[binary]==3.3.6",
     "pydantic==2.14.1",
@@ -44,9 +45,17 @@ none = "joinhound.llm.none:NoneJudge"
 [project.entry-points."joinhound.connectors"]
 postgres = "joinhound.connectors.postgres:PostgresSource"
 
+[project.entry-points."joinhound.matchers"]
+declared_fk = "joinhound.matchers:DeclaredFkMatcher"
+exact = "joinhound.matchers:ExactMatcher"
+
+[project.entry-points."joinhound.model_formats"]
+ossie = "joinhound.formats:OssieFormat"
+
 [tool.hatch.build.targets.wheel.force-include]
 "migrations/0001.kg.sql" = "joinhound/migrations/0001.kg.sql"
 "migrations/0001.kg.rollback.sql" = "joinhound/migrations/0001.kg.rollback.sql"
+"src/joinhound/formats/ossie-schema.json" = "joinhound/formats/ossie-schema.json"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

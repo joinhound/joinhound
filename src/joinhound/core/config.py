@@ -72,6 +72,14 @@ class ProfilerConfig(BaseModel):
 
     sample_values: int = 10000
     containment_threshold: float = 0.5
+    min_distinct: int = 20
+    year_min: int = 1900
+    year_max: int = 2100
+    year_share: float = 0.5
+    long_text_length: int = 200
+    integer_uniqueness: float = 0.99
+    integer_containment: float = 0.95
+    integer_min_distinct: int = 1000
     auto_approve: float | None = None
 
 

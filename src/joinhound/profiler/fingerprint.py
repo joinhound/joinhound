@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from collections import Counter
 
+import numpy as np
 import psycopg
 from datasketch import MinHash
 
@@ -18,7 +19,15 @@ _MINHASH_SEED = 1
 
 def profile_columns(source: TabularSource, sample_size: int = 10000) -> list[ColumnProfile]:
     """Fingerprint every column that can be sampled within the source timeout."""
-    profiles: list[ColumnProfile] = []
+    return [profile for profile, _values in sampled_profiles(source, sample_size)]
+
+
+def sampled_profiles(
+    source: TabularSource,
+    sample_size: int = 10000,
+) -> list[tuple[ColumnProfile, tuple[str, ...]]]:
+    """Fingerprint columns and keep the non-null sample used to build each one."""
+    profiles: list[tuple[ColumnProfile, tuple[str, ...]]] = []
     for collection in source.list_collections():
         try:
             stats = source.column_stats(collection.collection_id)
@@ -51,17 +60,31 @@ def value_pattern(value: str) -> str:
 
 def minhash_bytes(values: list[str]) -> bytes:
     """Return the 128-permutation MinHash of the normalized values."""
+    return _sketch(values).hashvalues.astype("<u4").tobytes()
+
+
+def sketch_from_bytes(payload: bytes) -> MinHash:
+    """Restore a MinHash written by minhash_bytes."""
+    restored = np.frombuffer(payload, dtype="<u4").copy()
+    if restored.size != _MINHASH_PERMUTATIONS:
+        raise ValueError("MinHash must contain 128 permutations")
+    sketch = MinHash(num_perm=_MINHASH_PERMUTATIONS, seed=_MINHASH_SEED)
+    sketch.hashvalues = restored
+    return sketch
+
+
+def _sketch(values: list[str]) -> MinHash:
     sketch = MinHash(num_perm=_MINHASH_PERMUTATIONS, seed=_MINHASH_SEED)
     for value in values:
         sketch.update(_normalize(value).encode())
-    return sketch.hashvalues.astype("<u4").tobytes()
+    return sketch
 
 
 def _profile(
     collection_id: str,
     stat: ColumnStats,
     values: list[object | None],
-) -> ColumnProfile:
+) -> tuple[ColumnProfile, tuple[str, ...]]:
     present = [str(value) for value in values if value is not None]
     distinct = set(present)
     null_count = len(values) - len(present)
@@ -70,7 +93,7 @@ def _profile(
     if null_ratio is None and values:
         null_ratio = null_count / len(values)
     n_distinct = stat.n_distinct if stat.n_distinct is not None else float(len(distinct))
-    return ColumnProfile(
+    profile = ColumnProfile(
         collection_id=collection_id,
         column_name=stat.column_name,
         type_class=stat.type_class,
@@ -80,6 +103,7 @@ def _profile(
         pattern=_dominant_pattern(present),
         minhash=minhash_bytes(present),
     )
+    return profile, tuple(present)
 
 
 def _dominant_pattern(values: list[str]) -> str | None:
