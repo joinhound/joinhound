@@ -183,7 +183,7 @@ def _discover(
     dst: ColumnProfile,
     context: ProfileContext,
 ) -> Candidate | None:
-    for name in ("exact", "normalized", "fuzzy"):
+    for name in ("exact", "normalized", "fuzzy", "semantic"):
         matcher = matchers.get(name)
         if matcher is None:
             continue

@@ -56,6 +56,8 @@ class EmbeddingsConfig(BaseModel):
     provider: str
     model: str
     dim: int
+    base_url: str | None = None
+    api_key: str | None = None
 
 
 class JudgeConfig(BaseModel):

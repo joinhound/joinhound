@@ -7,6 +7,7 @@ from joinhound.matchers.documents import DocumentMatcher
 from joinhound.matchers.exact import ExactMatcher
 from joinhound.matchers.fuzzy import FuzzyMatcher
 from joinhound.matchers.normalized import NormalizedMatcher
+from joinhound.matchers.semantic import SemanticMatcher
 
 __all__ = [
     "DeclaredFkMatcher",
@@ -14,4 +15,5 @@ __all__ = [
     "ExactMatcher",
     "FuzzyMatcher",
     "NormalizedMatcher",
+    "SemanticMatcher",
 ]
