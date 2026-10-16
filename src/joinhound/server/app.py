@@ -14,6 +14,7 @@ from joinhound.core.models import IndexedPassage, LinkDraft
 from joinhound.core.protocols import Embedder, LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.context import expand, get_context, read_record
+from joinhound.engine.lookup import Deployment
 from joinhound.engine.response import ContextResponse, RecordResult
 from joinhound.engine.score import text_tokens, truncate_text
 from joinhound.index.documents import read_passages
@@ -86,6 +87,7 @@ def create_server(
                     max_depth=max_depth,
                     scope=scope,
                     passages=passages,
+                    deployment=_deployment(runtime),
                 )
                 for name, source in sources
             ]
@@ -115,6 +117,7 @@ def create_server(
                         depth=depth,
                         budget_tokens=budget_tokens,
                         link_ids=links,
+                        deployment=_deployment(runtime),
                     )
                 )
         return _merge(" ".join(node_uris), parts)
@@ -145,6 +148,12 @@ def _stored_passages(runtime: Runtime) -> list[IndexedPassage]:
     if runtime.settings is None:
         return []
     return read_passages(runtime.settings.kg_database)
+
+
+def _deployment(runtime: Runtime) -> Deployment:
+    if runtime.settings is None:
+        return "sidecar"
+    return runtime.settings.mode
 
 
 def _index_dsn(runtime: Runtime) -> str | None:
