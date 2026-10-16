@@ -1,0 +1,461 @@
+# SPDX-License-Identifier: Apache-2.0
+
+"""Find seed rows and walk approved links within a token budget."""
+
+from __future__ import annotations
+
+import json
+import time
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass, field
+from typing import Any
+
+from joinhound.core.config import EngineConfig
+from joinhound.core.models import Link, LinkDraft, Match, QueryContext, Record
+from joinhound.core.protocols import LinkMatcher, TabularSource
+from joinhound.engine.dictionary import ValueDictionary, build_dictionary
+from joinhound.engine.response import ContextEdge, ContextNode, ContextResponse, ContextStats
+from joinhound.engine.score import content_tokens, path_score, relevance
+
+_EXACT = frozenset({"declared_fk", "exact"})
+
+
+@dataclass
+class _Edge:
+    link_id: str
+    relation: str
+    match_type: str
+    score: float
+
+
+@dataclass
+class _Node:
+    uri: str
+    record: Record
+    content: dict[str, Any]
+    score: float
+    seed: bool
+    depth: int
+    parent: _Node | None
+    edge: _Edge | None
+    edge_scores: tuple[float, ...]
+    clipped: bool = False
+    children: list[_Node] = field(default_factory=list)
+
+
+def get_context(
+    query: str,
+    source: TabularSource,
+    links: Sequence[LinkDraft],
+    matchers: Mapping[str, LinkMatcher],
+    settings: EngineConfig | None = None,
+    *,
+    budget_tokens: int | None = None,
+    max_depth: int | None = None,
+    scope: Sequence[str] | None = None,
+    dictionary: ValueDictionary | None = None,
+    clock: Callable[[], float] | None = None,
+) -> ContextResponse:
+    """Return the highest-scoring rows reachable from values mentioned in the query."""
+    config = settings or EngineConfig()
+    budget = config.budget_tokens if budget_tokens is None else budget_tokens
+    depth_limit = config.max_depth if max_depth is None else max_depth
+    now = clock or time.monotonic
+    started = now()
+    deadline = started + config.timeout_ms / 1000
+    approved = [link for link in links if link.status == "approved" and link.dst_column is not None]
+    words = dictionary if dictionary is not None else build_dictionary(source, approved)
+    decay = config.depth_decay
+    seeds = _seed_nodes(query, source, words, config.seeds_k, scope, decay)
+    visited = {node.uri for node in seeds}
+    discovered = list(seeds)
+    beam = _frontier(seeds, config.beam_width)
+    depth = 0
+    timed_out = False
+    while depth < depth_limit and beam and config.fanout > 0:
+        if now() >= deadline:
+            timed_out = True
+            break
+        expanded = _expand(
+            beam,
+            approved,
+            matchers,
+            source,
+            config.fanout,
+            visited,
+            scope,
+            query,
+            decay,
+        )
+        discovered.extend(expanded)
+        depth += 1
+        beam = _frontier(expanded, config.beam_width)
+    if timed_out or depth >= depth_limit:
+        for node in beam:
+            node.clipped = True
+    chosen, used, truncated = _fit(discovered, budget)
+    if timed_out:
+        truncated = True
+    nodes, edges, paths, expandable = _assemble(chosen)
+    return ContextResponse(
+        query=query,
+        nodes=nodes,
+        edges=edges,
+        paths=paths,
+        truncated=truncated,
+        expandable=expandable,
+        stats=ContextStats(
+            seeds=len(seeds),
+            visited=len(discovered),
+            returned=len(nodes),
+            tokens=used,
+            ms=int((now() - started) * 1000),
+        ),
+    )
+
+
+def _seed_nodes(
+    query: str,
+    source: TabularSource,
+    dictionary: ValueDictionary,
+    seeds_k: int,
+    scope: Sequence[str] | None,
+    decay: float,
+) -> list[_Node]:
+    if seeds_k <= 0:
+        return []
+    grouped: dict[tuple[str, str], list[str]] = {}
+    rank: dict[tuple[str, str, str], tuple[int, int]] = {}
+    for mention in dictionary.mentions(query):
+        if not _in_scope(mention.collection_id, scope):
+            continue
+        key = (mention.collection_id, mention.column)
+        values = grouped.setdefault(key, [])
+        if mention.value not in values:
+            values.append(mention.value)
+        rank.setdefault(key + (mention.value,), (len(mention.value), mention.start))
+    ranked: list[tuple[tuple[int, int, str], Record]] = []
+    for (collection_id, column), values in grouped.items():
+        matches = source.find_values(
+            collection_id,
+            column,
+            values,
+            "exact",
+            limit=seeds_k * len(values),
+        )
+        records = {
+            _pk_key(record.pk): record
+            for record in source.fetch_by_keys(collection_id, [dict(match.pk) for match in matches])
+        }
+        for match in matches:
+            record = records.get(_pk_key(match.pk))
+            place = rank.get((collection_id, column, match.value))
+            if record is None or place is None:
+                continue
+            length, start = place
+            ranked.append(((-length, start, record.uri), record))
+    ranked.sort(key=lambda item: item[0])
+    nodes: list[_Node] = []
+    seen: set[str] = set()
+    for _key, record in ranked:
+        if record.uri in seen:
+            continue
+        seen.add(record.uri)
+        nodes.append(_make_node(record, query, (), decay, seed=True, parent=None, edge=None))
+        if len(nodes) >= seeds_k:
+            break
+    return nodes
+
+
+def _expand(
+    beam: Sequence[_Node],
+    links: Sequence[LinkDraft],
+    matchers: Mapping[str, LinkMatcher],
+    source: TabularSource,
+    fanout: int,
+    visited: set[str],
+    scope: Sequence[str] | None,
+    query: str,
+    decay: float,
+) -> list[_Node]:
+    ordered = sorted(beam, key=lambda node: node.uri)
+    found: list[_Node] = []
+    for link in links:
+        if link.match_type not in _EXACT or link.dst_column is None:
+            continue
+        found.extend(
+            _follow(
+                ordered,
+                link,
+                matchers,
+                source,
+                fanout,
+                visited,
+                scope,
+                query,
+                decay,
+                forward=True,
+            )
+        )
+        found.extend(
+            _follow(
+                ordered,
+                link,
+                matchers,
+                source,
+                fanout,
+                visited,
+                scope,
+                query,
+                decay,
+                forward=False,
+            )
+        )
+    return found
+
+
+def _follow(
+    nodes: Sequence[_Node],
+    link: LinkDraft,
+    matchers: Mapping[str, LinkMatcher],
+    source: TabularSource,
+    fanout: int,
+    visited: set[str],
+    scope: Sequence[str] | None,
+    query: str,
+    decay: float,
+    *,
+    forward: bool,
+) -> list[_Node]:
+    if link.dst_column is None:
+        return []
+    origin = link.src_collection if forward else link.dst_collection
+    destination = link.dst_collection if forward else link.src_collection
+    column = link.src_column if forward else link.dst_column
+    if not _in_scope(destination, scope):
+        return []
+    grouped: dict[str, list[_Node]] = {}
+    for node in nodes:
+        if node.record.collection_id != origin:
+            continue
+        raw = node.record.values.get(column)
+        if raw is None:
+            continue
+        grouped.setdefault(str(raw), []).append(node)
+    if not grouped:
+        return []
+    if forward:
+        matcher = matchers.get(link.match_type)
+        if matcher is None:
+            return []
+        matches = matcher.resolve(
+            _as_link(link),
+            list(grouped),
+            QueryContext(limit=fanout * len(grouped)),
+        )
+    else:
+        matches = [
+            Match(pk=dict(match.pk), value=match.value, score=1.0)
+            for match in source.find_values(
+                destination,
+                link.src_column,
+                list(grouped),
+                "exact",
+                limit=fanout * len(grouped),
+            )
+        ]
+    by_value: dict[str, list[Match]] = {}
+    for match in matches:
+        by_value.setdefault(match.value, []).append(match)
+    created: list[_Node] = []
+    for value, parents in grouped.items():
+        ranked = sorted(by_value.get(value, []), key=lambda match: _pk_key(match.pk))
+        if len(ranked) > fanout:
+            for parent in parents:
+                parent.clipped = True
+        chosen = ranked[:fanout]
+        records = {
+            _pk_key(record.pk): record
+            for record in source.fetch_by_keys(destination, [dict(match.pk) for match in chosen])
+        }
+        for match in chosen:
+            record = records.get(_pk_key(match.pk))
+            if record is None or record.uri in visited:
+                continue
+            if not _in_scope(record.collection_id, scope):
+                continue
+            visited.add(record.uri)
+            edge_score = match.score * link.confidence
+            parent = parents[0]
+            edge = _Edge(link.link_id, link.relation_name or "", link.match_type, edge_score)
+            child = _make_node(
+                record,
+                query,
+                parent.edge_scores + (edge_score,),
+                decay,
+                seed=False,
+                parent=parent,
+                edge=edge,
+            )
+            parent.children.append(child)
+            created.append(child)
+    return created
+
+
+def _make_node(
+    record: Record,
+    query: str,
+    edge_scores: tuple[float, ...],
+    decay: float,
+    *,
+    seed: bool,
+    parent: _Node | None,
+    edge: _Edge | None,
+) -> _Node:
+    content = _content(record)
+    return _Node(
+        uri=record.uri,
+        record=record,
+        content=content,
+        score=path_score(relevance(query, _text(content)), edge_scores, decay),
+        seed=seed,
+        depth=0 if parent is None else parent.depth + 1,
+        parent=parent,
+        edge=edge,
+        edge_scores=edge_scores,
+    )
+
+
+def _frontier(nodes: Sequence[_Node], width: int) -> list[_Node]:
+    ordered = sorted(nodes, key=lambda node: (-node.score, node.uri))
+    chosen = ordered[: max(width, 0)]
+    kept = {node.uri for node in chosen}
+    for node in nodes:
+        if node.uri not in kept:
+            node.clipped = True
+    return chosen
+
+
+def _fit(nodes: Sequence[_Node], budget: int) -> tuple[list[_Node], int, bool]:
+    ordered = sorted(nodes, key=lambda node: (-node.score, node.uri))
+    chosen: list[_Node] = []
+    used = 0
+    for node in ordered:
+        cost = content_tokens(node.content)
+        if used + cost > budget:
+            return chosen, used, True
+        chosen.append(node)
+        used += cost
+    return chosen, used, False
+
+
+def _assemble(
+    chosen: Sequence[_Node],
+) -> tuple[list[ContextNode], list[ContextEdge], list[list[str]], list[str]]:
+    ordered = sorted(chosen, key=lambda node: (-node.score, node.uri))
+    id_by_uri = {node.uri: f"n{index + 1}" for index, node in enumerate(ordered)}
+    nodes = [
+        ContextNode(
+            id=id_by_uri[node.uri],
+            uri=node.uri,
+            kind="row",
+            collection=node.record.collection_id,
+            content=node.content,
+            score=node.score,
+            seed=node.seed,
+        )
+        for node in ordered
+    ]
+    edges: list[ContextEdge] = []
+    paths: list[list[str]] = []
+    expandable: list[str] = []
+    for node in ordered:
+        node_id = id_by_uri[node.uri]
+        omitted = any(child.uri not in id_by_uri for child in node.children)
+        if node.clipped or omitted:
+            expandable.append(node_id)
+        if node.parent is None or node.edge is None or node.parent.uri not in id_by_uri:
+            continue
+        edges.append(
+            ContextEdge(
+                from_=id_by_uri[node.parent.uri],
+                to=node_id,
+                link_id=node.edge.link_id,
+                relation=node.edge.relation,
+                match_type=node.edge.match_type,
+                score=node.edge.score,
+            )
+        )
+        path = _path(node, id_by_uri)
+        if path is not None:
+            paths.append(path)
+    edges.sort(key=lambda edge: (edge.from_, edge.to, edge.link_id))
+    paths.sort()
+    return nodes, edges, paths, expandable
+
+
+def _path(node: _Node, id_by_uri: Mapping[str, str]) -> list[str] | None:
+    chain: list[str] = []
+    current: _Node | None = node
+    while current is not None:
+        node_id = id_by_uri.get(current.uri)
+        if node_id is None:
+            return None
+        chain.append(node_id)
+        current = current.parent
+    if len(chain) < 2:
+        return None
+    chain.reverse()
+    return chain
+
+
+def _content(record: Record) -> dict[str, Any]:
+    content: dict[str, Any] = {}
+    for key in sorted(record.values):
+        value = record.values[key]
+        if value is None:
+            continue
+        content[key] = _json_value(value)
+    return content
+
+
+def _json_value(value: object) -> Any:
+    if isinstance(value, str | int | float | bool) or value is None:
+        return value
+    if isinstance(value, list):
+        return [_json_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(key): _json_value(item) for key, item in value.items()}
+    return str(value)
+
+
+def _text(content: Mapping[str, Any]) -> str:
+    parts: list[str] = []
+    for key in sorted(content):
+        value = content[key]
+        if isinstance(value, str):
+            parts.append(value)
+        elif isinstance(value, int | float) and not isinstance(value, bool):
+            parts.append(str(value))
+    return " ".join(parts)
+
+
+def _as_link(draft: LinkDraft) -> Link:
+    return Link(
+        link_id=draft.link_id,
+        match_type=draft.match_type,
+        src_collection=draft.src_collection,
+        src_column=draft.src_column,
+        dst_collection=draft.dst_collection,
+        dst_column=draft.dst_column,
+    )
+
+
+def _in_scope(collection_id: str, scope: Sequence[str] | None) -> bool:
+    if not scope:
+        return True
+    return any(collection_id.startswith(prefix) for prefix in scope)
+
+
+def _pk_key(pk: Mapping[str, object]) -> str:
+    return json.dumps(dict(pk), sort_keys=True, separators=(",", ":"), default=str)
