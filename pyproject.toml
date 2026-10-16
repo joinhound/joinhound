@@ -45,6 +45,9 @@ Issues = "https://github.com/joinhound/joinhound/issues"
 joinhound = "joinhound.cli:app"
 jh = "joinhound.cli:app"
 
+[project.entry-points."joinhound.embedders"]
+none = "joinhound.llm.none:NoneEmbedder"
+
 [project.entry-points."joinhound.judges"]
 none = "joinhound.llm.none:NoneJudge"
 
@@ -144,6 +147,8 @@ forbidden_modules = [
     "joinhound.formats",
     "joinhound.llm",
     "joinhound.matchers",
+    "joinhound.ocr",
+    "joinhound.parsers",
     "joinhound.server",
 ]
 
@@ -176,6 +181,8 @@ forbidden_modules = [
     "joinhound.formats",
     "joinhound.llm",
     "joinhound.matchers",
+    "joinhound.ocr",
+    "joinhound.parsers",
     "joinhound.profiler",
     "joinhound.server",
 ]
