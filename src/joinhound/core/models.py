@@ -171,6 +171,7 @@ class Link(BaseModel):
     src_column: str
     dst_collection: str
     dst_column: str | None = None
+    normalize_sql: str | None = None
 
 
 class JudgeVerdict(BaseModel):

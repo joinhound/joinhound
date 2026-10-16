@@ -62,7 +62,7 @@ def create_server(runtime: Runtime) -> MCPServer:
                     query,
                     source,
                     _links_for(name, source, links),
-                    _matchers(source, passages),
+                    _matchers(source, passages, _index_dsn(runtime)),
                     runtime.engine,
                     budget_tokens=budget_tokens,
                     max_depth=max_depth,
@@ -92,7 +92,7 @@ def create_server(runtime: Runtime) -> MCPServer:
                         owned,
                         source,
                         _links_for(name, source, stored),
-                        _matchers(source, passages),
+                        _matchers(source, passages, _index_dsn(runtime)),
                         runtime.engine,
                         depth=depth,
                         budget_tokens=budget_tokens,
@@ -129,12 +129,25 @@ def _stored_passages(runtime: Runtime) -> list[IndexedPassage]:
     return read_passages(runtime.settings.kg_database)
 
 
-def _matchers(source: TabularSource, passages: Sequence[IndexedPassage]) -> dict[str, LinkMatcher]:
+def _index_dsn(runtime: Runtime) -> str | None:
+    if runtime.settings is None:
+        return None
+    return runtime.settings.kg_database
+
+
+def _matchers(
+    source: TabularSource,
+    passages: Sequence[IndexedPassage],
+    index_dsn: str | None,
+) -> dict[str, LinkMatcher]:
     plugins = load_plugins("joinhound.matchers")
     matchers: dict[str, LinkMatcher] = {}
-    for name in ("declared_fk", "exact", "column_documents"):
+    for name in ("declared_fk", "exact", "normalized", "fuzzy", "column_documents"):
         factory = plugins.get(name)
         if not callable(factory):
+            continue
+        if name == "fuzzy":
+            matchers[name] = cast(LinkMatcher, factory(source, index_dsn))
             continue
         if name == "column_documents":
             converted = [

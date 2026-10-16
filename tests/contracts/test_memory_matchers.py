@@ -3,7 +3,13 @@
 """The packaged matcher contract, exercised by the built-in equality matchers."""
 
 from joinhound.core.models import CollectionProfile, ColumnProfile, DeclaredFK, Link
-from joinhound.matchers import DeclaredFkMatcher, DocumentMatcher, ExactMatcher
+from joinhound.matchers import (
+    DeclaredFkMatcher,
+    DocumentMatcher,
+    ExactMatcher,
+    FuzzyMatcher,
+    NormalizedMatcher,
+)
 from joinhound.matchers.documents import Passage
 from joinhound.testing.contracts import check_link_matcher
 from joinhound.testing.memory import MemoryTabularSource
@@ -77,6 +83,75 @@ def test_exact_contract() -> None:
         values=["a@example.com", "b@example.com"],
         missing_value="missing@example.com",
         expected_value="a@example.com",
+        expected_pk={"id": 1},
+    )
+
+
+def test_normalized_contract() -> None:
+    source = MemoryTabularSource(
+        {
+            "orders": [
+                {"id": 1, "email": "Ada@Example.com"},
+                {"id": 2, "email": "Bob@Example.com"},
+            ],
+            "customers": [
+                {"id": 1, "email": "ada@example.com"},
+                {"id": 2, "email": "bob@example.com"},
+            ],
+            "products": [{"id": 9, "sku": "SKU-9"}],
+        }
+    )
+    check_link_matcher(
+        NormalizedMatcher(source),
+        src=_column("orders", "email"),
+        dst=_column("customers", "email"),
+        unrelated=_column("products", "sku"),
+        link=Link(
+            link_id="orders.email",
+            match_type="normalized",
+            src_collection="orders",
+            src_column="email",
+            dst_collection="customers",
+            dst_column="email",
+            normalize_sql="fold",
+        ),
+        values=["Ada@Example.com", "Bob@Example.com"],
+        missing_value="missing@example.com",
+        expected_value="Ada@Example.com",
+        expected_pk={"id": 1},
+    )
+
+
+def test_fuzzy_contract() -> None:
+    source = MemoryTabularSource(
+        {
+            "orders": [
+                {"id": 1, "name": "Ada Lovelace"},
+                {"id": 2, "name": "Grace Hopper"},
+            ],
+            "customers": [
+                {"id": 1, "name": "Ada Lovlace"},
+                {"id": 2, "name": "Grace Hoppr"},
+            ],
+            "products": [{"id": 9, "sku": "SKU-9"}],
+        }
+    )
+    check_link_matcher(
+        FuzzyMatcher(source),
+        src=_column("orders", "name"),
+        dst=_column("customers", "name"),
+        unrelated=_column("products", "sku"),
+        link=Link(
+            link_id="orders.name",
+            match_type="fuzzy",
+            src_collection="orders",
+            src_column="name",
+            dst_collection="customers",
+            dst_column="name",
+        ),
+        values=["Ada Lovelace", "Grace Hopper"],
+        missing_value="zzzzzzzzzz",
+        expected_value="Ada Lovelace",
         expected_pk={"id": 1},
     )
 

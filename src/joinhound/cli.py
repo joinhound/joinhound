@@ -223,7 +223,9 @@ def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
             continue
         source = PostgresSource(name, source_config)
         with source:
-            profiles, drafts = propose_links(source, settings.profiler, _matchers(source))
+            profiles, drafts = propose_links(
+            source, settings.profiler, _matchers(source, settings.kg_database)
+        )
         save_column_profiles(settings.kg_database, name, profiles)
         save_links(settings.kg_database, drafts, approve_at)
         written += len(drafts)
@@ -289,13 +291,16 @@ def _embedder(settings: AppConfig) -> Embedder:
     return cast(Embedder, factory(dim=settings.embeddings.dim))
 
 
-def _matchers(source: TabularSource) -> Mapping[str, LinkMatcher]:
+def _matchers(source: TabularSource, index_dsn: str | None = None) -> Mapping[str, LinkMatcher]:
     plugins = load_plugins("joinhound.matchers")
     matchers: dict[str, LinkMatcher] = {}
-    for name in ("declared_fk", "exact"):
+    for name in ("declared_fk", "exact", "normalized", "fuzzy"):
         factory = plugins[name]
         if not callable(factory):
             raise TypeError(f"Matcher {name} is not callable")
+        if name == "fuzzy":
+            matchers[name] = cast(LinkMatcher, factory(source, index_dsn))
+            continue
         matchers[name] = cast(LinkMatcher, factory(source))
     return matchers
 
@@ -311,7 +316,7 @@ def _print_question_scores(settings: AppConfig, path: str) -> None:
                 questions,
                 source,
                 _declared_drafts(source),
-                _matchers(source),
+                _matchers(source, settings.kg_database),
                 settings.engine,
             )
         typer.echo(f"context_precision {report.precision:.3f}")

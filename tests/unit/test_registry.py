@@ -6,7 +6,7 @@ from joinhound.connectors.postgres import PostgresSource
 from joinhound.core.registry import load_plugins
 from joinhound.formats import OssieFormat
 from joinhound.llm.none import NoneJudge
-from joinhound.matchers import DeclaredFkMatcher, ExactMatcher
+from joinhound.matchers import DeclaredFkMatcher, ExactMatcher, FuzzyMatcher, NormalizedMatcher
 
 
 def test_registry_finds_builtin_judge() -> None:
@@ -26,6 +26,8 @@ def test_registry_finds_matchers() -> None:
 
     assert plugins["declared_fk"] is DeclaredFkMatcher
     assert plugins["exact"] is ExactMatcher
+    assert plugins["normalized"] is NormalizedMatcher
+    assert plugins["fuzzy"] is FuzzyMatcher
 
 
 def test_registry_finds_ossie_format() -> None:
