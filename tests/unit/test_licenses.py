@@ -29,5 +29,12 @@ def test_pathspec_mpl_exception_is_specific() -> None:
     assert not check_licenses.license_allowed("another", numpy)
 
 
+def test_engine_dependencies_use_permissive_terms() -> None:
+    mit_text = "MIT License\n\nCopyright (c) 2022 OpenAI\n\nPermission is hereby granted"
+    assert check_licenses.license_allowed("tiktoken", mit_text)
+    assert check_licenses.license_allowed("pyahocorasick", "BSD-3-Clause AND Public-Domain")
+    assert check_licenses.license_allowed("regex", "Apache-2.0 AND CNRI-Python")
+
+
 def test_gpl_is_rejected() -> None:
     assert not check_licenses.license_allowed("example", "GPL-3.0-only")

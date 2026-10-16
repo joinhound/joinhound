@@ -21,10 +21,12 @@ ALLOWED = {
     "lgpl-2.1-or-later",
     "lgpl-3.0-only",
     "lgpl-3.0-or-later",
+    "cnri-python",
     "mit",
     "mit license",
     "postgresql",
     "psf-2.0",
+    "public-domain",
 }
 
 # Unmodified libraries pulled in by required tools, outside the base allow list.
@@ -43,7 +45,14 @@ def license_allowed(name: str, license_name: str) -> bool:
     normalized = license_name.strip().lower()
     if (name.lower(), normalized) in TRANSITIVE_EXCEPTIONS:
         return True
-    parts = [part.strip() for part in normalized.split(" or ")]
+    if normalized.startswith("mit license") and "permission is hereby granted" in normalized:
+        return True
+    if " or " in normalized:
+        parts = [part.strip() for part in normalized.split(" or ")]
+    elif " and " in normalized:
+        parts = [part.strip() for part in normalized.split(" and ")]
+    else:
+        parts = [normalized]
     return all(part in ALLOWED for part in parts)
 
 
