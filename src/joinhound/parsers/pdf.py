@@ -12,8 +12,6 @@ import pypdfium2 as pdfium
 from joinhound.core.models import TextBlock
 from joinhound.core.protocols import OcrEngine
 
-_LINE_GAP = 3.0
-
 
 class PdfParser:
     """Digital PDF text. A page with no text layer is sent to OCR."""
@@ -58,11 +56,11 @@ def _lines(
     lines: list[list[tuple[str, float, float, float, float]]] = []
     current = [ordered[0]]
     for item in ordered[1:]:
-        if abs(item[2] - current[-1][2]) > _LINE_GAP:
+        if _overlaps(item, current):
+            current.append(item)
+        else:
             lines.append(current)
             current = [item]
-        else:
-            current.append(item)
     lines.append(current)
     blocks: list[TextBlock] = []
     for line in lines:
@@ -76,6 +74,15 @@ def _lines(
         top = max(item[4] for item in ordered_line)
         blocks.append(TextBlock(text=text, page=page, bbox=(left, bottom, right, top)))
     return blocks
+
+
+def _overlaps(
+    item: tuple[str, float, float, float, float],
+    line: Sequence[tuple[str, float, float, float, float]],
+) -> bool:
+    bottom = min(char[2] for char in line)
+    top = max(char[4] for char in line)
+    return item[2] < top and bottom < item[4]
 
 
 def _recognize(page: pdfium.PdfPage, page_number: int, ocr: OcrEngine) -> list[TextBlock]:

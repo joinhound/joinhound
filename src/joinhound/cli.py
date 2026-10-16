@@ -28,7 +28,7 @@ from joinhound.formats.ossie import (
     parse_document,
 )
 from joinhound.index.columns import save_column_profiles
-from joinhound.index.documents import sync_documents
+from joinhound.index.documents import read_passages, sync_documents
 from joinhound.index.links import ColumnLink, save_links, stored_links
 from joinhound.index.model import model_links, model_text, store_model
 from joinhound.index.schema import apply_schema
@@ -313,6 +313,7 @@ def _print_question_scores(settings: AppConfig, path: str) -> None:
                 _declared_drafts(source),
                 _matchers(source),
                 settings.engine,
+                passages=read_passages(settings.kg_database),
             )
         typer.echo(f"context_precision {report.precision:.3f}")
         typer.echo(f"context_recall {report.recall:.3f}")

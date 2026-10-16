@@ -34,6 +34,16 @@ class _FakeOcr:
         return "SCANNED PAGE"
 
 
+def test_pdf_keeps_an_email_on_one_line() -> None:
+    from joinhound.evalset import _pdf
+
+    blocks = PdfParser().parse(_pdf("Invoice INV-1000 for Ada ada@example.com"))
+
+    assert len(blocks) == 1
+    assert "INV-1000" in blocks[0].text
+    assert "ada@example.com" in blocks[0].text
+
+
 def test_pdf_text_has_page_and_box() -> None:
     blocks = PdfParser().parse(_HELLO)
     assert len(blocks) == 1
