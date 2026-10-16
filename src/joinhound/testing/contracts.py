@@ -1,8 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
-"""Contract checks that every source implementation must pass."""
+"""Contract checks that every source and matcher implementation must pass."""
 
-from joinhound.core.protocols import DocumentSource, TabularSource
+from joinhound.core.models import (
+    CollectionProfile,
+    ColumnProfile,
+    Link,
+    ProfileContext,
+    QueryContext,
+)
+from joinhound.core.protocols import DocumentSource, LinkMatcher, TabularSource
 
 
 def check_tabular_source(
@@ -43,3 +50,36 @@ def check_document_source(source: DocumentSource, *, name: str, content: bytes) 
     assert source.read(matching[0]) == content
     access = source.acl(matching[0])
     assert access is not None
+
+
+def check_link_matcher(
+    matcher: LinkMatcher,
+    *,
+    src: ColumnProfile,
+    dst: ColumnProfile | CollectionProfile,
+    unrelated: ColumnProfile | CollectionProfile,
+    link: Link,
+    values: list[str],
+    missing_value: str,
+    expected_value: str,
+    expected_pk: dict[str, object],
+) -> None:
+    """Check discovery and resolution against one known relationship and one miss.
+
+    ``values`` must resolve to at least two destination rows so the limit is observable.
+    """
+    profile = ProfileContext()
+    candidate = matcher.discover(src, dst, profile)
+    assert candidate is not None
+    assert candidate.match_type == matcher.match_type
+    assert 0.0 <= candidate.confidence <= 1.0
+    assert matcher.discover(src, unrelated, profile) is None
+
+    found = matcher.resolve(link, values, QueryContext())
+    assert len(found) >= 2
+    assert any(
+        match.value == expected_value and match.pk == expected_pk and 0.0 <= match.score <= 1.0
+        for match in found
+    )
+    assert matcher.resolve(link, [missing_value], QueryContext()) == []
+    assert len(matcher.resolve(link, values, QueryContext(limit=1))) == 1

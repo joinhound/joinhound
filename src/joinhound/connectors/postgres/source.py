@@ -319,7 +319,7 @@ class PostgresSource:
         schema, table = self._location(coll)
         plan = self._key_plan(schema, table)
         if mode == "exact":
-            where = sql.SQL("{} = ANY(%s)").format(sql.Identifier("t", column))
+            where = sql.SQL("{}::text = ANY(%s)").format(sql.Identifier("t", column))
         elif normalize_sql is None:
             raise SourceError("normalized search requires normalize_sql")
         else:
