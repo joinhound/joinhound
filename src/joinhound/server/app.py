@@ -7,6 +7,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import cast
 
+from mcp.server.auth.settings import AuthSettings
 from mcp.server.mcpserver import MCPServer
 
 from joinhound.core.models import IndexedPassage, LinkDraft
@@ -18,6 +19,7 @@ from joinhound.engine.score import text_tokens, truncate_text
 from joinhound.index.documents import read_passages
 from joinhound.llm.none import NoneEmbedder
 from joinhound.matchers.documents import Passage
+from joinhound.server.auth import StaticTokenVerifier
 from joinhound.server.runtime import Runtime
 
 _SUMMARY_TOKENS = 2000
@@ -45,9 +47,24 @@ _SUMMARY = (
 )
 
 
-def create_server(runtime: Runtime) -> MCPServer:
-    """Build the stdio MCP server. The official SDK exposes this as MCPServer."""
-    server: MCPServer = MCPServer("joinhound")
+def create_server(
+    runtime: Runtime,
+    *,
+    auth_token: str | None = None,
+    public_url: str = "http://127.0.0.1:8787",
+) -> MCPServer:
+    """Build the MCP server. HTTP requires the configured bearer token."""
+    verifier = StaticTokenVerifier(auth_token) if auth_token else None
+    auth = (
+        AuthSettings(
+            issuer_url=public_url,
+            resource_server_url=public_url,
+            validate_token_resource=False,
+        )
+        if verifier is not None
+        else None
+    )
+    server: MCPServer = MCPServer("joinhound", token_verifier=verifier, auth=auth)
 
     @server.tool(name="get_context", description=_GET_CONTEXT)
     def get_context_tool(
