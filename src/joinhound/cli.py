@@ -224,8 +224,8 @@ def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
         source = PostgresSource(name, source_config)
         with source:
             profiles, drafts = propose_links(
-            source, settings.profiler, _matchers(source, settings.kg_database)
-        )
+                source, settings.profiler, _matchers(source, settings.kg_database)
+            )
         save_column_profiles(settings.kg_database, name, profiles)
         save_links(settings.kg_database, drafts, approve_at)
         written += len(drafts)
