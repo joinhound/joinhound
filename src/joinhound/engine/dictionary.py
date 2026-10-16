@@ -92,7 +92,12 @@ def _columns(source: TabularSource, links: Sequence[LinkDraft]) -> dict[str, lis
     named: set[tuple[str, str]] = set()
     collections: set[str] = set()
     for link in links:
-        if link.status != "approved" or link.dst_column is None:
+        if link.status != "approved":
+            continue
+        if link.dst_column is None:
+            if link.match_type == "column_documents":
+                collections.add(link.src_collection)
+                named.add((link.src_collection, link.src_column))
             continue
         collections.add(link.src_collection)
         collections.add(link.dst_collection)
