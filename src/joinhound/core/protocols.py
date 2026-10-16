@@ -22,6 +22,7 @@ from joinhound.core.models import (
     ProfileContext,
     QueryContext,
     Record,
+    TextBlock,
 )
 
 
@@ -88,8 +89,8 @@ class DocumentParser(Protocol):
 
     mime_types: tuple[str, ...]
 
-    def parse(self, data: bytes) -> list[str]:
-        """Return the text blocks found in the document."""
+    def parse(self, data: bytes) -> list[TextBlock]:
+        """Return text blocks, each with a page number and a bounding box."""
 
 
 class OcrEngine(Protocol):

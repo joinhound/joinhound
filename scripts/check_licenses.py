@@ -24,6 +24,7 @@ ALLOWED = {
     "cnri-python",
     "mit",
     "mit-0",
+    "mit-cmu",
     "mit license",
     "postgresql",
     "psf-2.0",
@@ -33,11 +34,14 @@ ALLOWED = {
 # Unmodified libraries pulled in by required tools, outside the base allow list.
 # pathspec: mypy. certifi: testcontainers via requests.
 # numpy: datasketch. Its declaration is a conjunction of permissive terms.
-# See docs/decisions/0001-mpl-pathspec.md, 0004-mpl-certifi.md, and 0008-numpy-license.md.
+# pypdfium2: the PDF parser named in the specification. Pillow is MIT-CMU.
+# See docs/decisions/0001-mpl-pathspec.md, 0004-mpl-certifi.md, 0008-numpy-license.md,
+# and 0017-pdf-parser-licenses.md.
 TRANSITIVE_EXCEPTIONS = {
     ("certifi", "mozilla public license 2.0 (mpl 2.0)"),
     ("numpy", "bsd-3-clause and 0bsd and mit and zlib and cc0-1.0"),
     ("pathspec", "mozilla public license 2.0 (mpl 2.0)"),
+    ("pypdfium2", "bsd-3-clause, apache-2.0, dependency licenses"),
 }
 
 

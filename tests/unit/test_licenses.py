@@ -40,5 +40,12 @@ def test_mit_zero_is_permissive() -> None:
     assert check_licenses.license_allowed("cffi", "MIT-0")
 
 
+def test_pdf_libraries_are_permissive() -> None:
+    assert check_licenses.license_allowed("pillow", "MIT-CMU")
+    declared = "BSD-3-Clause, Apache-2.0, dependency licenses"
+    assert check_licenses.license_allowed("pypdfium2", declared)
+    assert not check_licenses.license_allowed("another", declared)
+
+
 def test_gpl_is_rejected() -> None:
     assert not check_licenses.license_allowed("example", "GPL-3.0-only")

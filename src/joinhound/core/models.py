@@ -60,6 +60,14 @@ class Match(BaseModel):
     score: float = 1.0
 
 
+class TextBlock(BaseModel):
+    """Text extracted from one region of a document."""
+
+    text: str
+    page: int
+    bbox: tuple[float, float, float, float]
+
+
 class DocRef(BaseModel):
     """A document that a document source can read."""
 
