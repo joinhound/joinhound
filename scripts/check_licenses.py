@@ -23,6 +23,7 @@ ALLOWED = {
     "lgpl-3.0-or-later",
     "cnri-python",
     "mit",
+    "mit-0",
     "mit license",
     "postgresql",
     "psf-2.0",

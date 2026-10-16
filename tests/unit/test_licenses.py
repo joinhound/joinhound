@@ -36,5 +36,9 @@ def test_engine_dependencies_use_permissive_terms() -> None:
     assert check_licenses.license_allowed("regex", "Apache-2.0 AND CNRI-Python")
 
 
+def test_mit_zero_is_permissive() -> None:
+    assert check_licenses.license_allowed("cffi", "MIT-0")
+
+
 def test_gpl_is_rejected() -> None:
     assert not check_licenses.license_allowed("example", "GPL-3.0-only")

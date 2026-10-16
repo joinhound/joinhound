@@ -28,6 +28,7 @@ from joinhound.index.links import ColumnLink, save_links, stored_links
 from joinhound.index.model import model_links, model_text, store_model
 from joinhound.index.schema import apply_schema
 from joinhound.profiler.profile import propose_links
+from joinhound.server import create_server, runtime_from_config
 
 app = typer.Typer(
     name="joinhound",
@@ -142,6 +143,21 @@ def export(
     except ModelError as error:
         raise typer.BadParameter(str(error)) from error
     Path(out).write_text(text, encoding="utf-8")
+
+
+@app.command()
+def serve(
+    config: str = typer.Option(
+        "joinhound.yaml",
+        "--config",
+        help="Path to the YAML configuration.",
+    ),
+) -> None:
+    """Serve get_context, expand, and get_record over MCP stdio."""
+    settings = load_config(Path(config))
+    if settings.server.transport != "stdio":
+        raise typer.BadParameter("Only the stdio transport is available")
+    create_server(runtime_from_config(settings)).run(transport="stdio")
 
 
 def _require_ossie(format_name: str) -> None:
