@@ -8,7 +8,7 @@ import json
 import math
 from collections.abc import Sequence
 
-from joinhound.core.uri import PgUri, parse_uri
+from joinhound.core.uri import PgUri, S3Uri, parse_uri
 from joinhound.index.links import ColumnLink
 
 
@@ -44,10 +44,12 @@ def overlap_scores(returned: Sequence[str], gold: Sequence[str]) -> tuple[float,
 
 
 def record_key(uri: str) -> tuple[str, str, str]:
-    """Return schema, table, and canonical primary key. The source name is dropped."""
+    """Return the identity of a row or document. The source name and box are dropped."""
     parsed = parse_uri(uri)
+    if isinstance(parsed, S3Uri):
+        return ("s3", parsed.key, "")
     if not isinstance(parsed, PgUri):
-        raise ValueError(f"Gold comparison supports row URIs only: {uri}")
+        raise ValueError(f"Gold comparison supports row and document URIs only: {uri}")
     pk = json.dumps(dict(parsed.pk), sort_keys=True, separators=(",", ":"), default=str)
     return (parsed.schema, parsed.table, pk)
 
