@@ -13,8 +13,15 @@ from typing import Any
 from joinhound.core.config import EngineConfig
 from joinhound.core.models import Link, LinkDraft, Match, QueryContext, Record
 from joinhound.core.protocols import LinkMatcher, TabularSource
+from joinhound.core.uri import PgUri, S3Uri, parse_uri
 from joinhound.engine.dictionary import ValueDictionary, build_dictionary
-from joinhound.engine.response import ContextEdge, ContextNode, ContextResponse, ContextStats
+from joinhound.engine.response import (
+    ContextEdge,
+    ContextNode,
+    ContextResponse,
+    ContextStats,
+    RecordResult,
+)
 from joinhound.engine.score import content_tokens, path_score, relevance
 
 _EXACT = frozenset({"declared_fk", "exact"})
@@ -60,13 +67,88 @@ def get_context(
     config = settings or EngineConfig()
     budget = config.budget_tokens if budget_tokens is None else budget_tokens
     depth_limit = config.max_depth if max_depth is None else max_depth
+    approved = [link for link in links if link.status == "approved" and link.dst_column is not None]
+    words = dictionary if dictionary is not None else build_dictionary(source, approved)
+    seeds = _seed_nodes(query, source, words, config.seeds_k, scope, config.depth_decay)
+    return _walk(
+        query,
+        source,
+        approved,
+        matchers,
+        config,
+        seeds,
+        budget=budget,
+        depth_limit=depth_limit,
+        scope=scope,
+        scoring_query=query,
+        clock=clock,
+    )
+
+
+def expand(
+    node_uris: Sequence[str],
+    source: TabularSource,
+    links: Sequence[LinkDraft],
+    matchers: Mapping[str, LinkMatcher],
+    settings: EngineConfig | None = None,
+    *,
+    depth: int = 1,
+    budget_tokens: int = 2000,
+    link_ids: Sequence[str] | None = None,
+    clock: Callable[[], float] | None = None,
+) -> ContextResponse:
+    """Walk outward from records the caller already identified."""
+    config = settings or EngineConfig()
+    approved = [link for link in links if link.status == "approved" and link.dst_column is not None]
+    if link_ids is not None:
+        wanted = set(link_ids)
+        approved = [link for link in approved if link.link_id in wanted]
+    seeds = _nodes_from_uris(source, node_uris)
+    scoring_query = " ".join(_text(node.content) for node in seeds)
+    return _walk(
+        " ".join(node_uris),
+        source,
+        approved,
+        matchers,
+        config,
+        seeds,
+        budget=budget_tokens,
+        depth_limit=depth,
+        scope=None,
+        scoring_query=scoring_query,
+        clock=clock,
+    )
+
+
+def read_record(uri: str, source: TabularSource) -> RecordResult:
+    """Return the full row for a provenance URI."""
+    record = _fetch_record(source, uri, _known_collections(source))
+    return RecordResult(
+        uri=record.uri,
+        collection=record.collection_id,
+        kind="row",
+        content=_content(record),
+        neighbors=[],
+    )
+
+
+def _walk(
+    query: str,
+    source: TabularSource,
+    links: Sequence[LinkDraft],
+    matchers: Mapping[str, LinkMatcher],
+    config: EngineConfig,
+    seeds: list[_Node],
+    *,
+    budget: int,
+    depth_limit: int,
+    scope: Sequence[str] | None,
+    scoring_query: str,
+    clock: Callable[[], float] | None,
+) -> ContextResponse:
     now = clock or time.monotonic
     started = now()
     deadline = started + config.timeout_ms / 1000
-    approved = [link for link in links if link.status == "approved" and link.dst_column is not None]
-    words = dictionary if dictionary is not None else build_dictionary(source, approved)
-    decay = config.depth_decay
-    seeds = _seed_nodes(query, source, words, config.seeds_k, scope, decay)
     visited = {node.uri for node in seeds}
     discovered = list(seeds)
     beam = _frontier(seeds, config.beam_width)
@@ -78,14 +160,14 @@ def get_context(
             break
         expanded = _expand(
             beam,
-            approved,
+            links,
             matchers,
             source,
             config.fanout,
             visited,
             scope,
-            query,
-            decay,
+            scoring_query,
+            config.depth_decay,
         )
         discovered.extend(expanded)
         depth += 1
@@ -459,3 +541,56 @@ def _in_scope(collection_id: str, scope: Sequence[str] | None) -> bool:
 
 def _pk_key(pk: Mapping[str, object]) -> str:
     return json.dumps(dict(pk), sort_keys=True, separators=(",", ":"), default=str)
+
+
+def _nodes_from_uris(source: TabularSource, uris: Sequence[str]) -> list[_Node]:
+    known = _known_collections(source)
+    nodes: list[_Node] = []
+    seen: set[str] = set()
+    for uri in uris:
+        if uri in seen:
+            continue
+        seen.add(uri)
+        record = _fetch_record(source, uri, known)
+        nodes.append(
+            _Node(
+                uri=record.uri,
+                record=record,
+                content=_content(record),
+                score=1.0,
+                seed=True,
+                depth=0,
+                parent=None,
+                edge=None,
+                edge_scores=(),
+            )
+        )
+    return nodes
+
+
+def _fetch_record(source: TabularSource, uri: str, known: set[str]) -> Record:
+    parsed = parse_uri(uri)
+    if isinstance(parsed, S3Uri):
+        raise ValueError(f"Document passages are not available yet: {uri}")
+    if not isinstance(parsed, PgUri):
+        raise ValueError(f"Unsupported record URI: {uri}")
+    collection = _collection_id(parsed, known)
+    found = source.fetch_by_keys(collection, [dict(parsed.pk)])
+    wanted = _pk_key(parsed.pk)
+    for record in found:
+        if _pk_key(record.pk) == wanted:
+            return record
+    raise ValueError(f"No record at {uri}")
+
+
+def _known_collections(source: TabularSource) -> set[str]:
+    return {info.collection_id for info in source.list_collections()}
+
+
+def _collection_id(uri: PgUri, known: set[str]) -> str:
+    qualified = f"pg://{uri.source}/{uri.schema}.{uri.table}"
+    if qualified in known:
+        return qualified
+    if uri.table in known:
+        return uri.table
+    return qualified

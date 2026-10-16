@@ -28,6 +28,13 @@ def test_profile_help_includes_auto_approve() -> None:
     assert "--auto-approve" in _ANSI.sub("", result.output)
 
 
+def test_help_lists_serve() -> None:
+    result = runner.invoke(app, ["--help"])
+
+    assert result.exit_code == 0
+    assert "serve" in _ANSI.sub("", result.output)
+
+
 def test_version_prints_package_version() -> None:
     result = runner.invoke(app, ["--version"])
 

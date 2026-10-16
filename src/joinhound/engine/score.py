@@ -29,6 +29,20 @@ def path_score(relevance_score: float, edge_scores: tuple[float, ...], depth_dec
     return relevance_score * product * (depth_decay ** len(edge_scores))
 
 
+def text_tokens(text: str) -> int:
+    """Count cl100k tokens in a text the caller would read."""
+    return len(_ENCODER.encode(text))
+
+
+def truncate_text(text: str, limit: int) -> str:
+    """Keep the leading tokens and mark the cut when the text is longer than the limit."""
+    tokens = _ENCODER.encode(text)
+    if len(tokens) <= limit:
+        return text
+    kept = tokens[: max(limit - 1, 0)]
+    return _ENCODER.decode(kept).rstrip() + "\n"
+
+
 def content_tokens(content: Mapping[str, Any]) -> int:
     """Count cl100k tokens in the JSON object a caller would read."""
     rendered = json.dumps(

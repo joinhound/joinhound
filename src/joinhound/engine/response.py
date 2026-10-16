@@ -48,6 +48,18 @@ class ContextStats(BaseModel):
     ms: int
 
 
+class RecordResult(BaseModel):
+    """One full row or passage addressed by a source URI."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    uri: str
+    collection: str
+    kind: Literal["row", "passage"]
+    content: dict[str, Any] | str
+    neighbors: list[str]
+
+
 class ContextResponse(BaseModel):
     """The graph returned by get_context and expand."""
 

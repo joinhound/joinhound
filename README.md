@@ -36,4 +36,19 @@ scripts/load_pagila.sh
 
 `kg-postgres` listens on port 55432, the Pagila source on port 55433, and MinIO on port 59000.
 
+## MCP
+
+`joinhound serve` speaks MCP over standard input and output. Point Claude Desktop or Cursor at the command:
+
+```json
+{
+  "mcpServers": {
+    "joinhound": {
+      "command": "joinhound",
+      "args": ["serve", "--config", "/absolute/path/joinhound.yaml"]
+    }
+  }
+}
+```
+
 The published `0.0.1` package reserves the project name. Application commands are still being built.

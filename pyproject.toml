@@ -21,6 +21,7 @@ classifiers = [
 dependencies = [
     "datasketch==2.0.0",
     "jsonschema==4.26.0",
+    "mcp==2.3.0",
     "psycopg-pool==3.3.0",
     "psycopg[binary]==3.3.6",
     "pyahocorasick==2.2.0",
