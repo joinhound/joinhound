@@ -12,6 +12,7 @@ from joinhound.connectors.postgres import PostgresSource
 from joinhound.core.config import AppConfig, EngineConfig, PostgresSourceConfig
 from joinhound.core.models import LinkDraft
 from joinhound.core.protocols import TabularSource
+from joinhound.engine.cache import ResultCache
 from joinhound.index.model import model_links
 
 
@@ -23,6 +24,7 @@ class Runtime:
     sources: list[tuple[str, TabularSource]] | None = None
     links: list[LinkDraft] | None = None
     settings: AppConfig | None = None
+    cache: ResultCache | None = None
 
     @contextmanager
     def session(self) -> Iterator[tuple[list[tuple[str, TabularSource]], list[LinkDraft]]]:
@@ -50,4 +52,8 @@ class Runtime:
 
 def runtime_from_config(settings: AppConfig) -> Runtime:
     """Bind a server to a configuration file. Connections open on the first tool call."""
-    return Runtime(engine=settings.engine, settings=settings)
+    return Runtime(
+        engine=settings.engine,
+        settings=settings,
+        cache=ResultCache(settings.engine.cache_ttl_seconds),
+    )
