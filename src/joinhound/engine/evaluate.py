@@ -1,9 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
-"""Score stored column links against a gold set of foreign keys."""
+"""Score stored column links and context graphs against a gold set."""
 
 from __future__ import annotations
 
+import json
+import math
+from collections.abc import Sequence
+
+from joinhound.core.uri import PgUri, parse_uri
 from joinhound.index.links import ColumnLink
 
 
@@ -26,6 +31,34 @@ def normalize_collection(value: str) -> str:
         value = value.split("://", 1)[1]
         value = value.split("/", 1)[-1]
     return value
+
+
+def overlap_scores(returned: Sequence[str], gold: Sequence[str]) -> tuple[float, float]:
+    """Return precision and recall of record URIs. The source name is ignored."""
+    returned_keys = {record_key(uri) for uri in returned}
+    gold_keys = {record_key(uri) for uri in gold}
+    hit = len(returned_keys & gold_keys)
+    precision = hit / len(returned_keys) if returned_keys else 0.0
+    recall = hit / len(gold_keys) if gold_keys else 0.0
+    return precision, recall
+
+
+def record_key(uri: str) -> tuple[str, str, str]:
+    """Return schema, table, and canonical primary key. The source name is dropped."""
+    parsed = parse_uri(uri)
+    if not isinstance(parsed, PgUri):
+        raise ValueError(f"Gold comparison supports row URIs only: {uri}")
+    pk = json.dumps(dict(parsed.pk), sort_keys=True, separators=(",", ":"), default=str)
+    return (parsed.schema, parsed.table, pk)
+
+
+def percentile(values: Sequence[int], rank: float) -> int:
+    """Return the nearest-rank percentile. An empty sample is 0."""
+    if not values:
+        return 0
+    ordered = sorted(values)
+    index = math.ceil(rank / 100 * len(ordered)) - 1
+    return ordered[min(max(index, 0), len(ordered) - 1)]
 
 
 def _key(link: ColumnLink) -> tuple[str, tuple[str, ...], str, tuple[str, ...]]:

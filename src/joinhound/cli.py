@@ -12,10 +12,12 @@ import yaml
 
 from joinhound import __version__
 from joinhound.connectors.postgres import PostgresSource
-from joinhound.core.config import PostgresSourceConfig, load_config
+from joinhound.core.config import AppConfig, PostgresSourceConfig, load_config
+from joinhound.core.models import LinkDraft
 from joinhound.core.protocols import LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.evaluate import precision_recall
+from joinhound.engine.questions import load_questions, score_questions
 from joinhound.formats.ossie import (
     ModelError,
     OssieFormat,
@@ -27,7 +29,7 @@ from joinhound.index.columns import save_column_profiles
 from joinhound.index.links import ColumnLink, save_links, stored_links
 from joinhound.index.model import model_links, model_text, store_model
 from joinhound.index.schema import apply_schema
-from joinhound.profiler.profile import propose_links
+from joinhound.profiler.profile import link_id, propose_links
 from joinhound.server import create_server, runtime_from_config
 
 app = typer.Typer(
@@ -81,9 +83,17 @@ def evaluate(
         "--gold",
         help="Foreign keys removed from the Pagila copy.",
     ),
+    questions: str | None = typer.Option(
+        None,
+        "--questions",
+        help="Questions with the record URIs an answer must cite.",
+    ),
 ) -> None:
-    """Score kg.links against a gold set of foreign keys."""
+    """Score kg.links, or score get_context when --questions is set."""
     settings = load_config(Path(config))
+    if questions is not None:
+        _print_question_scores(settings, questions)
+        return
     precision, recall = precision_recall(stored_links(settings.kg_database), _load_gold(gold))
     typer.echo(f"precision {precision:.3f}")
     typer.echo(f"recall {recall:.3f}")
@@ -211,6 +221,55 @@ def _matchers(source: TabularSource) -> Mapping[str, LinkMatcher]:
             raise TypeError(f"Matcher {name} is not callable")
         matchers[name] = cast(LinkMatcher, factory(source))
     return matchers
+
+
+def _print_question_scores(settings: AppConfig, path: str) -> None:
+    questions = load_questions(Path(path))
+    for name, source_config in settings.sources.items():
+        if not isinstance(source_config, PostgresSourceConfig):
+            continue
+        source = PostgresSource(name, source_config)
+        with source:
+            report = score_questions(
+                questions,
+                source,
+                _declared_drafts(source),
+                _matchers(source),
+                settings.engine,
+            )
+        typer.echo(f"context_precision {report.precision:.3f}")
+        typer.echo(f"context_recall {report.recall:.3f}")
+        typer.echo(f"context_p50_ms {report.latency_ms(50)}")
+        typer.echo(f"context_p95_ms {report.latency_ms(95)}")
+
+
+def _declared_drafts(source: TabularSource) -> list[LinkDraft]:
+    drafts: list[LinkDraft] = []
+    for foreign_key in source.declared_links():
+        if len(foreign_key.src_columns) != 1 or len(foreign_key.dst_columns) != 1:
+            continue
+        src_column = foreign_key.src_columns[0]
+        dst_column = foreign_key.dst_columns[0]
+        drafts.append(
+            LinkDraft(
+                link_id=link_id(
+                    foreign_key.src_collection,
+                    src_column,
+                    foreign_key.dst_collection,
+                    dst_column,
+                ),
+                src_collection=foreign_key.src_collection,
+                src_column=src_column,
+                dst_collection=foreign_key.dst_collection,
+                dst_column=dst_column,
+                match_type="declared_fk",
+                origin="catalog_fk",
+                confidence=1.0,
+                status="approved",
+                cardinality="N:1",
+            )
+        )
+    return drafts
 
 
 def _load_gold(path: str) -> list[ColumnLink]:
