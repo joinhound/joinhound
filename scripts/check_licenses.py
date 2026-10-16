@@ -15,6 +15,7 @@ ALLOWED = {
     "bsd license",
     "bsd-2-clause",
     "bsd-3-clause",
+    "3-clause bsd license",
     "isc",
     "isc license (iscl)",
     "lgpl-2.1-only",

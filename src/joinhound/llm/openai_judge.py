@@ -65,14 +65,24 @@ class OpenAIJudge:
 
             client = OpenAI(base_url=self._base_url, api_key=self._api_key or "missing")
             self._client = client
-        response = client.chat.completions.create(
-            model=self._model,
-            messages=[
-                {"role": "system", "content": _SYSTEM},
-                {"role": "user", "content": prompt},
-            ],
-            response_format={"type": "json_object"},
-        )
+        from joinhound.telemetry import span
+
+        with span(
+            "gen_ai.chat",
+            {
+                "gen_ai.operation.name": "chat",
+                "gen_ai.request.model": self._model,
+                "gen_ai.system": "openai",
+            },
+        ):
+            response = client.chat.completions.create(
+                model=self._model,
+                messages=[
+                    {"role": "system", "content": _SYSTEM},
+                    {"role": "user", "content": prompt},
+                ],
+                response_format={"type": "json_object"},
+            )
         content = response.choices[0].message.content
         if not isinstance(content, str) or not content:
             raise ValueError("The judge returned an empty response")

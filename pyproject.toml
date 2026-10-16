@@ -24,6 +24,9 @@ dependencies = [
     "mcp==2.3.0",
     "obstore==0.12.0",
     "openai==2.7.2",
+    "opentelemetry-api==1.45.1",
+    "opentelemetry-exporter-otlp-proto-http==1.45.1",
+    "opentelemetry-sdk==1.45.1",
     "psycopg-pool==3.3.0",
     "psycopg[binary]==3.3.6",
     "pyahocorasick==2.2.0",
@@ -140,6 +143,7 @@ forbidden_modules = [
     "joinhound.parsers",
     "joinhound.profiler",
     "joinhound.server",
+    "joinhound.telemetry",
 ]
 
 [[tool.importlinter.contracts]]
@@ -168,6 +172,7 @@ forbidden_modules = [
     "joinhound.ocr",
     "joinhound.parsers",
     "joinhound.server",
+    "joinhound.telemetry",
 ]
 
 [[tool.importlinter.contracts]]
@@ -187,6 +192,7 @@ forbidden_modules = [
     "joinhound.matchers",
     "joinhound.profiler",
     "joinhound.server",
+    "joinhound.telemetry",
 ]
 
 [[tool.importlinter.contracts]]
@@ -203,4 +209,5 @@ forbidden_modules = [
     "joinhound.parsers",
     "joinhound.profiler",
     "joinhound.server",
+    "joinhound.telemetry",
 ]
