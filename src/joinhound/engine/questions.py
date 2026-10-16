@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from joinhound.core.config import EngineConfig
-from joinhound.core.models import LinkDraft
+from joinhound.core.models import IndexedPassage, LinkDraft
 from joinhound.core.protocols import LinkMatcher, TabularSource
 from joinhound.engine.context import get_context
 from joinhound.engine.dictionary import build_dictionary
@@ -90,6 +90,7 @@ def score_questions(
     links: Sequence[LinkDraft],
     matchers: Mapping[str, LinkMatcher],
     settings: EngineConfig | None = None,
+    passages: Sequence[IndexedPassage] = (),
 ) -> QuestionReport:
     """Run get_context for each question and macro-average precision and recall."""
     config = settings or EngineConfig()
@@ -103,6 +104,7 @@ def score_questions(
             matchers,
             config,
             dictionary=dictionary,
+            passages=passages,
         )
         precision, recall = overlap_scores(
             [node.uri for node in response.nodes],

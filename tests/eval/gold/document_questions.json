@@ -1,0 +1,354 @@
+{
+  "questions": [
+    {
+      "id": "invoice-inv-1000",
+      "query": "INV-1000",
+      "uris": [
+        "s3://corpus/invoices/invoice-0000.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1001",
+      "query": "INV-1001",
+      "uris": [
+        "s3://corpus/invoices/invoice-0001.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1002",
+      "query": "INV-1002",
+      "uris": [
+        "s3://corpus/invoices/invoice-0002.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1003",
+      "query": "INV-1003",
+      "uris": [
+        "s3://corpus/invoices/invoice-0003.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1004",
+      "query": "INV-1004",
+      "uris": [
+        "s3://corpus/invoices/invoice-0004.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1005",
+      "query": "INV-1005",
+      "uris": [
+        "s3://corpus/invoices/invoice-0005.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1006",
+      "query": "INV-1006",
+      "uris": [
+        "s3://corpus/invoices/invoice-0006.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1007",
+      "query": "INV-1007",
+      "uris": [
+        "s3://corpus/invoices/invoice-0007.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1008",
+      "query": "INV-1008",
+      "uris": [
+        "s3://corpus/invoices/invoice-0008.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1009",
+      "query": "INV-1009",
+      "uris": [
+        "s3://corpus/invoices/invoice-0009.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1080",
+      "query": "SPC-1080",
+      "uris": [
+        "s3://corpus/specifications/specification-0080.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1081",
+      "query": "SPC-1081",
+      "uris": [
+        "s3://corpus/specifications/specification-0081.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1082",
+      "query": "SPC-1082",
+      "uris": [
+        "s3://corpus/specifications/specification-0082.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1083",
+      "query": "SPC-1083",
+      "uris": [
+        "s3://corpus/specifications/specification-0083.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1084",
+      "query": "SPC-1084",
+      "uris": [
+        "s3://corpus/specifications/specification-0084.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1085",
+      "query": "SPC-1085",
+      "uris": [
+        "s3://corpus/specifications/specification-0085.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1086",
+      "query": "SPC-1086",
+      "uris": [
+        "s3://corpus/specifications/specification-0086.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1087",
+      "query": "SPC-1087",
+      "uris": [
+        "s3://corpus/specifications/specification-0087.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1088",
+      "query": "SPC-1088",
+      "uris": [
+        "s3://corpus/specifications/specification-0088.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1089",
+      "query": "SPC-1089",
+      "uris": [
+        "s3://corpus/specifications/specification-0089.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1090",
+      "query": "SPC-1090",
+      "uris": [
+        "s3://corpus/specifications/specification-0090.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1091",
+      "query": "SPC-1091",
+      "uris": [
+        "s3://corpus/specifications/specification-0091.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1092",
+      "query": "SPC-1092",
+      "uris": [
+        "s3://corpus/specifications/specification-0092.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1093",
+      "query": "SPC-1093",
+      "uris": [
+        "s3://corpus/specifications/specification-0093.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1094",
+      "query": "SPC-1094",
+      "uris": [
+        "s3://corpus/specifications/specification-0094.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1140",
+      "query": "LTR-1140",
+      "uris": [
+        "s3://corpus/letters/letter-0140.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1141",
+      "query": "LTR-1141",
+      "uris": [
+        "s3://corpus/letters/letter-0141.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1142",
+      "query": "LTR-1142",
+      "uris": [
+        "s3://corpus/letters/letter-0142.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1143",
+      "query": "LTR-1143",
+      "uris": [
+        "s3://corpus/letters/letter-0143.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1144",
+      "query": "LTR-1144",
+      "uris": [
+        "s3://corpus/letters/letter-0144.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1145",
+      "query": "LTR-1145",
+      "uris": [
+        "s3://corpus/letters/letter-0145.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1146",
+      "query": "LTR-1146",
+      "uris": [
+        "s3://corpus/letters/letter-0146.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1147",
+      "query": "LTR-1147",
+      "uris": [
+        "s3://corpus/letters/letter-0147.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1148",
+      "query": "LTR-1148",
+      "uris": [
+        "s3://corpus/letters/letter-0148.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1149",
+      "query": "LTR-1149",
+      "uris": [
+        "s3://corpus/letters/letter-0149.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1150",
+      "query": "LTR-1150",
+      "uris": [
+        "s3://corpus/letters/letter-0150.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1151",
+      "query": "LTR-1151",
+      "uris": [
+        "s3://corpus/letters/letter-0151.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1152",
+      "query": "LTR-1152",
+      "uris": [
+        "s3://corpus/letters/letter-0152.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1153",
+      "query": "LTR-1153",
+      "uris": [
+        "s3://corpus/letters/letter-0153.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1154",
+      "query": "LTR-1154",
+      "uris": [
+        "s3://corpus/letters/letter-0154.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1070",
+      "query": "INV-1070",
+      "uris": [
+        "s3://corpus/invoices/invoice-0070.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1071",
+      "query": "INV-1071",
+      "uris": [
+        "s3://corpus/invoices/invoice-0071.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1072",
+      "query": "INV-1072",
+      "uris": [
+        "s3://corpus/invoices/invoice-0072.pdf"
+      ]
+    },
+    {
+      "id": "invoice-inv-1073",
+      "query": "INV-1073",
+      "uris": [
+        "s3://corpus/invoices/invoice-0073.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1130",
+      "query": "SPC-1130",
+      "uris": [
+        "s3://corpus/specifications/specification-0130.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1131",
+      "query": "SPC-1131",
+      "uris": [
+        "s3://corpus/specifications/specification-0131.pdf"
+      ]
+    },
+    {
+      "id": "specification-spc-1132",
+      "query": "SPC-1132",
+      "uris": [
+        "s3://corpus/specifications/specification-0132.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1190",
+      "query": "LTR-1190",
+      "uris": [
+        "s3://corpus/letters/letter-0190.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1191",
+      "query": "LTR-1191",
+      "uris": [
+        "s3://corpus/letters/letter-0191.pdf"
+      ]
+    },
+    {
+      "id": "letter-ltr-1192",
+      "query": "LTR-1192",
+      "uris": [
+        "s3://corpus/letters/letter-0192.pdf"
+      ]
+    }
+  ]
+}
