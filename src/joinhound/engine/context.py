@@ -15,6 +15,7 @@ from joinhound.core.models import IndexedPassage, Link, LinkDraft, Match, QueryC
 from joinhound.core.protocols import Embedder, LinkMatcher, TabularSource
 from joinhound.core.uri import PgUri, S3Uri, parse_uri
 from joinhound.engine.dictionary import ValueDictionary, build_dictionary
+from joinhound.engine.lookup import Deployment, direct_records, normalized_matches
 from joinhound.engine.passages import (
     lexical_rank,
     reciprocal_rank_fusion,
@@ -74,6 +75,7 @@ def get_context(
     passages: Sequence[IndexedPassage] = (),
     roles: Sequence[str] | None = None,
     embedder: Embedder | None = None,
+    deployment: Deployment = "sidecar",
 ) -> ContextResponse:
     """Return the highest-scoring rows and passages reachable from the query."""
     config = settings or EngineConfig()
@@ -99,6 +101,7 @@ def get_context(
         config.depth_decay,
         readable,
         embedder,
+        deployment,
     )
     approved = [*tabular, *documents]
     return _walk(
@@ -115,6 +118,7 @@ def get_context(
         clock=clock,
         passages=readable,
         roles=roles,
+        deployment=deployment,
     )
 
 
@@ -129,6 +133,7 @@ def expand(
     budget_tokens: int = 2000,
     link_ids: Sequence[str] | None = None,
     clock: Callable[[], float] | None = None,
+    deployment: Deployment = "sidecar",
 ) -> ContextResponse:
     """Walk outward from records the caller already identified."""
     config = settings or EngineConfig()
@@ -150,6 +155,7 @@ def expand(
         scope=None,
         scoring_query=scoring_query,
         clock=clock,
+        deployment=deployment,
     )
 
 
@@ -180,6 +186,7 @@ def _walk(
     clock: Callable[[], float] | None,
     passages: Sequence[IndexedPassage] = (),
     roles: Sequence[str] | None = None,
+    deployment: Deployment = "sidecar",
 ) -> ContextResponse:
     now = clock or time.monotonic
     started = now()
@@ -205,6 +212,7 @@ def _walk(
             config.depth_decay,
             passages,
             roles,
+            deployment,
         )
         discovered.extend(expanded)
         depth += 1
@@ -242,10 +250,11 @@ def _seed_nodes(
     decay: float,
     passages: Sequence[IndexedPassage],
     embedder: Embedder | None,
+    deployment: Deployment,
 ) -> list[_Node]:
     if seeds_k <= 0:
         return []
-    records = _ranked_records(query, source, dictionary, scope)
+    records = _ranked_records(query, source, dictionary, scope, deployment)
     by_uri = {record.uri: record for record in records}
     passage_by_uri = {passage.uri: passage for passage in passages}
     semantic: list[str] = []
@@ -288,6 +297,7 @@ def _ranked_records(
     source: TabularSource,
     dictionary: ValueDictionary,
     scope: Sequence[str] | None,
+    deployment: Deployment,
 ) -> list[Record]:
     grouped: dict[tuple[str, str], list[str]] = {}
     rank: dict[tuple[str, str, str], tuple[int, int]] = {}
@@ -301,17 +311,28 @@ def _ranked_records(
         rank.setdefault(key + (mention.value,), (len(mention.value), mention.start))
     ranked: list[tuple[tuple[int, int, str], Record]] = []
     for (collection_id, column), values in grouped.items():
-        matches = source.find_values(
-            collection_id,
-            column,
-            values,
-            "exact",
-            limit=max(len(values), 1) * 50,
+        limit = max(len(values), 1) * 50
+        loaded = direct_records(
+            source, deployment, collection_id, column, values, "exact", None, limit
         )
-        records = {
-            _pk_key(record.pk): record
-            for record in source.fetch_by_keys(collection_id, [dict(match.pk) for match in matches])
-        }
+        if loaded is None:
+            matches = source.find_values(collection_id, column, values, "exact", limit=limit)
+            records = {
+                _pk_key(record.pk): record
+                for record in source.fetch_by_keys(
+                    collection_id, [dict(match.pk) for match in matches]
+                )
+            }
+        else:
+            matches = [
+                Match(
+                    pk=dict(record.pk),
+                    value="" if record.values.get(column) is None else str(record.values[column]),
+                    score=1.0,
+                )
+                for record in loaded
+            ]
+            records = {_pk_key(record.pk): record for record in loaded}
         for match in matches:
             record = records.get(_pk_key(match.pk))
             place = rank.get((collection_id, column, match.value))
@@ -342,6 +363,7 @@ def _expand(
     decay: float,
     passages: Sequence[IndexedPassage],
     roles: Sequence[str] | None,
+    deployment: Deployment,
 ) -> list[_Node]:
     ordered = sorted(beam, key=lambda node: node.uri)
     found: list[_Node] = []
@@ -376,6 +398,7 @@ def _expand(
                 scope,
                 query,
                 decay,
+                deployment,
                 forward=True,
             )
         )
@@ -391,6 +414,7 @@ def _expand(
                     scope,
                     query,
                     decay,
+                    deployment,
                     forward=False,
                 )
             )
@@ -407,6 +431,7 @@ def _follow(
     scope: Sequence[str] | None,
     query: str,
     decay: float,
+    deployment: Deployment,
     *,
     forward: bool,
 ) -> list[_Node]:
@@ -427,26 +452,54 @@ def _follow(
         grouped.setdefault(str(raw), []).append(node)
     if not grouped:
         return []
-    if forward:
-        matcher = matchers.get(link.match_type)
-        if matcher is None:
-            return []
-        matches = matcher.resolve(
-            _as_link(link),
+    limit = fanout * len(grouped)
+    search_column = link.dst_column if forward else link.src_column
+    prefetched: dict[str, Record] | None = None
+    matches: list[Match] | None = None
+    if search_column is not None and link.match_type == "normalized" and forward:
+        found = normalized_matches(
+            source,
+            deployment,
+            destination,
+            search_column,
             list(grouped),
-            QueryContext(limit=fanout * len(grouped)),
+            link.normalize_sql,
+            limit,
         )
-    else:
-        matches = [
-            Match(pk=dict(match.pk), value=match.value, score=1.0)
-            for match in source.find_values(
-                destination,
-                link.src_column,
-                list(grouped),
-                "exact",
-                limit=fanout * len(grouped),
-            )
-        ]
+        if found is not None:
+            matches, rows = found
+            prefetched = {_pk_key(row.pk): row for row in rows}
+    elif search_column is not None and link.match_type in _EXACT:
+        loaded = direct_records(
+            source,
+            deployment,
+            destination,
+            search_column,
+            list(grouped),
+            "exact",
+            None,
+            limit,
+        )
+        if loaded is not None:
+            prefetched = {_pk_key(row.pk): row for row in loaded}
+            matches = [_exact_match(row, search_column) for row in loaded]
+    if matches is None:
+        if forward:
+            matcher = matchers.get(link.match_type)
+            if matcher is None:
+                return []
+            matches = matcher.resolve(_as_link(link), list(grouped), QueryContext(limit=limit))
+        else:
+            matches = [
+                Match(pk=dict(match.pk), value=match.value, score=1.0)
+                for match in source.find_values(
+                    destination,
+                    link.src_column,
+                    list(grouped),
+                    "exact",
+                    limit=limit,
+                )
+            ]
     by_value: dict[str, list[Match]] = {}
     for match in matches:
         by_value.setdefault(match.value, []).append(match)
@@ -457,10 +510,15 @@ def _follow(
             for parent in parents:
                 parent.clipped = True
         chosen = ranked[:fanout]
-        records = {
-            _pk_key(record.pk): record
-            for record in source.fetch_by_keys(destination, [dict(match.pk) for match in chosen])
-        }
+        if prefetched is None:
+            records = {
+                _pk_key(record.pk): record
+                for record in source.fetch_by_keys(
+                    destination, [dict(match.pk) for match in chosen]
+                )
+            }
+        else:
+            records = prefetched
         for match in chosen:
             record = records.get(_pk_key(match.pk))
             if record is None or record.uri in visited:
@@ -800,6 +858,11 @@ def _in_scope(collection_id: str, scope: Sequence[str] | None) -> bool:
     if not scope:
         return True
     return any(collection_id.startswith(prefix) for prefix in scope)
+
+
+def _exact_match(record: Record, column: str) -> Match:
+    raw = record.values.get(column)
+    return Match(pk=dict(record.pk), value="" if raw is None else str(raw), score=1.0)
 
 
 def _pk_key(pk: Mapping[str, object]) -> str:
