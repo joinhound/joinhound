@@ -3,6 +3,7 @@
 """Command-line entry point."""
 
 import json
+import shutil
 from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
@@ -12,9 +13,10 @@ import yaml
 
 from joinhound import __version__
 from joinhound.connectors.postgres import PostgresSource
-from joinhound.core.config import AppConfig, PostgresSourceConfig, load_config
-from joinhound.core.models import LinkDraft
-from joinhound.core.protocols import LinkMatcher, TabularSource
+from joinhound.connectors.s3 import S3Source
+from joinhound.core.config import AppConfig, PostgresSourceConfig, S3SourceConfig, load_config
+from joinhound.core.models import LinkDraft, TextBlock
+from joinhound.core.protocols import DocumentParser, Embedder, LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.evaluate import precision_recall
 from joinhound.engine.questions import load_questions, score_questions
@@ -26,6 +28,7 @@ from joinhound.formats.ossie import (
     parse_document,
 )
 from joinhound.index.columns import save_column_profiles
+from joinhound.index.documents import sync_documents
 from joinhound.index.links import ColumnLink, save_links, stored_links
 from joinhound.index.model import model_links, model_text, store_model
 from joinhound.index.schema import apply_schema
@@ -115,6 +118,18 @@ def profile(
     """Write column fingerprints and relationship proposals."""
     written = _profile_sources(Path(config), auto_approve)
     typer.echo(f"links {written}")
+
+
+@app.command()
+def sync(
+    config: str = typer.Option(
+        "joinhound.yaml",
+        "--config",
+        help="Path to the YAML configuration.",
+    ),
+) -> None:
+    """Index documents that changed since the last sync."""
+    typer.echo(f"documents {_sync_sources(load_config(Path(config)))}")
 
 
 @app.command(name="import")
@@ -210,6 +225,61 @@ def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
         save_links(settings.kg_database, drafts, approve_at)
         written += len(drafts)
     return written
+
+
+def _sync_sources(settings: AppConfig) -> int:
+    parsers = _document_parsers()
+    embedder = _embedder(settings)
+    written = 0
+    for name, source_config in settings.sources.items():
+        if not isinstance(source_config, S3SourceConfig):
+            continue
+        written += sync_documents(
+            settings.kg_database,
+            name,
+            S3Source(name, source_config),
+            embedder,
+            lambda mime, data: _parse(parsers, mime, data),
+        )
+    return written
+
+
+def _parse(parsers: Mapping[str, DocumentParser], mime: str, data: bytes) -> list[TextBlock]:
+    parser = parsers.get(mime)
+    if parser is None:
+        return []
+    return parser.parse(data)
+
+
+def _document_parsers() -> dict[str, DocumentParser]:
+    ocr = _ocr_engine()
+    found: dict[str, DocumentParser] = {}
+    for factory in load_plugins("joinhound.parsers").values():
+        if not callable(factory):
+            continue
+        try:
+            parser = cast(DocumentParser, factory(ocr=ocr))
+        except TypeError:
+            parser = cast(DocumentParser, factory())
+        for mime in parser.mime_types:
+            found[mime] = parser
+    return found
+
+
+def _ocr_engine() -> object | None:
+    if shutil.which("tesseract") is None:
+        return None
+    factory = load_plugins("joinhound.ocr").get("tesseract")
+    if not callable(factory):
+        return None
+    return factory()
+
+
+def _embedder(settings: AppConfig) -> Embedder:
+    factory = load_plugins("joinhound.embedders").get(settings.embeddings.provider)
+    if not callable(factory):
+        raise typer.BadParameter(f"Unknown embeddings provider: {settings.embeddings.provider}")
+    return cast(Embedder, factory(dim=settings.embeddings.dim))
 
 
 def _matchers(source: TabularSource) -> Mapping[str, LinkMatcher]:

@@ -3,6 +3,7 @@
 """Tests for the command-line entry point."""
 
 import re
+from pathlib import Path
 
 from typer.testing import CliRunner
 
@@ -33,6 +34,32 @@ def test_help_lists_serve() -> None:
 
     assert result.exit_code == 0
     assert "serve" in _ANSI.sub("", result.output)
+
+
+def test_sync_with_no_document_source_prints_zero(tmp_path: Path) -> None:
+    config = tmp_path / "joinhound.yaml"
+    config.write_text(
+        "\n".join(
+            [
+                "mode: sidecar",
+                "kg_database: postgresql://joinhound@localhost/joinhound",
+                "sources: {}",
+                "embeddings:",
+                "  provider: none",
+                "  model: none",
+                "  dim: 1024",
+                "judge:",
+                "  provider: none",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["sync", "--config", str(config)])
+
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "documents 0"
 
 
 def test_version_prints_package_version() -> None:
