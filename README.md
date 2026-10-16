@@ -1,6 +1,6 @@
 # joinhound
 
-> **Status: pre-alpha.** The first usable release is under development.
+> **Status: pre-alpha.** Follow [docs/quickstart.md](docs/quickstart.md) to connect Pagila.
 
 Joinhound connects to PostgreSQL and S3 with read-only credentials, proposes relationships between columns and document collections, and returns a bounded graph of related records and passages to an agent through MCP. Every item in the response carries the address of its source.
 
@@ -51,4 +51,4 @@ scripts/load_pagila.sh
 }
 ```
 
-The published `0.0.1` package reserves the project name. Application commands are still being built.
+Further reading: [configuration](docs/config.md), [JOINHOUND Ossie extension](docs/ossie-extension.md), and [plugins](docs/plugins.md).
