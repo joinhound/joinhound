@@ -199,11 +199,21 @@ def serve(
         help="Path to the YAML configuration.",
     ),
 ) -> None:
-    """Serve get_context, expand, and get_record over MCP stdio."""
+    """Serve get_context, expand, and get_record over MCP."""
     settings = load_config(Path(config))
-    if settings.server.transport != "stdio":
-        raise typer.BadParameter("Only the stdio transport is available")
-    create_server(runtime_from_config(settings)).run(transport="stdio")
+    runtime = runtime_from_config(settings)
+    if settings.server.transport == "stdio":
+        create_server(runtime).run(transport="stdio")
+        return
+    token = settings.server.auth_token
+    if not token:
+        raise typer.BadParameter("HTTP transport requires server.auth_token")
+    public_url = f"http://127.0.0.1:{settings.server.http_port}"
+    create_server(runtime, auth_token=token, public_url=public_url).run(
+        transport="streamable-http",
+        host="127.0.0.1",
+        port=settings.server.http_port,
+    )
 
 
 def _require_ossie(format_name: str) -> None:

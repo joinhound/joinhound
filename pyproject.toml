@@ -64,6 +64,9 @@ docx = "joinhound.parsers:DocxParser"
 html = "joinhound.parsers:HtmlParser"
 pdf = "joinhound.parsers:PdfParser"
 
+[project.entry-points."joinhound.auth"]
+bearer = "joinhound.server.auth:StaticTokenVerifier"
+
 [project.entry-points."joinhound.connectors"]
 postgres = "joinhound.connectors.postgres:PostgresSource"
 s3 = "joinhound.connectors.s3:S3Source"
