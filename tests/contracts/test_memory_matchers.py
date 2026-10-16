@@ -3,12 +3,14 @@
 """The packaged matcher contract, exercised by the built-in equality matchers."""
 
 from joinhound.core.models import CollectionProfile, ColumnProfile, DeclaredFK, Link
+from joinhound.llm.hashing import HashEmbedder
 from joinhound.matchers import (
     DeclaredFkMatcher,
     DocumentMatcher,
     ExactMatcher,
     FuzzyMatcher,
     NormalizedMatcher,
+    SemanticMatcher,
 )
 from joinhound.matchers.documents import Passage
 from joinhound.testing.contracts import check_link_matcher
@@ -144,6 +146,43 @@ def test_fuzzy_contract() -> None:
         link=Link(
             link_id="orders.name",
             match_type="fuzzy",
+            src_collection="orders",
+            src_column="name",
+            dst_collection="customers",
+            dst_column="name",
+        ),
+        values=["Ada Lovelace", "Grace Hopper"],
+        missing_value="zzzzzzzzzz",
+        expected_value="Ada Lovelace",
+        expected_pk={"id": 1},
+    )
+
+
+def test_semantic_contract() -> None:
+    source = MemoryTabularSource(
+        {
+            "orders": [
+                {"id": 1, "name": "Ada Lovelace"},
+                {"id": 2, "name": "Grace Hopper"},
+            ],
+            "customers": [
+                {"id": 1, "name": "Ada Lovelace"},
+                {"id": 2, "name": "Grace Hopper"},
+            ],
+            "products": [
+                {"id": 8, "sku": "WIDGET-8"},
+                {"id": 9, "sku": "GADGET-9"},
+            ],
+        }
+    )
+    check_link_matcher(
+        SemanticMatcher(source, HashEmbedder(dim=128)),
+        src=_column("orders", "name"),
+        dst=_column("customers", "name"),
+        unrelated=_column("products", "sku"),
+        link=Link(
+            link_id="orders.name",
+            match_type="semantic",
             src_collection="orders",
             src_column="name",
             dst_collection="customers",

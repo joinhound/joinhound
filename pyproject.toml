@@ -23,6 +23,7 @@ dependencies = [
     "jsonschema==4.26.0",
     "mcp==2.3.0",
     "obstore==0.12.0",
+    "openai==2.7.2",
     "psycopg-pool==3.3.0",
     "psycopg[binary]==3.3.6",
     "pyahocorasick==2.2.0",
@@ -47,10 +48,13 @@ joinhound = "joinhound.cli:app"
 jh = "joinhound.cli:app"
 
 [project.entry-points."joinhound.embedders"]
+local = "joinhound.llm.hashing:HashEmbedder"
 none = "joinhound.llm.none:NoneEmbedder"
+openai = "joinhound.llm.openai_embedder:OpenAIEmbedder"
 
 [project.entry-points."joinhound.judges"]
 none = "joinhound.llm.none:NoneJudge"
+openai = "joinhound.llm.openai_judge:OpenAIJudge"
 
 [project.entry-points."joinhound.ocr"]
 tesseract = "joinhound.ocr:TesseractOcrEngine"
@@ -70,6 +74,7 @@ declared_fk = "joinhound.matchers:DeclaredFkMatcher"
 exact = "joinhound.matchers:ExactMatcher"
 fuzzy = "joinhound.matchers:FuzzyMatcher"
 normalized = "joinhound.matchers:NormalizedMatcher"
+semantic = "joinhound.matchers:SemanticMatcher"
 
 [project.entry-points."joinhound.model_formats"]
 ossie = "joinhound.formats:OssieFormat"
@@ -79,6 +84,10 @@ ossie = "joinhound.formats:OssieFormat"
 "migrations/0001.kg.rollback.sql" = "joinhound/migrations/0001.kg.rollback.sql"
 "migrations/0002.value_sync.sql" = "joinhound/migrations/0002.value_sync.sql"
 "migrations/0002.value_sync.rollback.sql" = "joinhound/migrations/0002.value_sync.rollback.sql"
+"migrations/0003.judge_cache.sql" = "joinhound/migrations/0003.judge_cache.sql"
+"migrations/0003.judge_cache.rollback.sql" = "joinhound/migrations/0003.judge_cache.rollback.sql"
+"migrations/0004.embedding_model.sql" = "joinhound/migrations/0004.embedding_model.sql"
+"migrations/0004.embedding_model.rollback.sql" = "joinhound/migrations/0004.embedding_model.rollback.sql"
 "src/joinhound/formats/ossie-schema.json" = "joinhound/formats/ossie-schema.json"
 
 [tool.pytest.ini_options]

@@ -56,6 +56,8 @@ class EmbeddingsConfig(BaseModel):
     provider: str
     model: str
     dim: int
+    base_url: str | None = None
+    api_key: str | None = None
 
 
 class JudgeConfig(BaseModel):
@@ -65,6 +67,8 @@ class JudgeConfig(BaseModel):
     base_url: str | None = None
     api_key: str | None = None
     model: str | None = None
+    redact: bool = False
+    sensitive_columns: list[str] = Field(default_factory=list)
 
 
 class ProfilerConfig(BaseModel):

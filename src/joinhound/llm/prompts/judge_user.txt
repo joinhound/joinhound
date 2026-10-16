@@ -1,0 +1,3 @@
+Relationship type: {match_type}
+Confidence: {confidence}
+Evidence: {evidence}

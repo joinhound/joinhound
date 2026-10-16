@@ -36,6 +36,8 @@ def sync_documents(
     source: DocumentSource,
     embedder: Embedder,
     parse: Parse,
+    *,
+    force: bool = False,
 ) -> int:
     """Index documents that changed since the stored ETags. Return how many were visited."""
     visited = 0
@@ -45,7 +47,8 @@ def sync_documents(
                 continue
             _ensure_collection(connection, source_name, collection.collection_id)
             stored = _stored(connection, collection.collection_id)
-            for ref in source.changes_since(collection.collection_id, _cursor(stored)):
+            cursor = None if force else _cursor(stored)
+            for ref in source.changes_since(collection.collection_id, cursor):
                 with connection.transaction():
                     _apply(connection, collection.collection_id, source, embedder, parse, ref)
                 visited += 1

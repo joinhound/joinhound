@@ -6,6 +6,7 @@ from joinhound.connectors.postgres import PostgresSource
 from joinhound.core.registry import load_plugins
 from joinhound.formats import OssieFormat
 from joinhound.llm.none import NoneJudge
+from joinhound.llm.openai_judge import OpenAIJudge
 from joinhound.matchers import DeclaredFkMatcher, ExactMatcher, FuzzyMatcher, NormalizedMatcher
 
 
@@ -13,6 +14,7 @@ def test_registry_finds_builtin_judge() -> None:
     plugins = load_plugins("joinhound.judges")
 
     assert plugins["none"] is NoneJudge
+    assert plugins["openai"] is OpenAIJudge
 
 
 def test_registry_finds_postgres_connector() -> None:
