@@ -318,6 +318,24 @@ class PostgresSource:
         limit: int = 50,
     ) -> list[Match]:
         """Find rows whose column matches the given values."""
+        return [
+            Match(
+                pk=dict(record.pk),
+                value="" if record.values.get(column) is None else str(record.values[column]),
+            )
+            for record in self.match_records(coll, column, values, mode, normalize_sql, limit)
+        ]
+
+    def match_records(
+        self,
+        coll: str,
+        column: str,
+        values: list[str],
+        mode: Literal["exact", "normalized"],
+        normalize_sql: str | None = None,
+        limit: int = 50,
+    ) -> list[Record]:
+        """Return matching rows in one statement. Used when kg shares this database."""
         schema, table = self._location(coll)
         plan = self._key_plan(schema, table)
         if mode == "exact":
@@ -326,7 +344,7 @@ class PostgresSource:
             raise SourceError("normalized search requires normalize_sql")
         else:
             where = sql.SQL("({}) = ANY(%s)").format(sql.SQL(normalize_sql))
-        records = self._query_records(
+        return self._query_records(
             coll,
             schema,
             table,
@@ -336,13 +354,6 @@ class PostgresSource:
             order=False,
             limit=limit,
         )
-        return [
-            Match(
-                pk=dict(record.pk),
-                value="" if record.values.get(column) is None else str(record.values[column]),
-            )
-            for record in records
-        ]
 
     def scan_column(
         self,

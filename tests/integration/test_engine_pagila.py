@@ -39,7 +39,8 @@ def pagila_dsn() -> Iterator[str]:
         yield postgres.get_connection_url(driver=None)
 
 
-def test_title_seed_respects_fanout_and_budget(pagila_dsn: str) -> None:
+@pytest.mark.parametrize("deployment", ["sidecar", "co_located"])
+def test_title_seed_respects_fanout_and_budget(pagila_dsn: str, deployment: str) -> None:
     with PostgresSource(
         "pagila",
         PostgresSourceConfig(
@@ -62,6 +63,7 @@ def test_title_seed_respects_fanout_and_budget(pagila_dsn: str) -> None:
             max_depth=1,
             dictionary=dictionary,
             clock=_frozen,
+            deployment=deployment,
         )
         second = get_context(
             "ACADEMY DINOSAUR",
@@ -72,6 +74,7 @@ def test_title_seed_respects_fanout_and_budget(pagila_dsn: str) -> None:
             max_depth=1,
             dictionary=dictionary,
             clock=_frozen,
+            deployment=deployment,
         )
         narrow = get_context(
             "ACADEMY DINOSAUR",
@@ -82,6 +85,7 @@ def test_title_seed_respects_fanout_and_budget(pagila_dsn: str) -> None:
             max_depth=1,
             dictionary=dictionary,
             clock=_frozen,
+            deployment=deployment,
         )
         seeds = get_context(
             "ACADEMY DINOSAUR",
@@ -92,6 +96,7 @@ def test_title_seed_respects_fanout_and_budget(pagila_dsn: str) -> None:
             max_depth=0,
             dictionary=dictionary,
             clock=_frozen,
+            deployment=deployment,
         )
         limited = get_context(
             "ACADEMY DINOSAUR",
@@ -103,6 +108,7 @@ def test_title_seed_respects_fanout_and_budget(pagila_dsn: str) -> None:
             max_depth=1,
             dictionary=dictionary,
             clock=_frozen,
+            deployment=deployment,
         )
 
     assert first.model_dump() == second.model_dump()
