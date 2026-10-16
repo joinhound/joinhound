@@ -29,6 +29,7 @@ from joinhound.core.models import (
 from joinhound.core.uri import PgUri, build_uri
 
 _SMALL_TABLE_ROWS = 10_000
+_BLOCK_MODULUS = 32
 _TYPE_CLASSES = {
     "bool": "bool",
     "bpchar": "text",
@@ -95,6 +96,7 @@ class PostgresSource:
         self._schemas = list(config.schemas)
         self._exclude = set(config.exclude_tables)
         self._timeout_ms = config.statement_timeout_ms
+        self.scan_cursor: Cursor | None = None
         self._pool: ConnectionPool[dict[str, object]] = ConnectionPool(
             config.dsn,
             min_size=1,
@@ -348,17 +350,161 @@ class PostgresSource:
         column: str,
         since: Cursor | None,
     ) -> Iterator[tuple[dict[str, object], str]]:
-        """Yield keys and column values changed since the cursor."""
+        """Yield keys and column values changed since the cursor.
+
+        A table with ``updated_at`` yields rows newer than the cursor. Otherwise
+        rows are grouped by a hash of the primary key, and only a group whose
+        hash changed is read again. ``scan_cursor`` is the position to store.
+        """
+        self.scan_cursor = None
         schema, table = self._location(coll)
         plan = self._key_plan(schema, table)
+        if plan.has_updated_at:
+            yield from self._scan_updated(coll, schema, table, plan, column, since)
+            return
+        if plan.unstable:
+            yield from self._scan_replaced(coll, schema, table, plan, column, since)
+            return
+        yield from self._scan_blocks(coll, schema, table, plan, column, since)
+
+    def _scan_updated(
+        self,
+        coll: str,
+        schema: str,
+        table: str,
+        plan: KeyPlan,
+        column: str,
+        since: Cursor | None,
+    ) -> Iterator[tuple[dict[str, object], str]]:
         where, params = self._since(plan, since)
         if where is None:
             return
+        stamp = self._max_updated_at(schema, table)
+        if stamp is not None:
+            self.scan_cursor = Cursor(value=stamp)
+        elif since is not None:
+            self.scan_cursor = since
+        yield from self._yield_column(coll, schema, table, plan, column, where, params)
+
+    def _scan_blocks(
+        self,
+        coll: str,
+        schema: str,
+        table: str,
+        plan: KeyPlan,
+        column: str,
+        since: Cursor | None,
+    ) -> Iterator[tuple[dict[str, object], str]]:
+        digests = self._block_digests(schema, table, plan, column)
+        self.scan_cursor = Cursor(value=_block_payload(_BLOCK_MODULUS, digests))
+        previous = _stored_blocks(since)
+        if previous is not None and previous == digests:
+            return
+        changed = set(digests) if previous is None else _changed_blocks(previous, digests)
+        if not changed:
+            return
+        if previous is None:
+            where: sql.Composable = sql.SQL("TRUE")
+            params: list[object] = []
+        else:
+            where = sql.SQL("{} = ANY(%s)").format(_block_sql(plan))
+            params = [sorted(int(block) for block in changed)]
+        yield from self._yield_column(coll, schema, table, plan, column, where, params)
+
+    def _scan_replaced(
+        self,
+        coll: str,
+        schema: str,
+        table: str,
+        plan: KeyPlan,
+        column: str,
+        since: Cursor | None,
+    ) -> Iterator[tuple[dict[str, object], str]]:
+        digest = self._table_digest(schema, table, plan, column)
+        self.scan_cursor = Cursor(value=_block_payload(0, {"0": digest}))
+        if since is not None and since.value == self.scan_cursor.value:
+            return
+        yield from self._yield_column(coll, schema, table, plan, column, sql.SQL("TRUE"), [])
+
+    def _yield_column(
+        self,
+        coll: str,
+        schema: str,
+        table: str,
+        plan: KeyPlan,
+        column: str,
+        where: sql.Composable,
+        params: list[object],
+    ) -> Iterator[tuple[dict[str, object], str]]:
         for record in self._query_records(
             coll, schema, table, plan, where, params, order=True, limit=None
         ):
             value = record.values.get(column)
             yield dict(record.pk), "" if value is None else str(value)
+
+    def _max_updated_at(self, schema: str, table: str) -> str | None:
+        statement = sql.SQL("SELECT max(t.updated_at)::text AS stamp FROM {}.{} AS t").format(
+            sql.Identifier(schema),
+            sql.Identifier(table),
+        )
+        with self.connection() as connection:
+            row = connection.execute(statement).fetchone()
+        if row is None or row["stamp"] is None:
+            return None
+        return str(row["stamp"])
+
+    def _block_digests(
+        self,
+        schema: str,
+        table: str,
+        plan: KeyPlan,
+        column: str,
+    ) -> dict[str, str]:
+        statement = sql.SQL(
+            """
+            SELECT block::text AS block,
+                   md5(string_agg(
+                     pk_text || chr(31) || coalesce(value, ''),
+                     chr(10) ORDER BY pk_text
+                   )) AS digest
+            FROM (
+              SELECT {block} AS block, ({pk})::text AS pk_text, {value}::text AS value
+              FROM {relation} AS t
+            ) AS rows
+            GROUP BY block
+            """
+        ).format(
+            block=_block_sql(plan),
+            pk=_pk_json(plan),
+            value=sql.Identifier("t", column),
+            relation=_relation(schema, table),
+        )
+        with self.connection() as connection:
+            rows = connection.execute(statement).fetchall()
+        return {str(row["block"]): str(row["digest"]) for row in rows if row["digest"] is not None}
+
+    def _table_digest(self, schema: str, table: str, plan: KeyPlan, column: str) -> str:
+        statement = sql.SQL(
+            """
+            SELECT coalesce(md5(string_agg(
+                     pk_text || chr(31) || coalesce(value, ''),
+                     chr(10) ORDER BY pk_text
+                   )), '') AS digest
+            FROM (
+              SELECT ({pk})::text AS pk_text, {value}::text AS value
+              FROM {relation} AS t
+            ) AS rows
+            """
+        ).format(
+            pk=_pk_json(plan),
+            value=sql.Identifier("t", column),
+            relation=_relation(schema, table),
+        )
+        with self.connection() as connection:
+            row = connection.execute(statement).fetchone()
+        if row is None or row["digest"] is None:
+            return ""
+        return str(row["digest"])
 
     def _configure(self, connection: psycopg.Connection[dict[str, object]]) -> None:
         connection.execute(
@@ -509,6 +655,49 @@ class PostgresSource:
         )
         with self.connection() as connection:
             return list(connection.execute(statement, params).fetchall())
+
+
+def _relation(schema: str, table: str) -> sql.Composable:
+    return sql.SQL("{}.{}").format(sql.Identifier(schema), sql.Identifier(table))
+
+
+def _pk_json(plan: KeyPlan) -> sql.Composable:
+    parts: list[sql.Composable] = []
+    for column in plan.columns:
+        parts.append(sql.Literal(column))
+        parts.append(sql.Identifier("t", column))
+    return sql.SQL("jsonb_build_object({})").format(sql.SQL(", ").join(parts))
+
+
+def _block_sql(plan: KeyPlan) -> sql.Composable:
+    return sql.SQL("mod(abs(hashtext(({})::text)::bigint), {})").format(
+        _pk_json(plan),
+        sql.Literal(_BLOCK_MODULUS),
+    )
+
+
+def _block_payload(modulus: int, blocks: dict[str, str]) -> str:
+    return json.dumps({"modulus": modulus, "blocks": blocks}, sort_keys=True)
+
+
+def _stored_blocks(since: Cursor | None) -> dict[str, str] | None:
+    if since is None:
+        return None
+    try:
+        parsed = cast(object, json.loads(since.value))
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(parsed, dict) or "blocks" not in parsed:
+        return None
+    blocks = parsed["blocks"]
+    if not isinstance(blocks, dict):
+        return None
+    return {str(key): str(value) for key, value in blocks.items()}
+
+
+def _changed_blocks(previous: dict[str, str], current: dict[str, str]) -> set[str]:
+    names = set(previous) | set(current)
+    return {name for name in names if previous.get(name) != current.get(name)}
 
 
 def select_key(
