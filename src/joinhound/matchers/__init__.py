@@ -5,5 +5,15 @@
 from joinhound.matchers.declared import DeclaredFkMatcher
 from joinhound.matchers.documents import DocumentMatcher
 from joinhound.matchers.exact import ExactMatcher
+from joinhound.matchers.fuzzy import FuzzyMatcher
+from joinhound.matchers.normalized import NormalizedMatcher
+from joinhound.matchers.semantic import SemanticMatcher
 
-__all__ = ["DeclaredFkMatcher", "DocumentMatcher", "ExactMatcher"]
+__all__ = [
+    "DeclaredFkMatcher",
+    "DocumentMatcher",
+    "ExactMatcher",
+    "FuzzyMatcher",
+    "NormalizedMatcher",
+    "SemanticMatcher",
+]

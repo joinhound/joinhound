@@ -16,7 +16,7 @@ from joinhound.connectors.postgres import PostgresSource
 from joinhound.connectors.s3 import S3Source
 from joinhound.core.config import AppConfig, PostgresSourceConfig, S3SourceConfig, load_config
 from joinhound.core.models import LinkDraft, TextBlock
-from joinhound.core.protocols import DocumentParser, Embedder, LinkMatcher, TabularSource
+from joinhound.core.protocols import DocumentParser, Embedder, Judge, LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.evaluate import precision_recall
 from joinhound.engine.questions import load_questions, score_questions
@@ -29,10 +29,12 @@ from joinhound.formats.ossie import (
 )
 from joinhound.index.columns import save_column_profiles
 from joinhound.index.documents import read_passages, sync_documents
+from joinhound.index.embedding_model import EmbeddingModelChanged, check_embedding_model
 from joinhound.index.links import ColumnLink, save_links, stored_links
 from joinhound.index.model import model_links, model_text, store_model
 from joinhound.index.schema import apply_schema
 from joinhound.index.values import sync_values
+from joinhound.llm.none import NoneEmbedder
 from joinhound.profiler.profile import link_id, propose_links
 from joinhound.server import create_server, runtime_from_config
 
@@ -128,9 +130,25 @@ def sync(
         "--config",
         help="Path to the YAML configuration.",
     ),
+    reindex: bool = typer.Option(
+        False,
+        "--reindex",
+        help="Rebuild stored vectors after an embedding model change.",
+    ),
 ) -> None:
     """Index changed documents and approved fuzzy or semantic column values."""
-    documents, values = _sync_sources(load_config(Path(config)))
+    settings = load_config(Path(config))
+    if settings.sources:
+        try:
+            check_embedding_model(
+                settings.kg_database,
+                settings.embeddings.model,
+                settings.embeddings.dim,
+                reindex=reindex,
+            )
+        except EmbeddingModelChanged as error:
+            raise typer.BadParameter(str(error)) from error
+    documents, values = _sync_sources(settings, force=reindex)
     typer.echo(f"documents {documents}")
     typer.echo(f"values {values}")
 
@@ -223,14 +241,19 @@ def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
             continue
         source = PostgresSource(name, source_config)
         with source:
-            profiles, drafts = propose_links(source, settings.profiler, _matchers(source))
+            profiles, drafts = propose_links(
+                source,
+                settings.profiler,
+                _matchers(source, settings.kg_database, _embedder(settings)),
+                _judge(settings),
+            )
         save_column_profiles(settings.kg_database, name, profiles)
         save_links(settings.kg_database, drafts, approve_at)
         written += len(drafts)
     return written
 
 
-def _sync_sources(settings: AppConfig) -> tuple[int, int]:
+def _sync_sources(settings: AppConfig, *, force: bool = False) -> tuple[int, int]:
     parsers = _document_parsers()
     embedder = _embedder(settings)
     documents = 0
@@ -243,11 +266,18 @@ def _sync_sources(settings: AppConfig) -> tuple[int, int]:
                 S3Source(name, source_config),
                 embedder,
                 lambda mime, data: _parse(parsers, mime, data),
+                force=force,
             )
         elif isinstance(source_config, PostgresSourceConfig):
             source = PostgresSource(name, source_config)
             with source:
-                values += sync_values(settings.kg_database, name, source)
+                values += sync_values(
+                    settings.kg_database,
+                    name,
+                    source,
+                    embedder,
+                    force=force,
+                )
     return documents, values
 
 
@@ -286,16 +316,61 @@ def _embedder(settings: AppConfig) -> Embedder:
     factory = load_plugins("joinhound.embedders").get(settings.embeddings.provider)
     if not callable(factory):
         raise typer.BadParameter(f"Unknown embeddings provider: {settings.embeddings.provider}")
+    if settings.embeddings.provider == "openai":
+        return cast(
+            Embedder,
+            factory(
+                dim=settings.embeddings.dim,
+                model=settings.embeddings.model,
+                base_url=settings.embeddings.base_url,
+                api_key=settings.embeddings.api_key,
+            ),
+        )
+    if settings.embeddings.provider == "local":
+        return cast(
+            Embedder,
+            factory(dim=settings.embeddings.dim, model=settings.embeddings.model),
+        )
     return cast(Embedder, factory(dim=settings.embeddings.dim))
 
 
-def _matchers(source: TabularSource) -> Mapping[str, LinkMatcher]:
+def _judge(settings: AppConfig) -> Judge:
+    factory = load_plugins("joinhound.judges").get(settings.judge.provider)
+    if not callable(factory):
+        raise typer.BadParameter(f"Unknown judge provider: {settings.judge.provider}")
+    if settings.judge.provider == "none":
+        return cast(Judge, factory())
+    return cast(
+        Judge,
+        factory(
+            base_url=settings.judge.base_url,
+            api_key=settings.judge.api_key,
+            model=settings.judge.model,
+            redact=settings.judge.redact,
+            sensitive_columns=settings.judge.sensitive_columns,
+            dsn=settings.kg_database,
+        ),
+    )
+
+
+def _matchers(
+    source: TabularSource,
+    index_dsn: str | None = None,
+    embedder: Embedder | None = None,
+) -> Mapping[str, LinkMatcher]:
     plugins = load_plugins("joinhound.matchers")
     matchers: dict[str, LinkMatcher] = {}
-    for name in ("declared_fk", "exact"):
+    vectors = embedder or NoneEmbedder()
+    for name in ("declared_fk", "exact", "normalized", "fuzzy", "semantic"):
         factory = plugins[name]
         if not callable(factory):
             raise TypeError(f"Matcher {name} is not callable")
+        if name == "fuzzy":
+            matchers[name] = cast(LinkMatcher, factory(source, index_dsn))
+            continue
+        if name == "semantic":
+            matchers[name] = cast(LinkMatcher, factory(source, vectors, index_dsn))
+            continue
         matchers[name] = cast(LinkMatcher, factory(source))
     return matchers
 
@@ -311,7 +386,7 @@ def _print_question_scores(settings: AppConfig, path: str) -> None:
                 questions,
                 source,
                 _declared_drafts(source),
-                _matchers(source),
+                _matchers(source, settings.kg_database, _embedder(settings)),
                 settings.engine,
                 passages=read_passages(settings.kg_database),
             )

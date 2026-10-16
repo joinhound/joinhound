@@ -10,12 +10,13 @@ from typing import cast
 from mcp.server.mcpserver import MCPServer
 
 from joinhound.core.models import IndexedPassage, LinkDraft
-from joinhound.core.protocols import LinkMatcher, TabularSource
+from joinhound.core.protocols import Embedder, LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
 from joinhound.engine.context import expand, get_context, read_record
 from joinhound.engine.response import ContextResponse, RecordResult
 from joinhound.engine.score import text_tokens, truncate_text
 from joinhound.index.documents import read_passages
+from joinhound.llm.none import NoneEmbedder
 from joinhound.matchers.documents import Passage
 from joinhound.server.runtime import Runtime
 
@@ -62,7 +63,7 @@ def create_server(runtime: Runtime) -> MCPServer:
                     query,
                     source,
                     _links_for(name, source, links),
-                    _matchers(source, passages),
+                    _matchers(source, passages, _index_dsn(runtime), _server_embedder(runtime)),
                     runtime.engine,
                     budget_tokens=budget_tokens,
                     max_depth=max_depth,
@@ -92,7 +93,7 @@ def create_server(runtime: Runtime) -> MCPServer:
                         owned,
                         source,
                         _links_for(name, source, stored),
-                        _matchers(source, passages),
+                        _matchers(source, passages, _index_dsn(runtime), _server_embedder(runtime)),
                         runtime.engine,
                         depth=depth,
                         budget_tokens=budget_tokens,
@@ -129,12 +130,51 @@ def _stored_passages(runtime: Runtime) -> list[IndexedPassage]:
     return read_passages(runtime.settings.kg_database)
 
 
-def _matchers(source: TabularSource, passages: Sequence[IndexedPassage]) -> dict[str, LinkMatcher]:
+def _index_dsn(runtime: Runtime) -> str | None:
+    if runtime.settings is None:
+        return None
+    return runtime.settings.kg_database
+
+
+def _server_embedder(runtime: Runtime) -> Embedder:
+    if runtime.settings is None:
+        return NoneEmbedder()
+    settings = runtime.settings
+    factory = load_plugins("joinhound.embedders").get(settings.embeddings.provider)
+    if not callable(factory):
+        return NoneEmbedder()
+    if settings.embeddings.provider == "openai":
+        return cast(
+            Embedder,
+            factory(
+                dim=settings.embeddings.dim,
+                model=settings.embeddings.model,
+                base_url=settings.embeddings.base_url,
+                api_key=settings.embeddings.api_key,
+            ),
+        )
+    if settings.embeddings.provider == "local":
+        return cast(Embedder, factory(dim=settings.embeddings.dim, model=settings.embeddings.model))
+    return cast(Embedder, factory(dim=settings.embeddings.dim))
+
+
+def _matchers(
+    source: TabularSource,
+    passages: Sequence[IndexedPassage],
+    index_dsn: str | None,
+    embedder: Embedder,
+) -> dict[str, LinkMatcher]:
     plugins = load_plugins("joinhound.matchers")
     matchers: dict[str, LinkMatcher] = {}
-    for name in ("declared_fk", "exact", "column_documents"):
+    for name in ("declared_fk", "exact", "normalized", "fuzzy", "semantic", "column_documents"):
         factory = plugins.get(name)
         if not callable(factory):
+            continue
+        if name == "fuzzy":
+            matchers[name] = cast(LinkMatcher, factory(source, index_dsn))
+            continue
+        if name == "semantic":
+            matchers[name] = cast(LinkMatcher, factory(source, embedder, index_dsn))
             continue
         if name == "column_documents":
             converted = [

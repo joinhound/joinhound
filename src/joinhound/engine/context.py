@@ -31,6 +31,7 @@ from joinhound.engine.response import (
 from joinhound.engine.score import content_tokens, path_score, relevance
 
 _EXACT = frozenset({"declared_fk", "exact"})
+_WALK = _EXACT | {"normalized", "fuzzy", "semantic"}
 _DOCUMENTS = "column_documents"
 
 
@@ -362,7 +363,7 @@ def _expand(
                 )
             )
             continue
-        if link.match_type not in _EXACT or link.dst_column is None:
+        if link.match_type not in _WALK or link.dst_column is None:
             continue
         found.extend(
             _follow(
@@ -378,20 +379,21 @@ def _expand(
                 forward=True,
             )
         )
-        found.extend(
-            _follow(
-                ordered,
-                link,
-                matchers,
-                source,
-                fanout,
-                visited,
-                scope,
-                query,
-                decay,
-                forward=False,
+        if link.match_type in _EXACT:
+            found.extend(
+                _follow(
+                    ordered,
+                    link,
+                    matchers,
+                    source,
+                    fanout,
+                    visited,
+                    scope,
+                    query,
+                    decay,
+                    forward=False,
+                )
             )
-        )
     return found
 
 
@@ -790,6 +792,7 @@ def _as_link(draft: LinkDraft) -> Link:
         src_column=draft.src_column,
         dst_collection=draft.dst_collection,
         dst_column=draft.dst_column,
+        normalize_sql=draft.normalize_sql,
     )
 
 

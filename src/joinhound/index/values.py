@@ -13,7 +13,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Json
 
 from joinhound.core.models import Cursor
-from joinhound.core.protocols import TabularSource
+from joinhound.core.protocols import Embedder, TabularSource
 from joinhound.index.normalize import apply, names
 
 _MODULUS = 32
@@ -26,14 +26,21 @@ class _Column:
     expression: str
 
 
-def sync_values(dsn: str, source_name: str, source: TabularSource) -> int:
+def sync_values(
+    dsn: str,
+    source_name: str,
+    source: TabularSource,
+    embedder: Embedder | None = None,
+    *,
+    force: bool = False,
+) -> int:
     """Refresh indexed values for one source. Return how many rows were written."""
     written = 0
     for column in _columns(dsn, source_name):
-        stored = _read_cursor(dsn, column)
+        stored = None if force else _read_cursor(dsn, column)
         rows = list(source.scan_column(column.collection_id, column.column, stored))
         scanned = _scanned_cursor(source)
-        written += _write(dsn, column, stored, scanned, rows)
+        written += _write(dsn, column, stored, scanned, rows, embedder)
     return written
 
 
@@ -104,6 +111,7 @@ def _write(
     stored: Cursor | None,
     scanned: Cursor | None,
     rows: Sequence[tuple[dict[str, object], str]],
+    embedder: Embedder | None,
 ) -> int:
     if stored is not None and scanned is not None and stored.value == scanned.value:
         return 0
@@ -121,15 +129,15 @@ def _write(
                     """,
                     (column.collection_id, column.column, _MODULUS, changed),
                 )
-            count = _insert(connection, column, rows)
+            count = _insert(connection, column, rows, embedder)
         elif mode == "updated_at":
-            count = _upsert(connection, column, rows)
+            count = _upsert(connection, column, rows, embedder)
         else:
             connection.execute(
                 "DELETE FROM kg.value_index WHERE collection_id = %s AND column_name = %s",
                 (column.collection_id, column.column),
             )
-            count = _insert(connection, column, rows)
+            count = _insert(connection, column, rows, embedder)
         if scanned is not None:
             connection.execute(
                 """
@@ -181,6 +189,7 @@ def _upsert(
     connection: psycopg.Connection[tuple[object, ...]],
     column: _Column,
     rows: Sequence[tuple[dict[str, object], str]],
+    embedder: Embedder | None,
 ) -> int:
     for pk, _value in rows:
         connection.execute(
@@ -190,20 +199,43 @@ def _upsert(
             """,
             (column.collection_id, column.column, Json(pk)),
         )
-    return _insert(connection, column, rows)
+    return _insert(connection, column, rows, embedder)
 
 
 def _insert(
     connection: psycopg.Connection[tuple[object, ...]],
     column: _Column,
     rows: Sequence[tuple[dict[str, object], str]],
+    embedder: Embedder | None,
 ) -> int:
-    for pk, value in rows:
+    norms = [apply(column.expression, value) for _pk, value in rows]
+    vectors: list[list[float] | None]
+    if embedder is None:
+        vectors = [None] * len(rows)
+    else:
+        vectors = [list(vector) for vector in embedder.embed(norms)]
+    for (pk, _value), norm, vector in zip(rows, norms, vectors, strict=True):
+        if vector is None:
+            connection.execute(
+                """
+                INSERT INTO kg.value_index (collection_id, column_name, pk, norm_value, synced_at)
+                VALUES (%s, %s, %s, %s, now())
+                """,
+                (column.collection_id, column.column, Json(pk), norm),
+            )
+            continue
         connection.execute(
             """
-            INSERT INTO kg.value_index (collection_id, column_name, pk, norm_value, synced_at)
-            VALUES (%s, %s, %s, %s, now())
+            INSERT INTO kg.value_index
+              (collection_id, column_name, pk, norm_value, embedding, synced_at)
+            VALUES (%s, %s, %s, %s, %s::vector, now())
             """,
-            (column.collection_id, column.column, Json(pk), apply(column.expression, value)),
+            (
+                column.collection_id,
+                column.column,
+                Json(pk),
+                norm,
+                "[" + ",".join(f"{item:.6f}" for item in vector) + "]",
+            ),
         )
     return len(rows)
