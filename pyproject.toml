@@ -64,6 +64,7 @@ postgres = "joinhound.connectors.postgres:PostgresSource"
 s3 = "joinhound.connectors.s3:S3Source"
 
 [project.entry-points."joinhound.matchers"]
+column_documents = "joinhound.matchers:DocumentMatcher"
 declared_fk = "joinhound.matchers:DeclaredFkMatcher"
 exact = "joinhound.matchers:ExactMatcher"
 

@@ -2,8 +2,9 @@
 
 """The packaged matcher contract, exercised by the built-in equality matchers."""
 
-from joinhound.core.models import ColumnProfile, DeclaredFK, Link
-from joinhound.matchers import DeclaredFkMatcher, ExactMatcher
+from joinhound.core.models import CollectionProfile, ColumnProfile, DeclaredFK, Link
+from joinhound.matchers import DeclaredFkMatcher, DocumentMatcher, ExactMatcher
+from joinhound.matchers.documents import Passage
 from joinhound.testing.contracts import check_link_matcher
 from joinhound.testing.memory import MemoryTabularSource
 
@@ -77,4 +78,38 @@ def test_exact_contract() -> None:
         missing_value="missing@example.com",
         expected_value="a@example.com",
         expected_pk={"id": 1},
+    )
+
+
+def test_column_documents_contract() -> None:
+    source = MemoryTabularSource(
+        {
+            "orders": [
+                {"id": 1, "code": "ACME-1"},
+                {"id": 2, "code": "ACME-2"},
+            ]
+        }
+    )
+    passages = [
+        Passage("s3://docs/", {"chunk_id": 1}, "Invoice for ACME-1 shipped today"),
+        Passage("s3://docs/", {"chunk_id": 2}, "Quote ACME-2 is attached"),
+        Passage("s3://other/", {"chunk_id": 9}, "Unrelated handbook"),
+    ]
+    check_link_matcher(
+        DocumentMatcher(source, passages),
+        src=_column("orders", "code"),
+        dst=CollectionProfile(collection_id="s3://docs/"),
+        unrelated=CollectionProfile(collection_id="s3://other/"),
+        link=Link(
+            link_id="orders.code",
+            match_type="column_documents",
+            src_collection="orders",
+            src_column="code",
+            dst_collection="s3://docs/",
+            dst_column=None,
+        ),
+        values=["ACME-1", "ACME-2"],
+        missing_value="MISSING",
+        expected_value="ACME-1",
+        expected_pk={"chunk_id": 1},
     )
