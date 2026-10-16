@@ -135,6 +135,8 @@ class LinkDraft(BaseModel):
     threshold: float | None = None
     confidence: float
     cardinality: str | None = None
+    normalize_sql: str | None = None
+    relation_name: str | None = None
     status: str
     evidence: dict[str, EvidenceValue] = Field(default_factory=dict)
 

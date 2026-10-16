@@ -2,6 +2,10 @@ joinhound
 Copyright 2026 Joinhound contributors
 
 This product is licensed under the Apache License, Version 2.0.
+
+This product includes the Apache Ossie core schema and TPC-DS example from
+apache/ossie commit 95314296b725dcff503cf2eb92e89f7cf43c5a95, also licensed
+under the Apache License, Version 2.0.
 You may obtain a copy of the license in the LICENSE file or at
 
     http://www.apache.org/licenses/LICENSE-2.0
