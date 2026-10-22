@@ -8,8 +8,9 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 
+from joinhound.connectors.mssql import MssqlSource
 from joinhound.connectors.postgres import PostgresSource
-from joinhound.core.config import AppConfig, EngineConfig, PostgresSourceConfig
+from joinhound.core.config import AppConfig, EngineConfig, MssqlSourceConfig, PostgresSourceConfig
 from joinhound.core.models import LinkDraft
 from joinhound.core.protocols import TabularSource
 from joinhound.engine.cache import ResultCache
@@ -35,12 +36,13 @@ class Runtime:
         if self.settings is None:
             yield [], []
             return
-        opened: list[tuple[str, PostgresSource]] = []
+        opened: list[tuple[str, TabularSource]] = []
         try:
             for name, source_config in self.settings.sources.items():
-                if not isinstance(source_config, PostgresSourceConfig):
-                    continue
-                opened.append((name, PostgresSource(name, source_config)))
+                if isinstance(source_config, PostgresSourceConfig):
+                    opened.append((name, PostgresSource(name, source_config)))
+                elif isinstance(source_config, MssqlSourceConfig):
+                    opened.append((name, MssqlSource(name, source_config)))
             yield (
                 [(name, source) for name, source in opened],
                 model_links(self.settings.kg_database),

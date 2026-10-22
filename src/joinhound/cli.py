@@ -12,9 +12,16 @@ import typer
 import yaml
 
 from joinhound import __version__
+from joinhound.connectors.mssql import MssqlSource
 from joinhound.connectors.postgres import PostgresSource
 from joinhound.connectors.s3 import S3Source
-from joinhound.core.config import AppConfig, PostgresSourceConfig, S3SourceConfig, load_config
+from joinhound.core.config import (
+    AppConfig,
+    MssqlSourceConfig,
+    PostgresSourceConfig,
+    S3SourceConfig,
+    load_config,
+)
 from joinhound.core.models import LinkDraft, TextBlock
 from joinhound.core.protocols import DocumentParser, Embedder, Judge, LinkMatcher, TabularSource
 from joinhound.core.registry import load_plugins
@@ -256,9 +263,12 @@ def _profile_sources(config_path: Path, auto_approve: float | None) -> int:
     approve_at = settings.profiler.auto_approve if auto_approve is None else auto_approve
     written = 0
     for name, source_config in settings.sources.items():
-        if not isinstance(source_config, PostgresSourceConfig):
+        if isinstance(source_config, PostgresSourceConfig):
+            source: TabularSource = PostgresSource(name, source_config)
+        elif isinstance(source_config, MssqlSourceConfig):
+            source = MssqlSource(name, source_config)
+        else:
             continue
-        source = PostgresSource(name, source_config)
         with source:
             profiles, drafts = propose_links(
                 source,
@@ -287,13 +297,17 @@ def _sync_sources(settings: AppConfig, *, force: bool = False) -> tuple[int, int
                 lambda mime, data: _parse(parsers, mime, data),
                 force=force,
             )
-        elif isinstance(source_config, PostgresSourceConfig):
-            source = PostgresSource(name, source_config)
-            with source:
+        elif isinstance(source_config, PostgresSourceConfig | MssqlSourceConfig):
+            tabular = (
+                PostgresSource(name, source_config)
+                if isinstance(source_config, PostgresSourceConfig)
+                else MssqlSource(name, source_config)
+            )
+            with tabular:
                 values += sync_values(
                     settings.kg_database,
                     name,
-                    source,
+                    tabular,
                     embedder,
                     force=force,
                 )

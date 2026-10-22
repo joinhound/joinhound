@@ -32,6 +32,7 @@ dependencies = [
     "pyahocorasick==2.2.0",
     "pydantic==2.14.1",
     "pydantic-settings==2.16.0",
+    "pymssql==2.3.8",
     "pypdfium2==5.14.0",
     "pytesseract==0.3.13",
     "pyyaml==6.0.3",
@@ -71,6 +72,7 @@ pdf = "joinhound.parsers:PdfParser"
 bearer = "joinhound.server.auth:StaticTokenVerifier"
 
 [project.entry-points."joinhound.connectors"]
+mssql = "joinhound.connectors.mssql:MssqlSource"
 postgres = "joinhound.connectors.postgres:PostgresSource"
 s3 = "joinhound.connectors.s3:S3Source"
 

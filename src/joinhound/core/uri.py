@@ -29,6 +29,16 @@ class PgUri:
 
 
 @dataclass(frozen=True)
+class MssqlUri:
+    """Address of a SQL Server row."""
+
+    source: str
+    schema: str
+    table: str
+    pk: Mapping[str, object]
+
+
+@dataclass(frozen=True)
 class S3Uri:
     """Address of an S3 object or a located passage inside it."""
 
@@ -38,7 +48,7 @@ class S3Uri:
     bbox: tuple[float, float, float, float] | None = None
 
 
-SourceUri = PgUri | S3Uri
+SourceUri = PgUri | MssqlUri | S3Uri
 
 
 def parse_uri(value: str) -> SourceUri:
@@ -46,6 +56,8 @@ def parse_uri(value: str) -> SourceUri:
     parts = urlsplit(value)
     if parts.scheme == "pg":
         return _parse_pg(parts.netloc, parts.path, parts.fragment)
+    if parts.scheme == "mssql":
+        return _parse_mssql(parts.netloc, parts.path, parts.fragment)
     if parts.scheme == "s3":
         return _parse_s3(parts.netloc, parts.path, parts.fragment)
     raise UriError(f"Unsupported URI scheme: {parts.scheme or '(none)'}")
@@ -55,6 +67,8 @@ def build_uri(uri: SourceUri) -> str:
     """Build the canonical form of a provenance URI."""
     if isinstance(uri, PgUri):
         return _build_pg(uri)
+    if isinstance(uri, MssqlUri):
+        return _build_mssql(uri)
     return _build_s3(uri)
 
 
@@ -79,6 +93,28 @@ def _parse_pg(source: str, path: str, fragment: str) -> PgUri:
         unstable=params.get("unstable") == "true",
         row_hash=params.get("hash"),
     )
+
+
+def _parse_mssql(source: str, path: str, fragment: str) -> MssqlUri:
+    if not source:
+        raise UriError("SQL Server URI is missing its source")
+    location = path.lstrip("/")
+    if "." not in location:
+        raise UriError("SQL Server URI must contain schema.table")
+    schema, table = location.split(".", 1)
+    if not schema or not table:
+        raise UriError("SQL Server URI must contain schema.table")
+    params = dict(parse_qsl(fragment, keep_blank_values=True))
+    if "pk" not in params:
+        raise UriError("SQL Server URI is missing pk")
+    return MssqlUri(source=source, schema=schema, table=table, pk=_json_object(params["pk"]))
+
+
+def _build_mssql(uri: MssqlUri) -> str:
+    fragment = urlencode(
+        {"pk": json.dumps(dict(uri.pk), sort_keys=True, separators=(",", ":"), default=str)}
+    )
+    return urlunsplit(("mssql", uri.source, f"/{uri.schema}.{uri.table}", "", fragment))
 
 
 def _parse_s3(source: str, path: str, fragment: str) -> S3Uri:
