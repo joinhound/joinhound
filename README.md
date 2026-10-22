@@ -1,6 +1,6 @@
 # joinhound
 
-> **Status: pre-alpha.** Follow [docs/quickstart.md](docs/quickstart.md) to connect Pagila.
+> **Status: 0.1.0.** Follow [docs/quickstart.md](docs/quickstart.md) to connect Pagila.
 
 Joinhound connects to PostgreSQL and S3 with read-only credentials, proposes relationships between columns and document collections, and returns a bounded graph of related records and passages to an agent through MCP. Every item in the response carries the address of its source.
 
