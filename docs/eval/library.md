@@ -38,9 +38,10 @@ split once.
 
 ## What is fair here
 
-The baseline has all of the data. It can inspect the schema, execute any
-read-only SQL query, and search all 10,000 files. Joinhound gets one
-`get_context` tool. Both arms use the same model and may make eight tool calls.
+Both arms can inspect the schema, execute any read-only SQL query, and search
+all 10,000 files. The joinhound arm additionally gets `get_context`. Both arms
+use the same model and may make eight tool calls. Their execution order is
+randomized per question.
 
 The deterministic comparison is narrower. Both arms use the same seed search.
 The flat arm stops after one hop; joinhound can traverse five hops. This
@@ -55,9 +56,8 @@ does not support claiming that joinhound improves answer quality.
 
 ## Recorded test run
 
-The untouched test split was run on 2026-10-22. Retrieval used all 250 test
-questions. The agent comparison used a balanced 50-question sample and
-`claude-sonnet-5-5`.
+The untouched retrieval test split was run on 2026-10-22 using all 250 test
+questions.
 
 | Retrieval | Recall | Precision | Mean latency |
 | --- | ---: | ---: | ---: |
@@ -69,17 +69,8 @@ file. It also returned a large graph: precision fell from 40.3% to 1.1%, and
 latency was 3.2 times higher. One of fifty file-to-member retrieval questions
 missed the user row.
 
-| Agent | Answer recall | Confirmed | Tool calls | Mean latency | Input tokens |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| SQL + all-file search | 1.000 | 1.000 | 2.64 | 6.07 s | 157,145 |
-| Joinhound | 1.000 | 1.000 | 1.00 | 5.11 s | 1,855,661 |
-
-Both agents answered every sampled test question. Joinhound needed one tool
-call and was 16% faster, but sent 11.8 times as many input tokens because the
-low-precision graph was included in the model context.
-
-This run does **not** show better answer quality with joinhound. It shows a
-retrieval-recall and orchestration advantage offset by severe precision and
-context-size costs. The next product work should reduce returned neighbors and
-serialized graph size; this benchmark can then be rerun without changing the
-test questions.
+An initial 50-question agent run gave the joinhound arm only `get_context`.
+Although both arms could reach all data, that tested two different workflows
+rather than the additive value of joinhound. Its figures are superseded and are
+not reported as an effectiveness result. The corrected paired agent run must be
+recorded before making an answer-quality, latency, tool-call, or token claim.

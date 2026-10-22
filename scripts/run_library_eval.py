@@ -100,6 +100,7 @@ _BASELINE_TOOLS: list[dict[str, object]] = [
     _SUBMIT_TOOL,
 ]
 _JOINHOUND_TOOLS: list[dict[str, object]] = [
+    *_BASELINE_TOOLS[:-1],
     {
         "type": "function",
         "function": {
@@ -171,29 +172,35 @@ def main() -> None:
             headers = {"anthropic-workspace-id": args.workspace_id} if args.workspace_id else None
             client = OpenAI(api_key=args.api_key, base_url=args.base_url, default_headers=headers)
             results = {"baseline": [], "joinhound": []}
+            order_random = random.Random(args.seed)
             for question in selected:
                 baseline = _BaselineTools(args.dsn, passages)
-                results["baseline"].append(
-                    run_agent(
-                        client,
-                        args.model,
-                        question,
-                        _BASELINE_TOOLS,
-                        baseline.execute,
-                        max_tool_calls=args.max_tool_calls,
-                    )
+                joinhound = _JoinhoundTools(
+                    baseline,
+                    source,
+                    links,
+                    matchers,
+                    dictionary,
+                    passages,
                 )
-                joinhound = _JoinhoundTools(source, links, matchers, dictionary, passages)
-                results["joinhound"].append(
-                    run_agent(
-                        client,
-                        args.model,
-                        question,
-                        _JOINHOUND_TOOLS,
-                        joinhound.execute,
-                        max_tool_calls=args.max_tool_calls,
+                arms: list[
+                    tuple[Arm, list[dict[str, object]], _BaselineTools | _JoinhoundTools]
+                ] = [
+                    ("baseline", _BASELINE_TOOLS, baseline),
+                    ("joinhound", _JOINHOUND_TOOLS, joinhound),
+                ]
+                order_random.shuffle(arms)
+                for arm, tools, executor in arms:
+                    results[arm].append(
+                        run_agent(
+                            client,
+                            args.model,
+                            question,
+                            tools,
+                            executor.execute,
+                            max_tool_calls=args.max_tool_calls,
+                        )
                     )
-                )
 
     payload = {
         "model": args.model,
@@ -264,12 +271,14 @@ class _BaselineTools:
 class _JoinhoundTools:
     def __init__(
         self,
+        baseline: _BaselineTools,
         source: PostgresSource,
         links: Sequence[LinkDraft],
         matchers: Mapping[str, LinkMatcher],
         dictionary: ValueDictionary,
         passages: Sequence[IndexedPassage],
     ) -> None:
+        self._baseline = baseline
         self._source = source
         self._links = links
         self._matchers = matchers
@@ -278,7 +287,7 @@ class _JoinhoundTools:
 
     def execute(self, name: str, arguments: Mapping[str, object]) -> str:
         if name != "get_context":
-            raise ValueError(f"Unknown joinhound tool: {name}")
+            return self._baseline.execute(name, arguments)
         result = get_context(
             str(arguments.get("query", "")),
             self._source,

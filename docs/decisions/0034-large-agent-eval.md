@@ -14,9 +14,10 @@ There are two baselines:
 1. One-hop retrieval uses the same value dictionary and passage search, but
    stops before multi-hop traversal. This isolates the traversal effect without
    involving a model.
-2. An agent receives schema inspection, unrestricted read-only `SELECT`, and
-   lexical search over every file. The joinhound arm receives `get_context`.
-   The model, questions, tool-call limit, database, and files are identical.
+2. Both agent arms receive schema inspection, unrestricted read-only `SELECT`,
+   and lexical search over every file. The joinhound arm additionally receives
+   `get_context`. Arm order is randomized per question. The model, questions,
+   tool-call limit, database, and files are identical.
 
 Answer recall, confirmed-answer rate, tool calls, latency, and token use are
 reported. Retrieval also reports evidence precision and recall. Results are

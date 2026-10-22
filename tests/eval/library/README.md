@@ -22,8 +22,9 @@ by database traversal.
 The run has two comparisons:
 
 1. Flat, one-hop retrieval versus joinhound traversal, with no model.
-2. One model with either `describe_schema` + read-only SQL + full file search, or
-   joinhound `get_context`. Both arms receive the same questions, data, maximum
-   tool calls, and model.
+2. One model with `describe_schema` + read-only SQL + full file search in both
+   arms; the joinhound arm additionally receives `get_context`. Both arms receive
+   the same questions, data, maximum tool calls, and model. Their execution order
+   is randomized per question.
 
 The generated bundle and result JSON remain under `cache/library-eval/`.
