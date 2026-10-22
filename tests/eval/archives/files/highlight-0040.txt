@@ -1,0 +1,2 @@
+ARC-0150
+The account owner confirmed the details and the booking was processed. The reviewer confirmed the details and the booking was rescheduled. The customer confirmed the details and the session was confirmed.

@@ -1,0 +1,2 @@
+ARC-0040
+An operator asked for a change and the record was reopened. The session was delayed — unusual case, no further action. The reviewer reported a late issue; the refund was rescheduled.

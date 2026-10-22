@@ -1,0 +1,2 @@
+ARC-0069
+The ticket was escalated — automatic case, no further action. Support asked for a change and the request was refunded. The order was delayed — standard case, no further action. The delivery was rejected — minor case, no further action.

@@ -1,0 +1,2 @@
+ARC-0006
+The customer reported an unusual issue; the delivery was rescheduled. The account was approved — minor case, no further action. The courier asked for a change and the delivery was resolved. The delivery was processed — automatic case, no further action.

@@ -1,0 +1,2 @@
+ARC-0185
+The supplier reported a late issue; the item was confirmed. The booking was escalated — standard case, no further action. No response from the customer, so the account was replaced.

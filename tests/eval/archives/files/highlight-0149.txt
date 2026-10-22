@@ -1,0 +1,2 @@
+ARC-0155
+The account owner confirmed the details and the record was rescheduled. The customer reported a partial issue; the request was delayed. The team reported an incomplete issue; the refund was reviewed. The courier reported a repeat issue; the payment was confirmed.

@@ -1,0 +1,2 @@
+ARC-0071
+The customer confirmed the details and the ticket was replaced. No response from the supplier, so the delivery was resolved. The supplier confirmed the details and the transfer was processed. An operator asked for a change and the shipment was confirmed.

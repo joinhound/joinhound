@@ -1,0 +1,2 @@
+ARC-0071
+The supplier confirmed the details and the booking was reviewed. The account owner asked for a change and the shipment was updated.

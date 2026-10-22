@@ -1,0 +1,2 @@
+ARC-0188
+The report was approved — partial case, no further action. The customer asked for a change and the payment was refunded. The shipment was approved — manual case, no further action.

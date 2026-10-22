@@ -1,0 +1,2 @@
+ARC-0009
+No response from the supplier, so the claim was rescheduled. The supplier reported a partial issue; the order was updated. The record was approved — duplicate case, no further action.

@@ -1,0 +1,2 @@
+ARC-0005
+The customer confirmed the details and the session was rejected. The appointment was completed — repeat case, no further action.

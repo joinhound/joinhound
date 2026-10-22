@@ -1,0 +1,2 @@
+ARC-0173
+The appointment was rejected — urgent case, no further action. The supplier confirmed the details and the account was reviewed. The payment was reviewed — manual case, no further action. The supplier confirmed the details and the shipment was resolved.

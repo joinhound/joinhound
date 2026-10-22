@@ -1,0 +1,2 @@
+ARC-0029
+The reviewer reported a partial issue; the record was reviewed. The reviewer asked for a change and the request was delayed.

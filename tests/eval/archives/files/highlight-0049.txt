@@ -1,0 +1,2 @@
+ARC-0064
+The reviewer reported a manual issue; the invoice was reopened. The account owner asked for a change and the account was closed.
