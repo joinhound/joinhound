@@ -1,0 +1,2 @@
+ARC-0101
+The team reported a duplicate issue; the appointment was approved. The ticket was rescheduled — urgent case, no further action.

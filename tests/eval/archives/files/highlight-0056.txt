@@ -1,0 +1,2 @@
+ARC-0143
+The shipment was completed — partial case, no further action. An operator asked for a change and the session was cancelled. The courier reported a minor issue; the invoice was confirmed.

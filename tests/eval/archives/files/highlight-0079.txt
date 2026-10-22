@@ -1,0 +1,2 @@
+ARC-0126
+The courier asked for a change and the delivery was escalated. The supplier reported a manual issue; the record was reopened. The courier asked for a change and the item was confirmed. No response from the courier, so the account was completed.

@@ -1,0 +1,2 @@
+ARC-0185
+The team asked for a change and the booking was rejected. The account owner reported an incomplete issue; the session was refunded. The invoice was closed — repeat case, no further action.

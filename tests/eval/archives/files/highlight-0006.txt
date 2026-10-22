@@ -1,0 +1,2 @@
+ARC-0031
+The account owner confirmed the details and the refund was refunded. The reviewer confirmed the details and the record was confirmed. The customer reported a repeat issue; the payment was rejected. The courier asked for a change and the session was completed.

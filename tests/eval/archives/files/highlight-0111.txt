@@ -1,0 +1,2 @@
+ARC-0175
+The courier reported a partial issue; the refund was escalated. The customer asked for a change and the ticket was cancelled.

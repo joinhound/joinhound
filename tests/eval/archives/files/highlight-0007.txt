@@ -1,0 +1,2 @@
+ARC-0161
+The courier asked for a change and the shipment was cancelled. The account was rescheduled — manual case, no further action. The refund was cancelled — routine case, no further action.

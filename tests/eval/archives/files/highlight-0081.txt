@@ -1,0 +1,2 @@
+ARC-0016
+The account was replaced — standard case, no further action. The order was escalated — minor case, no further action. No response from the account owner, so the shipment was completed. The account owner reported a minor issue; the request was closed.

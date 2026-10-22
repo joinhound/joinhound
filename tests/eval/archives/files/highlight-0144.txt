@@ -1,0 +1,2 @@
+ARC-0182
+The team asked for a change and the order was resolved. The order was replaced — partial case, no further action. An operator asked for a change and the ticket was reopened.

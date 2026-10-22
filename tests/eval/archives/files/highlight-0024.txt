@@ -1,0 +1,2 @@
+ARC-0086
+No response from the account owner, so the transfer was cancelled. The account owner asked for a change and the invoice was reviewed. The reviewer reported an incomplete issue; the request was rescheduled. An operator confirmed the details and the item was reviewed.

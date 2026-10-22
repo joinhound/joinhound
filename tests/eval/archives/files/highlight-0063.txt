@@ -1,0 +1,2 @@
+ARC-0030
+The team asked for a change and the payment was reopened. No response from the customer, so the payment was escalated.

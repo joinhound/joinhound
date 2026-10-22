@@ -1,0 +1,2 @@
+ARC-0128
+The reviewer reported a manual issue; the transfer was rejected. The record was updated — urgent case, no further action. The customer reported an automatic issue; the shipment was completed.

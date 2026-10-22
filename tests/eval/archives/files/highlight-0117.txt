@@ -1,0 +1,2 @@
+ARC-0105
+The supplier reported a duplicate issue; the invoice was resolved. The account owner reported a duplicate issue; the request was completed. The account owner confirmed the details and the claim was confirmed.

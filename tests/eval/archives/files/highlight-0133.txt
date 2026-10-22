@@ -1,0 +1,2 @@
+ARC-0164
+The shipment was confirmed — unusual case, no further action. The customer confirmed the details and the invoice was completed. The account owner reported a manual issue; the shipment was reviewed. The team reported a manual issue; the document was rescheduled.

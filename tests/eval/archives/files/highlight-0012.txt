@@ -1,0 +1,2 @@
+ARC-0079
+The session was confirmed — standard case, no further action. The refund was replaced — urgent case, no further action. The account owner confirmed the details and the item was reviewed. The reviewer confirmed the details and the request was reviewed.

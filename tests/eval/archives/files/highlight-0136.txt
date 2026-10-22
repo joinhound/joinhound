@@ -1,0 +1,2 @@
+ARC-0094
+The supplier confirmed the details and the document was approved. An operator confirmed the details and the document was delayed. The session was reopened — minor case, no further action.

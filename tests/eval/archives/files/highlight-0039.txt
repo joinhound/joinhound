@@ -1,0 +1,2 @@
+ARC-0186
+Support asked for a change and the item was rescheduled. The customer reported a routine issue; the booking was escalated. The reviewer confirmed the details and the session was escalated. The account was confirmed — standard case, no further action.

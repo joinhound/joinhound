@@ -1,0 +1,2 @@
+ARC-0123
+No response from the customer, so the delivery was reopened. No response from the account owner, so the transfer was replaced. The transfer was reviewed — manual case, no further action. The invoice was escalated — automatic case, no further action.
