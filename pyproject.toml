@@ -19,6 +19,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
+    "azure-storage-blob==12.31.0",
     "datasketch==2.0.0",
     "jsonschema==4.26.0",
     "mcp==2.3.0",
@@ -72,6 +73,7 @@ pdf = "joinhound.parsers:PdfParser"
 bearer = "joinhound.server.auth:StaticTokenVerifier"
 
 [project.entry-points."joinhound.connectors"]
+azure = "joinhound.connectors.azure:AzureSource"
 mssql = "joinhound.connectors.mssql:MssqlSource"
 postgres = "joinhound.connectors.postgres:PostgresSource"
 s3 = "joinhound.connectors.s3:S3Source"

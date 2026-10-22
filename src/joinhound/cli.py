@@ -12,11 +12,13 @@ import typer
 import yaml
 
 from joinhound import __version__
+from joinhound.connectors.azure import AzureSource
 from joinhound.connectors.mssql import MssqlSource
 from joinhound.connectors.postgres import PostgresSource
 from joinhound.connectors.s3 import S3Source
 from joinhound.core.config import (
     AppConfig,
+    AzureSourceConfig,
     MssqlSourceConfig,
     PostgresSourceConfig,
     S3SourceConfig,
@@ -288,11 +290,16 @@ def _sync_sources(settings: AppConfig, *, force: bool = False) -> tuple[int, int
     documents = 0
     values = 0
     for name, source_config in settings.sources.items():
-        if isinstance(source_config, S3SourceConfig):
+        if isinstance(source_config, S3SourceConfig | AzureSourceConfig):
+            document_source = (
+                S3Source(name, source_config)
+                if isinstance(source_config, S3SourceConfig)
+                else AzureSource(name, source_config)
+            )
             documents += sync_documents(
                 settings.kg_database,
                 name,
-                S3Source(name, source_config),
+                document_source,
                 embedder,
                 lambda mime, data: _parse(parsers, mime, data),
                 force=force,

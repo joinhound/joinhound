@@ -47,6 +47,16 @@ class MssqlSourceConfig(BaseModel):
     statement_timeout_ms: int = 5000
 
 
+class AzureSourceConfig(BaseModel):
+    """Connection settings for a read-only Azure Blob container."""
+
+    type: Literal["azure"]
+    container: str
+    prefix: str = ""
+    account_url: str | None = None
+    acl: AclConfig = Field(default_factory=AclConfig)
+
+
 class S3SourceConfig(BaseModel):
     """Connection settings for an S3-compatible document source."""
 
@@ -58,7 +68,8 @@ class S3SourceConfig(BaseModel):
 
 
 SourceConfig = Annotated[
-    PostgresSourceConfig | MssqlSourceConfig | S3SourceConfig, Field(discriminator="type")
+    PostgresSourceConfig | MssqlSourceConfig | S3SourceConfig | AzureSourceConfig,
+    Field(discriminator="type"),
 ]
 
 

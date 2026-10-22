@@ -13,7 +13,7 @@ from typing import Any, Literal, cast
 from joinhound.core.config import EngineConfig
 from joinhound.core.models import IndexedPassage, Link, LinkDraft, Match, QueryContext, Record
 from joinhound.core.protocols import Embedder, LinkMatcher, TabularSource
-from joinhound.core.uri import MssqlUri, PgUri, S3Uri, parse_uri
+from joinhound.core.uri import AzureUri, MssqlUri, PgUri, S3Uri, parse_uri
 from joinhound.engine.cache import ResultCache, cache_key
 from joinhound.engine.dictionary import ValueDictionary, build_dictionary
 from joinhound.engine.lookup import Deployment, direct_records, normalized_matches
@@ -916,7 +916,7 @@ def _nodes_from_uris(source: TabularSource, uris: Sequence[str]) -> list[_Node]:
 
 def _fetch_record(source: TabularSource, uri: str, known: set[str]) -> Record:
     parsed = parse_uri(uri)
-    if isinstance(parsed, S3Uri):
+    if isinstance(parsed, S3Uri | AzureUri):
         raise ValueError(f"Document passages are not available yet: {uri}")
     if not isinstance(parsed, PgUri | MssqlUri):
         raise ValueError(f"Unsupported record URI: {uri}")

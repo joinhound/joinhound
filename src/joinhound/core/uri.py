@@ -48,11 +48,21 @@ class S3Uri:
     bbox: tuple[float, float, float, float] | None = None
 
 
-SourceUri = PgUri | MssqlUri | S3Uri
+@dataclass(frozen=True)
+class AzureUri:
+    """Address of an Azure Blob or a located passage inside it."""
+
+    source: str
+    key: str
+    page: int | None = None
+    bbox: tuple[float, float, float, float] | None = None
+
+
+SourceUri = PgUri | MssqlUri | S3Uri | AzureUri
 
 
 def parse_uri(value: str) -> SourceUri:
-    """Parse a PostgreSQL or S3 provenance URI."""
+    """Parse a provenance URI."""
     parts = urlsplit(value)
     if parts.scheme == "pg":
         return _parse_pg(parts.netloc, parts.path, parts.fragment)
@@ -60,6 +70,8 @@ def parse_uri(value: str) -> SourceUri:
         return _parse_mssql(parts.netloc, parts.path, parts.fragment)
     if parts.scheme == "s3":
         return _parse_s3(parts.netloc, parts.path, parts.fragment)
+    if parts.scheme == "azure":
+        return _parse_azure(parts.netloc, parts.path, parts.fragment)
     raise UriError(f"Unsupported URI scheme: {parts.scheme or '(none)'}")
 
 
@@ -69,6 +81,8 @@ def build_uri(uri: SourceUri) -> str:
         return _build_pg(uri)
     if isinstance(uri, MssqlUri):
         return _build_mssql(uri)
+    if isinstance(uri, AzureUri):
+        return _build_azure(uri)
     return _build_s3(uri)
 
 
@@ -118,15 +132,30 @@ def _build_mssql(uri: MssqlUri) -> str:
 
 
 def _parse_s3(source: str, path: str, fragment: str) -> S3Uri:
+    key, page, bbox = _object_parts(source, path, fragment, "S3")
+    return S3Uri(source=source, key=key, page=page, bbox=bbox)
+
+
+def _parse_azure(source: str, path: str, fragment: str) -> AzureUri:
+    key, page, bbox = _object_parts(source, path, fragment, "Azure")
+    return AzureUri(source=source, key=key, page=page, bbox=bbox)
+
+
+def _object_parts(
+    source: str,
+    path: str,
+    fragment: str,
+    label: str,
+) -> tuple[str, int | None, tuple[float, float, float, float] | None]:
     if not source:
-        raise UriError("S3 URI is missing its source")
+        raise UriError(f"{label} URI is missing its source")
     key = path.lstrip("/")
     if not key:
-        raise UriError("S3 URI is missing its key")
+        raise UriError(f"{label} URI is missing its key")
     params = dict(parse_qsl(fragment, keep_blank_values=True))
     page = int(params["page"]) if "page" in params else None
     bbox = _bbox(params["bbox"]) if "bbox" in params else None
-    return S3Uri(source=source, key=key, page=page, bbox=bbox)
+    return key, page, bbox
 
 
 def _build_pg(uri: PgUri) -> str:
@@ -143,13 +172,26 @@ def _build_pg(uri: PgUri) -> str:
 
 
 def _build_s3(uri: S3Uri) -> str:
+    return _build_object("s3", uri.source, uri.key, uri.page, uri.bbox)
+
+
+def _build_azure(uri: AzureUri) -> str:
+    return _build_object("azure", uri.source, uri.key, uri.page, uri.bbox)
+
+
+def _build_object(
+    scheme: str,
+    source: str,
+    key: str,
+    page: int | None,
+    bbox: tuple[float, float, float, float] | None,
+) -> str:
     query: dict[str, str] = {}
-    if uri.page is not None:
-        query["page"] = str(uri.page)
-    if uri.bbox is not None:
-        query["bbox"] = ",".join(str(number) for number in uri.bbox)
-    fragment = urlencode(query)
-    return urlunsplit(("s3", uri.source, f"/{uri.key}", "", fragment))
+    if page is not None:
+        query["page"] = str(page)
+    if bbox is not None:
+        query["bbox"] = ",".join(str(number) for number in bbox)
+    return urlunsplit((scheme, source, f"/{key}", "", urlencode(query)))
 
 
 def _json_object(value: str) -> dict[str, object]:
