@@ -13,6 +13,10 @@ sources:
     schemas: [public]
     exclude_tables: []
     statement_timeout_ms: 5000
+  warehouse:
+    type: mssql
+    dsn: mssql://reader:${MSSQL_PASSWORD}@warehouse.example:1433/sales
+    schemas: [dbo]
   contracts:
     type: s3
     bucket: acme-contracts
@@ -64,6 +68,8 @@ server:
 `kg_database` is the service database. Joinhound creates the `kg` schema there. It does not create schemas in a customer database.
 
 A `postgres` source is read-only. `statement_timeout_ms` bounds one statement. `exclude_tables` is a list of table names to skip.
+
+An `mssql` source is the same idea for SQL Server. The DSN is `mssql://user:password@host:port/database`. The login should have only read rights. Row addresses use `mssql://source/schema.table#pk=...`.
 
 An `s3` source reads one bucket prefix. `acl.roles` is the set of roles allowed to see its passages. A caller who passes other roles does not receive those passages.
 

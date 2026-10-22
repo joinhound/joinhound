@@ -37,6 +37,16 @@ class PostgresSourceConfig(BaseModel):
     statement_timeout_ms: int = 5000
 
 
+class MssqlSourceConfig(BaseModel):
+    """Connection settings for a read-only SQL Server source."""
+
+    type: Literal["mssql"]
+    dsn: str
+    schemas: list[str] = Field(default_factory=lambda: ["dbo"])
+    exclude_tables: list[str] = Field(default_factory=list)
+    statement_timeout_ms: int = 5000
+
+
 class S3SourceConfig(BaseModel):
     """Connection settings for an S3-compatible document source."""
 
@@ -47,7 +57,9 @@ class S3SourceConfig(BaseModel):
     acl: AclConfig = Field(default_factory=AclConfig)
 
 
-SourceConfig = Annotated[PostgresSourceConfig | S3SourceConfig, Field(discriminator="type")]
+SourceConfig = Annotated[
+    PostgresSourceConfig | MssqlSourceConfig | S3SourceConfig, Field(discriminator="type")
+]
 
 
 class EmbeddingsConfig(BaseModel):

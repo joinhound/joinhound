@@ -13,7 +13,7 @@ from typing import Any, Literal, cast
 from joinhound.core.config import EngineConfig
 from joinhound.core.models import IndexedPassage, Link, LinkDraft, Match, QueryContext, Record
 from joinhound.core.protocols import Embedder, LinkMatcher, TabularSource
-from joinhound.core.uri import PgUri, S3Uri, parse_uri
+from joinhound.core.uri import MssqlUri, PgUri, S3Uri, parse_uri
 from joinhound.engine.cache import ResultCache, cache_key
 from joinhound.engine.dictionary import ValueDictionary, build_dictionary
 from joinhound.engine.lookup import Deployment, direct_records, normalized_matches
@@ -918,7 +918,7 @@ def _fetch_record(source: TabularSource, uri: str, known: set[str]) -> Record:
     parsed = parse_uri(uri)
     if isinstance(parsed, S3Uri):
         raise ValueError(f"Document passages are not available yet: {uri}")
-    if not isinstance(parsed, PgUri):
+    if not isinstance(parsed, PgUri | MssqlUri):
         raise ValueError(f"Unsupported record URI: {uri}")
     collection = _collection_id(parsed, known)
     found = source.fetch_by_keys(collection, [dict(parsed.pk)])
@@ -933,8 +933,9 @@ def _known_collections(source: TabularSource) -> set[str]:
     return {info.collection_id for info in source.list_collections()}
 
 
-def _collection_id(uri: PgUri, known: set[str]) -> str:
-    qualified = f"pg://{uri.source}/{uri.schema}.{uri.table}"
+def _collection_id(uri: PgUri | MssqlUri, known: set[str]) -> str:
+    scheme = "mssql" if isinstance(uri, MssqlUri) else "pg"
+    qualified = f"{scheme}://{uri.source}/{uri.schema}.{uri.table}"
     if qualified in known:
         return qualified
     if uri.table in known:
