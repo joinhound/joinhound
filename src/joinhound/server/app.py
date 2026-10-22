@@ -22,6 +22,7 @@ from joinhound.llm.none import NoneEmbedder
 from joinhound.matchers.documents import Passage
 from joinhound.server.auth import StaticTokenVerifier
 from joinhound.server.runtime import Runtime
+from joinhound.telemetry import span
 
 _SUMMARY_TOKENS = 2000
 
@@ -74,7 +75,7 @@ def create_server(
         scope: list[str] | None = None,
         max_depth: int = 3,
     ) -> ContextResponse:
-        with runtime.session() as (sources, links):
+        with span("joinhound.get_context"), runtime.session() as (sources, links):
             passages = _stored_passages(runtime)
             parts = [
                 get_context(

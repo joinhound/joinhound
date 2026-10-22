@@ -63,6 +63,9 @@ def callback(
     ),
 ) -> None:
     """Joinhound command-line interface."""
+    from joinhound.telemetry import configure
+
+    configure()
 
 
 @app.command()
@@ -119,7 +122,10 @@ def profile(
     ),
 ) -> None:
     """Write column fingerprints and relationship proposals."""
-    written = _profile_sources(Path(config), auto_approve)
+    from joinhound.telemetry import span
+
+    with span("joinhound.profile"):
+        written = _profile_sources(Path(config), auto_approve)
     typer.echo(f"links {written}")
 
 
@@ -137,6 +143,8 @@ def sync(
     ),
 ) -> None:
     """Index changed documents and approved fuzzy or semantic column values."""
+    from joinhound.telemetry import span
+
     settings = load_config(Path(config))
     if settings.sources:
         try:
@@ -148,7 +156,8 @@ def sync(
             )
         except EmbeddingModelChanged as error:
             raise typer.BadParameter(str(error)) from error
-    documents, values = _sync_sources(settings, force=reindex)
+    with span("joinhound.sync"):
+        documents, values = _sync_sources(settings, force=reindex)
     typer.echo(f"documents {documents}")
     typer.echo(f"values {values}")
 

@@ -32,7 +32,17 @@ class OpenAIEmbedder:
 
             client = OpenAI(base_url=self._base_url, api_key=self._api_key or "missing")
             self._client = client
-        response = client.embeddings.create(model=self.model, input=texts, dimensions=self._dim)
+        from joinhound.telemetry import span
+
+        with span(
+            "gen_ai.embeddings",
+            {
+                "gen_ai.operation.name": "embeddings",
+                "gen_ai.request.model": self.model,
+                "gen_ai.system": "openai",
+            },
+        ):
+            response = client.embeddings.create(model=self.model, input=texts, dimensions=self._dim)
         vectors = [list(item.embedding) for item in response.data]
         if len(vectors) != len(texts):
             raise ValueError("Embedder returned a different number of vectors than texts")
