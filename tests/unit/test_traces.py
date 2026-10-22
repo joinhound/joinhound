@@ -55,9 +55,7 @@ def test_model_calls_use_genai_attribute_names(monkeypatch) -> None:
     )
     OpenAIEmbedder(dim=3, model="embed-model", client=_Embeddings()).embed(["alpha"])
 
-    by_name = {
-        item.name: dict(item.attributes or {}) for item in exporter.get_finished_spans()
-    }
+    by_name = {item.name: dict(item.attributes or {}) for item in exporter.get_finished_spans()}
     assert by_name["gen_ai.chat"]["gen_ai.operation.name"] == "chat"
     assert by_name["gen_ai.chat"]["gen_ai.request.model"] == "judge-model"
     assert by_name["gen_ai.embeddings"]["gen_ai.operation.name"] == "embeddings"
