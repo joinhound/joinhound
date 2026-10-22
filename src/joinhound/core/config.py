@@ -97,6 +97,7 @@ class EngineConfig(BaseModel):
     depth_decay: float = 0.8
     budget_tokens: int = 4000
     timeout_ms: int = 10000
+    cache_ttl_seconds: float = 30
 
 
 class ServerConfig(BaseModel):

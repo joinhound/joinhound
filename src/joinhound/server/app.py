@@ -88,6 +88,7 @@ def create_server(
                     scope=scope,
                     passages=passages,
                     deployment=_deployment(runtime),
+                    cache=runtime.cache,
                 )
                 for name, source in sources
             ]

@@ -14,6 +14,7 @@ from joinhound.core.config import EngineConfig
 from joinhound.core.models import IndexedPassage, Link, LinkDraft, Match, QueryContext, Record
 from joinhound.core.protocols import Embedder, LinkMatcher, TabularSource
 from joinhound.core.uri import PgUri, S3Uri, parse_uri
+from joinhound.engine.cache import ResultCache, cache_key
 from joinhound.engine.dictionary import ValueDictionary, build_dictionary
 from joinhound.engine.lookup import Deployment, direct_records, normalized_matches
 from joinhound.engine.passages import (
@@ -76,11 +77,27 @@ def get_context(
     roles: Sequence[str] | None = None,
     embedder: Embedder | None = None,
     deployment: Deployment = "sidecar",
+    cache: ResultCache | None = None,
 ) -> ContextResponse:
     """Return the highest-scoring rows and passages reachable from the query."""
     config = settings or EngineConfig()
     budget = config.budget_tokens if budget_tokens is None else budget_tokens
     depth_limit = config.max_depth if max_depth is None else max_depth
+    now = (clock or time.monotonic)()
+    key = cache_key(
+        query,
+        budget=budget,
+        depth=depth_limit,
+        scope=scope,
+        deployment=deployment,
+        links=links,
+        roles=roles,
+        passages=passages,
+    )
+    if cache is not None:
+        cached = cache.get(key, now)
+        if cached is not None:
+            return cached
     tabular = [link for link in links if link.status == "approved" and link.dst_column is not None]
     documents = [
         link for link in links if link.status == "approved" and link.match_type == _DOCUMENTS
@@ -104,7 +121,7 @@ def get_context(
         deployment,
     )
     approved = [*tabular, *documents]
-    return _walk(
+    result = _walk(
         query,
         source,
         approved,
@@ -120,6 +137,9 @@ def get_context(
         roles=roles,
         deployment=deployment,
     )
+    if cache is not None:
+        cache.put(key, result, now)
+    return result
 
 
 def expand(
