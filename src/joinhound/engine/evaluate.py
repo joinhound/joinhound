@@ -8,7 +8,7 @@ import json
 import math
 from collections.abc import Sequence
 
-from joinhound.core.uri import MssqlUri, PgUri, S3Uri, parse_uri
+from joinhound.core.uri import AzureUri, MssqlUri, PgUri, S3Uri, parse_uri
 from joinhound.index.links import ColumnLink
 
 
@@ -48,6 +48,8 @@ def record_key(uri: str) -> tuple[str, str, str]:
     parsed = parse_uri(uri)
     if isinstance(parsed, S3Uri):
         return ("s3", parsed.key, "")
+    if isinstance(parsed, AzureUri):
+        return ("azure", parsed.key, "")
     if not isinstance(parsed, PgUri | MssqlUri):
         raise ValueError(f"Gold comparison supports row and document URIs only: {uri}")
     pk = json.dumps(dict(parsed.pk), sort_keys=True, separators=(",", ":"), default=str)

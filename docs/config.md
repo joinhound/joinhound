@@ -18,6 +18,12 @@ sources:
     dsn: mssql://reader:${MSSQL_PASSWORD}@warehouse.example:1433/sales
     schemas: [dbo]
   contracts:
+    type: azure
+    container: acme-contracts
+    account_url: https://acme.blob.core.windows.net
+    acl:
+      roles: [legal]
+  specs:
     type: s3
     bucket: acme-contracts
     prefix: ""
@@ -71,7 +77,9 @@ A `postgres` source is read-only. `statement_timeout_ms` bounds one statement. `
 
 An `mssql` source is the same idea for SQL Server. The DSN is `mssql://user:password@host:port/database`. The login should have only read rights. Row addresses use `mssql://source/schema.table#pk=...`.
 
-An `s3` source reads one bucket prefix. `acl.roles` is the set of roles allowed to see its passages. A caller who passes other roles does not receive those passages.
+An `azure` source reads one blob container. The account key stays in `AZURE_STORAGE_ACCOUNT_KEY`, or the whole connection stays in `AZURE_STORAGE_CONNECTION_STRING`. The source lists and downloads blobs. Blob addresses use `azure://source/key`.
+
+An `s3` source reads one bucket prefix. `acl.roles` is the set of roles allowed to see its passages. A caller who passes other roles does not receive those passages. The same `acl.roles` field applies to an `azure` source.
 
 `embeddings.provider: local` is the hashed trigram embedder. `openai` calls an OpenAI-compatible `/embeddings` endpoint. `none` stores no vectors. Changing `model` or `dim` after a sync requires `joinhound sync --reindex`.
 

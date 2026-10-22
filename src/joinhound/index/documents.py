@@ -14,7 +14,7 @@ from psycopg.types.json import Json
 
 from joinhound.core.models import Cursor, DocRef, IndexedPassage, TextBlock
 from joinhound.core.protocols import DocumentSource, Embedder
-from joinhound.core.uri import S3Uri, build_uri, parse_uri
+from joinhound.core.uri import AzureUri, S3Uri, build_uri, parse_uri
 from joinhound.index.chunks import chunk_blocks, normalize_blocks
 
 logger = logging.getLogger(__name__)
@@ -170,9 +170,11 @@ def read_passages(dsn: str) -> list[IndexedPassage]:
 
 def _passage_uri(doc_id: str, page: int, bbox: tuple[float, ...]) -> str:
     parsed = parse_uri(doc_id)
-    if not isinstance(parsed, S3Uri) or len(bbox) != 4:
+    if not isinstance(parsed, S3Uri | AzureUri) or len(bbox) != 4:
         return doc_id
     box = (bbox[0], bbox[1], bbox[2], bbox[3])
+    if isinstance(parsed, AzureUri):
+        return build_uri(AzureUri(parsed.source, parsed.key, page=page, bbox=box))
     return build_uri(S3Uri(parsed.source, parsed.key, page=page, bbox=box))
 
 
@@ -198,7 +200,7 @@ def _cursor(stored: list[tuple[str, str]]) -> Cursor | None:
     etags: dict[str, str] = {}
     for uri, etag in stored:
         parsed = parse_uri(uri)
-        if isinstance(parsed, S3Uri):
+        if isinstance(parsed, S3Uri | AzureUri):
             etags[parsed.key] = etag
     if not etags:
         return None
@@ -207,7 +209,7 @@ def _cursor(stored: list[tuple[str, str]]) -> Cursor | None:
 
 def _mime(uri: str) -> str | None:
     parsed = parse_uri(uri)
-    if not isinstance(parsed, S3Uri):
+    if not isinstance(parsed, S3Uri | AzureUri):
         return None
     return _MIME.get(PurePosixPath(parsed.key).suffix.lower())
 

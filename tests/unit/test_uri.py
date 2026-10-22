@@ -4,7 +4,7 @@
 
 import pytest
 
-from joinhound.core.uri import MssqlUri, PgUri, S3Uri, UriError, build_uri, parse_uri
+from joinhound.core.uri import AzureUri, MssqlUri, PgUri, S3Uri, UriError, build_uri, parse_uri
 
 
 def test_postgres_uri_round_trip_with_composite_key() -> None:
@@ -45,6 +45,17 @@ def test_mssql_uri_round_trip() -> None:
 
     assert parsed == original
     assert build_uri(parsed) == "mssql://warehouse/dbo.customers#pk=%7B%22id%22%3A1%7D"
+
+
+def test_azure_uri_round_trip() -> None:
+    original = AzureUri(
+        source="contracts",
+        key="2025/prd-901.pdf",
+        page=3,
+        bbox=(72.0, 140.0, 310.0, 162.0),
+    )
+
+    assert parse_uri(build_uri(original)) == original
 
 
 def test_s3_passage_uri_round_trip() -> None:
