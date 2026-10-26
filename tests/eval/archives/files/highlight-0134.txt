@@ -1,0 +1,2 @@
+ARC-0110
+The item was delayed — repeat case, no further action. The supplier confirmed the details and the session was resolved. The request was replaced — urgent case, no further action.

@@ -1,0 +1,2 @@
+ARC-0174
+The shipment was resolved — automatic case, no further action. No response from an operator, so the claim was rescheduled.

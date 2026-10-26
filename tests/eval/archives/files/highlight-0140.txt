@@ -1,0 +1,2 @@
+ARC-0016
+The payment was approved — duplicate case, no further action. The team reported a manual issue; the report was delayed. No response from the reviewer, so the request was reopened. No response from the account owner, so the request was closed.

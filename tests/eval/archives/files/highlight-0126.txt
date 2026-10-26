@@ -1,0 +1,2 @@
+ARC-0086
+An operator asked for a change and the record was resolved. The customer reported an automatic issue; the transfer was reviewed. The account owner confirmed the details and the account was rejected.

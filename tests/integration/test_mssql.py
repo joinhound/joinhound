@@ -19,10 +19,10 @@ def test_mssql_source_passes_the_tabular_contract() -> None:
     for _attempt in range(3):
         with _server() as server:
             host = server.get_container_host_ip()
-            port = int(server.get_exposed_port(1433))
             try:
+                port = int(server.get_exposed_port(1433))
                 _wait(host, port)
-            except RuntimeError as error:
+            except (ConnectionError, RuntimeError) as error:
                 stdout, stderr = server.get_logs()
                 last_error = f"{error}\n{stdout.decode()[-1500:]}\n{stderr.decode()[-500:]}"
                 continue

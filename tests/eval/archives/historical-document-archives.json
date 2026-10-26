@@ -1,0 +1,3934 @@
+{
+  "document_authors": [
+    {
+      "id": 1,
+      "full_name": "Leo Clark",
+      "birth_year": 1711,
+      "death_year": 1803
+    },
+    {
+      "id": 2,
+      "full_name": "Arjun Pereira",
+      "birth_year": 1776,
+      "death_year": 1935
+    },
+    {
+      "id": 3,
+      "full_name": "Ethan Young",
+      "birth_year": 1844,
+      "death_year": 1860
+    },
+    {
+      "id": 4,
+      "full_name": "Marco Lopez",
+      "birth_year": 1891,
+      "death_year": 1721
+    },
+    {
+      "id": 5,
+      "full_name": "Carla Smith",
+      "birth_year": 1944,
+      "death_year": 1929
+    },
+    {
+      "id": 6,
+      "full_name": "Yara Zhang",
+      "birth_year": 1837,
+      "death_year": 1822
+    },
+    {
+      "id": 7,
+      "full_name": "Karim Chen",
+      "birth_year": 1873,
+      "death_year": 1837
+    },
+    {
+      "id": 8,
+      "full_name": "Elena Shah",
+      "birth_year": 1835,
+      "death_year": 1934
+    },
+    {
+      "id": 9,
+      "full_name": "Alice Murphy",
+      "birth_year": 1830,
+      "death_year": 1970
+    },
+    {
+      "id": 10,
+      "full_name": "Anna Kaya",
+      "birth_year": 1707,
+      "death_year": 1980
+    },
+    {
+      "id": 11,
+      "full_name": "Sven Becker",
+      "birth_year": 1937,
+      "death_year": 1992
+    },
+    {
+      "id": 12,
+      "full_name": "Diego Weber",
+      "birth_year": 1820,
+      "death_year": 1828
+    },
+    {
+      "id": 13,
+      "full_name": "Kai Weber",
+      "birth_year": 1868,
+      "death_year": 1922
+    },
+    {
+      "id": 14,
+      "full_name": "Zara Walker",
+      "birth_year": 1929,
+      "death_year": 1881
+    },
+    {
+      "id": 15,
+      "full_name": "Maja Kumar",
+      "birth_year": 1941,
+      "death_year": 1988
+    },
+    {
+      "id": 16,
+      "full_name": "Elena Novak",
+      "birth_year": 1914,
+      "death_year": 1800
+    },
+    {
+      "id": 17,
+      "full_name": "Diego Johnson",
+      "birth_year": 1793,
+      "death_year": 1946
+    },
+    {
+      "id": 18,
+      "full_name": "Ibrahim Costa",
+      "birth_year": 1762,
+      "death_year": 1877
+    },
+    {
+      "id": 19,
+      "full_name": "Emma Jensen",
+      "birth_year": 1731,
+      "death_year": 1764
+    },
+    {
+      "id": 20,
+      "full_name": "Omar Baker",
+      "birth_year": 1802,
+      "death_year": 1744
+    },
+    {
+      "id": 21,
+      "full_name": "Uma Patel",
+      "birth_year": 1826,
+      "death_year": 1749
+    },
+    {
+      "id": 22,
+      "full_name": "Priya Kowalski",
+      "birth_year": 1866,
+      "death_year": 1923
+    },
+    {
+      "id": 23,
+      "full_name": "Leo Wright",
+      "birth_year": 1877,
+      "death_year": 1979
+    },
+    {
+      "id": 24,
+      "full_name": "Mateo Castro",
+      "birth_year": 1703,
+      "death_year": 1777
+    },
+    {
+      "id": 25,
+      "full_name": "Isaac Becker",
+      "birth_year": 1820,
+      "death_year": null
+    },
+    {
+      "id": 26,
+      "full_name": "Daniel Oliveira",
+      "birth_year": 1987,
+      "death_year": 2014
+    },
+    {
+      "id": 27,
+      "full_name": "Sven Almeida",
+      "birth_year": 1873,
+      "death_year": 1808
+    },
+    {
+      "id": 28,
+      "full_name": "Priya Flores",
+      "birth_year": 1933,
+      "death_year": 1840
+    },
+    {
+      "id": 29,
+      "full_name": "Chloe Yilmaz",
+      "birth_year": 1947,
+      "death_year": 1852
+    },
+    {
+      "id": 30,
+      "full_name": "Ethan Rossi",
+      "birth_year": 1853,
+      "death_year": 1822
+    },
+    {
+      "id": 31,
+      "full_name": "Felix Zhang",
+      "birth_year": 1959,
+      "death_year": 1832
+    },
+    {
+      "id": 32,
+      "full_name": "Emma Rossi",
+      "birth_year": 1762,
+      "death_year": 1884
+    },
+    {
+      "id": 33,
+      "full_name": "Ibrahim Kowalski",
+      "birth_year": 1844,
+      "death_year": 1789
+    },
+    {
+      "id": 34,
+      "full_name": "Ethan Hughes",
+      "birth_year": 1739,
+      "death_year": 1833
+    },
+    {
+      "id": 35,
+      "full_name": "Noah Becker",
+      "birth_year": 1867,
+      "death_year": 1994
+    },
+    {
+      "id": 36,
+      "full_name": "Ines Kim",
+      "birth_year": 1827,
+      "death_year": 1941
+    },
+    {
+      "id": 37,
+      "full_name": "Ravi Tanaka",
+      "birth_year": 1787,
+      "death_year": 1888
+    },
+    {
+      "id": 38,
+      "full_name": "Paula Chen",
+      "birth_year": 1934,
+      "death_year": 1714
+    },
+    {
+      "id": 39,
+      "full_name": "David Meyer",
+      "birth_year": 1758,
+      "death_year": 1877
+    },
+    {
+      "id": 40,
+      "full_name": "Chen Diaz",
+      "birth_year": 1911,
+      "death_year": null
+    },
+    {
+      "id": 41,
+      "full_name": "Lina Rossi",
+      "birth_year": 1758,
+      "death_year": 1996
+    },
+    {
+      "id": 42,
+      "full_name": "Carlos Lee",
+      "birth_year": 1858,
+      "death_year": 1875
+    },
+    {
+      "id": 43,
+      "full_name": "Elif Carter",
+      "birth_year": 1845,
+      "death_year": null
+    },
+    {
+      "id": 44,
+      "full_name": "Wei Castro",
+      "birth_year": 1955,
+      "death_year": null
+    },
+    {
+      "id": 45,
+      "full_name": "Noah Bauer",
+      "birth_year": 1924,
+      "death_year": null
+    },
+    {
+      "id": 46,
+      "full_name": "Maya Miller",
+      "birth_year": 1702,
+      "death_year": 1823
+    },
+    {
+      "id": 47,
+      "full_name": "Julia Gomez",
+      "birth_year": 1848,
+      "death_year": 2010
+    },
+    {
+      "id": 48,
+      "full_name": "Priya Evans",
+      "birth_year": 1982,
+      "death_year": 1786
+    },
+    {
+      "id": 49,
+      "full_name": "Emma Pereira",
+      "birth_year": 1756,
+      "death_year": null
+    },
+    {
+      "id": 50,
+      "full_name": "Carlos Ibrahim",
+      "birth_year": 1788,
+      "death_year": 2007
+    }
+  ],
+  "document_eras": [
+    {
+      "id": 1,
+      "era_name": "Industrial Colonial",
+      "start_year": 1797,
+      "end_year": 1799
+    },
+    {
+      "id": 2,
+      "era_name": "Modern Prehistoric Industrial",
+      "start_year": 1731,
+      "end_year": 1766
+    },
+    {
+      "id": 3,
+      "era_name": "Medieval Renaissance",
+      "start_year": 1740,
+      "end_year": 1894
+    },
+    {
+      "id": 4,
+      "era_name": "Prehistoric Industrial",
+      "start_year": 1907,
+      "end_year": 2003
+    },
+    {
+      "id": 5,
+      "era_name": "Victorian Gothic Industrial",
+      "start_year": 1869,
+      "end_year": 1726
+    },
+    {
+      "id": 6,
+      "era_name": "Industrial Renaissance Digital",
+      "start_year": 2013,
+      "end_year": 1982
+    },
+    {
+      "id": 7,
+      "era_name": "Baroque Contemporary",
+      "start_year": 1727,
+      "end_year": 1944
+    },
+    {
+      "id": 8,
+      "era_name": "Golden Romantic",
+      "start_year": 2016,
+      "end_year": 1726
+    },
+    {
+      "id": 9,
+      "era_name": "Information",
+      "start_year": 1781,
+      "end_year": 1877
+    },
+    {
+      "id": 10,
+      "era_name": "Industrial Space Digital",
+      "start_year": 1839,
+      "end_year": 1844
+    }
+  ],
+  "document_materials": [
+    {
+      "id": 1,
+      "material_type": "Ceramic",
+      "durability_score": 4,
+      "source": "archival paper",
+      "sustainability_score": 6
+    },
+    {
+      "id": 2,
+      "material_type": "Leather",
+      "durability_score": 10,
+      "source": "parchment",
+      "sustainability_score": 4
+    },
+    {
+      "id": 3,
+      "material_type": "Paper Leather",
+      "durability_score": 10,
+      "source": "parchment",
+      "sustainability_score": 5
+    },
+    {
+      "id": 4,
+      "material_type": "Parchment",
+      "durability_score": 2,
+      "source": "archival paper",
+      "sustainability_score": 6
+    },
+    {
+      "id": 5,
+      "material_type": "Papyrus",
+      "durability_score": 9,
+      "source": "archival paper",
+      "sustainability_score": 3
+    },
+    {
+      "id": 6,
+      "material_type": "Textile",
+      "durability_score": 10,
+      "source": "archival paper",
+      "sustainability_score": 6
+    },
+    {
+      "id": 7,
+      "material_type": "Plastic",
+      "durability_score": 8,
+      "source": "parchment",
+      "sustainability_score": 8
+    },
+    {
+      "id": 8,
+      "material_type": "Microfilm Digital Canvas",
+      "durability_score": 9,
+      "source": "parchment",
+      "sustainability_score": 6
+    },
+    {
+      "id": 9,
+      "material_type": "Plastic",
+      "durability_score": 9,
+      "source": "parchment",
+      "sustainability_score": 6
+    },
+    {
+      "id": 10,
+      "material_type": "Photograph Microfilm Blueprint",
+      "durability_score": 8,
+      "source": "archival paper",
+      "sustainability_score": 7
+    },
+    {
+      "id": 11,
+      "material_type": "Blueprint Plastic",
+      "durability_score": 10,
+      "source": "parchment",
+      "sustainability_score": 5
+    },
+    {
+      "id": 12,
+      "material_type": "Microfilm Scroll Cardboard",
+      "durability_score": 8,
+      "source": "archival paper",
+      "sustainability_score": 3
+    },
+    {
+      "id": 13,
+      "material_type": "Parchment Blueprint Vellum",
+      "durability_score": 7,
+      "source": "parchment",
+      "sustainability_score": 5
+    },
+    {
+      "id": 14,
+      "material_type": "Ink",
+      "durability_score": 9,
+      "source": "parchment",
+      "sustainability_score": 7
+    },
+    {
+      "id": 15,
+      "material_type": "Map Vellum Parchment",
+      "durability_score": 10,
+      "source": "cotton",
+      "sustainability_score": 6
+    },
+    {
+      "id": 16,
+      "material_type": "Canvas Microfilm Parchment",
+      "durability_score": 7,
+      "source": "archival paper",
+      "sustainability_score": 5
+    },
+    {
+      "id": 17,
+      "material_type": "Paper Blueprint Metal",
+      "durability_score": 9,
+      "source": "archival paper",
+      "sustainability_score": 6
+    },
+    {
+      "id": 18,
+      "material_type": "Plastic",
+      "durability_score": 10,
+      "source": "synthetic",
+      "sustainability_score": 5
+    },
+    {
+      "id": 19,
+      "material_type": "Canvas Paper",
+      "durability_score": 9,
+      "source": "archival paper",
+      "sustainability_score": 4
+    },
+    {
+      "id": 20,
+      "material_type": "Ink Vellum Wood",
+      "durability_score": 2,
+      "source": "synthetic",
+      "sustainability_score": 6
+    },
+    {
+      "id": 21,
+      "material_type": "Cardboard",
+      "durability_score": 8,
+      "source": "archival paper",
+      "sustainability_score": 5
+    },
+    {
+      "id": 22,
+      "material_type": "Textile Cardboard",
+      "durability_score": 4,
+      "source": "parchment",
+      "sustainability_score": 5
+    },
+    {
+      "id": 23,
+      "material_type": "Glass Blueprint",
+      "durability_score": 10,
+      "source": "parchment",
+      "sustainability_score": 6
+    },
+    {
+      "id": 24,
+      "material_type": "Leather",
+      "durability_score": 8,
+      "source": "archival paper",
+      "sustainability_score": 6
+    },
+    {
+      "id": 25,
+      "material_type": "Parchment Microfilm Vellum",
+      "durability_score": 7,
+      "source": "archival paper",
+      "sustainability_score": 7
+    },
+    {
+      "id": 26,
+      "material_type": "Blueprint Metal",
+      "durability_score": 9,
+      "source": "parchment",
+      "sustainability_score": 5
+    },
+    {
+      "id": 27,
+      "material_type": "Leather Map Wood",
+      "durability_score": 9,
+      "source": "recycled",
+      "sustainability_score": 4
+    },
+    {
+      "id": 28,
+      "material_type": "Parchment Microfilm Wood",
+      "durability_score": 6,
+      "source": "archival paper",
+      "sustainability_score": 5
+    },
+    {
+      "id": 29,
+      "material_type": "Cardboard Parchment Metal",
+      "durability_score": 10,
+      "source": "parchment",
+      "sustainability_score": 4
+    },
+    {
+      "id": 30,
+      "material_type": "Scroll",
+      "durability_score": 10,
+      "source": "archival paper",
+      "sustainability_score": 6
+    }
+  ],
+  "documents": [
+    {
+      "id": 1,
+      "title": "Overview",
+      "document_era_id": 9,
+      "author_id": 36,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 2,
+      "title": "Report",
+      "document_era_id": 6,
+      "author_id": 18,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 3,
+      "title": "Review Overview",
+      "document_era_id": 4,
+      "author_id": 4,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 4,
+      "title": "Record Overview Proposal",
+      "document_era_id": 5,
+      "author_id": 14,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 5,
+      "title": "Outline",
+      "document_era_id": 4,
+      "author_id": 42,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 6,
+      "title": "Outline",
+      "document_era_id": 2,
+      "author_id": 38,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 7,
+      "title": "Assessment Guide",
+      "document_era_id": 2,
+      "author_id": 37,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 8,
+      "title": "Proposal",
+      "document_era_id": 6,
+      "author_id": 16,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 9,
+      "title": "Insights Proposal",
+      "document_era_id": 8,
+      "author_id": 27,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 10,
+      "title": "Report Assessment Guide",
+      "document_era_id": 7,
+      "author_id": 38,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 11,
+      "title": "Analysis Proposal Insights",
+      "document_era_id": 5,
+      "author_id": 1,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 12,
+      "title": "Strategy Summary Insights",
+      "document_era_id": 1,
+      "author_id": 46,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 13,
+      "title": "Outline Bulletin",
+      "document_era_id": 10,
+      "author_id": 34,
+      "format": "microfilm",
+      "condition": "intact"
+    },
+    {
+      "id": 14,
+      "title": "Memo Review Strategy",
+      "document_era_id": 1,
+      "author_id": 32,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 15,
+      "title": "Summary Brief",
+      "document_era_id": 8,
+      "author_id": 40,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 16,
+      "title": "Outline",
+      "document_era_id": 3,
+      "author_id": 3,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 17,
+      "title": "Brief",
+      "document_era_id": 10,
+      "author_id": 44,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 18,
+      "title": "Review Analysis",
+      "document_era_id": 3,
+      "author_id": 35,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 19,
+      "title": "Summary Study",
+      "document_era_id": 7,
+      "author_id": 44,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 20,
+      "title": "Report Proposal",
+      "document_era_id": 10,
+      "author_id": 35,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 21,
+      "title": "Plan Summary",
+      "document_era_id": 3,
+      "author_id": 22,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 22,
+      "title": "Evaluation",
+      "document_era_id": 2,
+      "author_id": 41,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 23,
+      "title": "Findings",
+      "document_era_id": 10,
+      "author_id": 37,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 24,
+      "title": "Brief",
+      "document_era_id": 2,
+      "author_id": 3,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 25,
+      "title": "Plan",
+      "document_era_id": 2,
+      "author_id": 35,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 26,
+      "title": "Review Findings Plan",
+      "document_era_id": 3,
+      "author_id": 44,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 27,
+      "title": "Review Analysis Proposal",
+      "document_era_id": 6,
+      "author_id": 6,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 28,
+      "title": "Memo",
+      "document_era_id": 1,
+      "author_id": 28,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 29,
+      "title": "Review",
+      "document_era_id": 9,
+      "author_id": 24,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 30,
+      "title": "Bulletin Evaluation",
+      "document_era_id": 5,
+      "author_id": 43,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 31,
+      "title": "Summary Memo Review",
+      "document_era_id": 4,
+      "author_id": 7,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 32,
+      "title": "Summary Assessment",
+      "document_era_id": 5,
+      "author_id": 40,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 33,
+      "title": "Brief",
+      "document_era_id": 9,
+      "author_id": 48,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 34,
+      "title": "Evaluation Strategy Memo",
+      "document_era_id": 7,
+      "author_id": 24,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 35,
+      "title": "Bulletin Summary",
+      "document_era_id": 7,
+      "author_id": 9,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 36,
+      "title": "Bulletin Study",
+      "document_era_id": 4,
+      "author_id": 42,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 37,
+      "title": "Guide Review Report",
+      "document_era_id": 8,
+      "author_id": 33,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 38,
+      "title": "Memo Brief",
+      "document_era_id": 9,
+      "author_id": 45,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 39,
+      "title": "Outline Overview",
+      "document_era_id": 7,
+      "author_id": 22,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 40,
+      "title": "Memo",
+      "document_era_id": 1,
+      "author_id": 17,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 41,
+      "title": "Record Evaluation",
+      "document_era_id": 8,
+      "author_id": 7,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 42,
+      "title": "Memo Bulletin",
+      "document_era_id": 7,
+      "author_id": 44,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 43,
+      "title": "Overview",
+      "document_era_id": 5,
+      "author_id": 35,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 44,
+      "title": "Guide",
+      "document_era_id": 1,
+      "author_id": 27,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 45,
+      "title": "Brief Proposal",
+      "document_era_id": 8,
+      "author_id": 47,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 46,
+      "title": "Outline Findings Review",
+      "document_era_id": 8,
+      "author_id": 25,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 47,
+      "title": "Framework Guide",
+      "document_era_id": 3,
+      "author_id": 24,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 48,
+      "title": "Summary Report",
+      "document_era_id": 9,
+      "author_id": 30,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 49,
+      "title": "Insights",
+      "document_era_id": 2,
+      "author_id": 24,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 50,
+      "title": "Assessment Memo Guide",
+      "document_era_id": 5,
+      "author_id": 12,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 51,
+      "title": "Proposal Review",
+      "document_era_id": 7,
+      "author_id": 33,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 52,
+      "title": "Review",
+      "document_era_id": 2,
+      "author_id": 44,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 53,
+      "title": "Guide Plan Proposal",
+      "document_era_id": 10,
+      "author_id": 11,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 54,
+      "title": "Summary",
+      "document_era_id": 3,
+      "author_id": 23,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 55,
+      "title": "Study",
+      "document_era_id": 1,
+      "author_id": 26,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 56,
+      "title": "Guide",
+      "document_era_id": 9,
+      "author_id": 29,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 57,
+      "title": "Findings Brief",
+      "document_era_id": 8,
+      "author_id": 37,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 58,
+      "title": "Assessment",
+      "document_era_id": 1,
+      "author_id": 37,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 59,
+      "title": "Bulletin Guide Review",
+      "document_era_id": 1,
+      "author_id": 8,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 60,
+      "title": "Study Strategy Proposal",
+      "document_era_id": 3,
+      "author_id": 40,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 61,
+      "title": "Review Overview Study",
+      "document_era_id": 4,
+      "author_id": 22,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 62,
+      "title": "Insights",
+      "document_era_id": 2,
+      "author_id": 38,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 63,
+      "title": "Memo",
+      "document_era_id": 3,
+      "author_id": 50,
+      "format": "microfilm",
+      "condition": "intact"
+    },
+    {
+      "id": 64,
+      "title": "Findings",
+      "document_era_id": 9,
+      "author_id": 2,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 65,
+      "title": "Summary Brief",
+      "document_era_id": 9,
+      "author_id": 8,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 66,
+      "title": "Insights Review Framework",
+      "document_era_id": 8,
+      "author_id": 10,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 67,
+      "title": "Plan",
+      "document_era_id": 2,
+      "author_id": 47,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 68,
+      "title": "Bulletin Analysis",
+      "document_era_id": 2,
+      "author_id": 21,
+      "format": "microfilm",
+      "condition": "intact"
+    },
+    {
+      "id": 69,
+      "title": "Strategy Assessment Bulletin",
+      "document_era_id": 4,
+      "author_id": 34,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 70,
+      "title": "Study Bulletin Outline",
+      "document_era_id": 5,
+      "author_id": 48,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 71,
+      "title": "Insights",
+      "document_era_id": 6,
+      "author_id": 43,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 72,
+      "title": "Record Bulletin Memo",
+      "document_era_id": 9,
+      "author_id": 22,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 73,
+      "title": "Proposal",
+      "document_era_id": 9,
+      "author_id": 1,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 74,
+      "title": "Report",
+      "document_era_id": 7,
+      "author_id": 48,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 75,
+      "title": "Summary Strategy Overview",
+      "document_era_id": 7,
+      "author_id": 39,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 76,
+      "title": "Findings",
+      "document_era_id": 10,
+      "author_id": 43,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 77,
+      "title": "Findings Study",
+      "document_era_id": 6,
+      "author_id": 29,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 78,
+      "title": "Strategy Record Findings",
+      "document_era_id": 7,
+      "author_id": 42,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 79,
+      "title": "Overview Evaluation",
+      "document_era_id": 2,
+      "author_id": 32,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 80,
+      "title": "Framework Report",
+      "document_era_id": 6,
+      "author_id": 9,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 81,
+      "title": "Guide Overview",
+      "document_era_id": 4,
+      "author_id": 12,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 82,
+      "title": "Record",
+      "document_era_id": 2,
+      "author_id": 9,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 83,
+      "title": "Proposal Record Review",
+      "document_era_id": 5,
+      "author_id": 31,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 84,
+      "title": "Evaluation Insights",
+      "document_era_id": 9,
+      "author_id": 46,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 85,
+      "title": "Review Findings Report",
+      "document_era_id": 5,
+      "author_id": 35,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 86,
+      "title": "Record",
+      "document_era_id": 2,
+      "author_id": 41,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 87,
+      "title": "Assessment Outline Analysis",
+      "document_era_id": 5,
+      "author_id": 40,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 88,
+      "title": "Summary Strategy Proposal",
+      "document_era_id": 4,
+      "author_id": 24,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 89,
+      "title": "Plan Report Strategy",
+      "document_era_id": 6,
+      "author_id": 44,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 90,
+      "title": "Outline",
+      "document_era_id": 1,
+      "author_id": 19,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 91,
+      "title": "Framework",
+      "document_era_id": 3,
+      "author_id": 2,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 92,
+      "title": "Record Plan Assessment",
+      "document_era_id": 7,
+      "author_id": 2,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 93,
+      "title": "Proposal Summary",
+      "document_era_id": 4,
+      "author_id": 49,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 94,
+      "title": "Bulletin Strategy Guide",
+      "document_era_id": 8,
+      "author_id": 27,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 95,
+      "title": "Summary Evaluation",
+      "document_era_id": 10,
+      "author_id": 37,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 96,
+      "title": "Outline",
+      "document_era_id": 9,
+      "author_id": 46,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 97,
+      "title": "Insights Report Evaluation",
+      "document_era_id": 3,
+      "author_id": 30,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 98,
+      "title": "Guide",
+      "document_era_id": 3,
+      "author_id": 44,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 99,
+      "title": "Insights Study Report",
+      "document_era_id": 7,
+      "author_id": 24,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 100,
+      "title": "Outline Plan Summary",
+      "document_era_id": 10,
+      "author_id": 20,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 101,
+      "title": "Review",
+      "document_era_id": 2,
+      "author_id": 15,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 102,
+      "title": "Findings Strategy",
+      "document_era_id": 4,
+      "author_id": 21,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 103,
+      "title": "Overview",
+      "document_era_id": 1,
+      "author_id": 46,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 104,
+      "title": "Summary Framework Guide",
+      "document_era_id": 4,
+      "author_id": 47,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 105,
+      "title": "Assessment Memo Proposal",
+      "document_era_id": 1,
+      "author_id": 29,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 106,
+      "title": "Findings",
+      "document_era_id": 5,
+      "author_id": 2,
+      "format": "microfilm",
+      "condition": "intact"
+    },
+    {
+      "id": 107,
+      "title": "Analysis Plan",
+      "document_era_id": 7,
+      "author_id": 25,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 108,
+      "title": "Study Brief Report",
+      "document_era_id": 5,
+      "author_id": 24,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 109,
+      "title": "Strategy Record",
+      "document_era_id": 1,
+      "author_id": 41,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 110,
+      "title": "Memo Overview Bulletin",
+      "document_era_id": 6,
+      "author_id": 49,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 111,
+      "title": "Record",
+      "document_era_id": 4,
+      "author_id": 4,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 112,
+      "title": "Analysis Record",
+      "document_era_id": 9,
+      "author_id": 38,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 113,
+      "title": "Guide Analysis",
+      "document_era_id": 9,
+      "author_id": 44,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 114,
+      "title": "Report Evaluation Study",
+      "document_era_id": 8,
+      "author_id": 9,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 115,
+      "title": "Proposal Guide Bulletin",
+      "document_era_id": 1,
+      "author_id": 5,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 116,
+      "title": "Bulletin Brief",
+      "document_era_id": 7,
+      "author_id": 7,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 117,
+      "title": "Evaluation Insights Memo",
+      "document_era_id": 2,
+      "author_id": 12,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 118,
+      "title": "Assessment Plan",
+      "document_era_id": 7,
+      "author_id": 24,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 119,
+      "title": "Guide Memo",
+      "document_era_id": 10,
+      "author_id": 2,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 120,
+      "title": "Assessment Record Memo",
+      "document_era_id": 1,
+      "author_id": 25,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 121,
+      "title": "Plan",
+      "document_era_id": 6,
+      "author_id": 31,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 122,
+      "title": "Assessment Plan Insights",
+      "document_era_id": 1,
+      "author_id": 43,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 123,
+      "title": "Outline",
+      "document_era_id": 7,
+      "author_id": 18,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 124,
+      "title": "Framework",
+      "document_era_id": 2,
+      "author_id": 4,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 125,
+      "title": "Analysis Framework",
+      "document_era_id": 7,
+      "author_id": 33,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 126,
+      "title": "Assessment Insights Bulletin",
+      "document_era_id": 1,
+      "author_id": 8,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 127,
+      "title": "Plan Review Framework",
+      "document_era_id": 6,
+      "author_id": 31,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 128,
+      "title": "Assessment Brief Bulletin",
+      "document_era_id": 10,
+      "author_id": 42,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 129,
+      "title": "Review",
+      "document_era_id": 4,
+      "author_id": 45,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 130,
+      "title": "Insights",
+      "document_era_id": 8,
+      "author_id": 12,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 131,
+      "title": "Brief",
+      "document_era_id": 3,
+      "author_id": 30,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 132,
+      "title": "Summary Study",
+      "document_era_id": 10,
+      "author_id": 1,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 133,
+      "title": "Proposal Study Review",
+      "document_era_id": 4,
+      "author_id": 35,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 134,
+      "title": "Evaluation",
+      "document_era_id": 5,
+      "author_id": 11,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 135,
+      "title": "Study",
+      "document_era_id": 7,
+      "author_id": 21,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 136,
+      "title": "Study Brief",
+      "document_era_id": 3,
+      "author_id": 3,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 137,
+      "title": "Summary Framework",
+      "document_era_id": 3,
+      "author_id": 11,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 138,
+      "title": "Study Outline Analysis",
+      "document_era_id": 3,
+      "author_id": 12,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 139,
+      "title": "Proposal Bulletin Record",
+      "document_era_id": 3,
+      "author_id": 45,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 140,
+      "title": "Brief",
+      "document_era_id": 8,
+      "author_id": 2,
+      "format": "microfilm",
+      "condition": "intact"
+    },
+    {
+      "id": 141,
+      "title": "Plan",
+      "document_era_id": 7,
+      "author_id": 4,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 142,
+      "title": "Evaluation",
+      "document_era_id": 7,
+      "author_id": 6,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 143,
+      "title": "Record",
+      "document_era_id": 5,
+      "author_id": 16,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 144,
+      "title": "Bulletin Guide",
+      "document_era_id": 3,
+      "author_id": 18,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 145,
+      "title": "Summary Study Strategy",
+      "document_era_id": 1,
+      "author_id": 39,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 146,
+      "title": "Summary Insights",
+      "document_era_id": 2,
+      "author_id": 35,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 147,
+      "title": "Report Overview",
+      "document_era_id": 6,
+      "author_id": 49,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 148,
+      "title": "Study",
+      "document_era_id": 5,
+      "author_id": 49,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 149,
+      "title": "Brief",
+      "document_era_id": 7,
+      "author_id": 17,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 150,
+      "title": "Review",
+      "document_era_id": 9,
+      "author_id": 15,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 151,
+      "title": "Proposal Plan Report",
+      "document_era_id": 1,
+      "author_id": 14,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 152,
+      "title": "Bulletin Plan",
+      "document_era_id": 4,
+      "author_id": 46,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 153,
+      "title": "Brief Evaluation Plan",
+      "document_era_id": 6,
+      "author_id": 25,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 154,
+      "title": "Guide",
+      "document_era_id": 2,
+      "author_id": 37,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 155,
+      "title": "Outline Brief Evaluation",
+      "document_era_id": 10,
+      "author_id": 3,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 156,
+      "title": "Findings Framework",
+      "document_era_id": 6,
+      "author_id": 4,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 157,
+      "title": "Brief Framework",
+      "document_era_id": 2,
+      "author_id": 7,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 158,
+      "title": "Findings Summary",
+      "document_era_id": 9,
+      "author_id": 43,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 159,
+      "title": "Review",
+      "document_era_id": 8,
+      "author_id": 40,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 160,
+      "title": "Summary",
+      "document_era_id": 4,
+      "author_id": 47,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 161,
+      "title": "Plan",
+      "document_era_id": 5,
+      "author_id": 18,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 162,
+      "title": "Outline Memo Analysis",
+      "document_era_id": 5,
+      "author_id": 50,
+      "format": "microfilm",
+      "condition": "restored"
+    },
+    {
+      "id": 163,
+      "title": "Evaluation",
+      "document_era_id": 9,
+      "author_id": 29,
+      "format": "digital",
+      "condition": "intact"
+    },
+    {
+      "id": 164,
+      "title": "Outline Assessment Proposal",
+      "document_era_id": 4,
+      "author_id": 16,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 165,
+      "title": "Brief Analysis Summary",
+      "document_era_id": 10,
+      "author_id": 17,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 166,
+      "title": "Summary",
+      "document_era_id": 4,
+      "author_id": 39,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 167,
+      "title": "Plan Insights Outline",
+      "document_era_id": 7,
+      "author_id": 44,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 168,
+      "title": "Outline Assessment",
+      "document_era_id": 8,
+      "author_id": 41,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 169,
+      "title": "Record Insights Analysis",
+      "document_era_id": 6,
+      "author_id": 12,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 170,
+      "title": "Review",
+      "document_era_id": 6,
+      "author_id": 46,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 171,
+      "title": "Memo",
+      "document_era_id": 8,
+      "author_id": 21,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 172,
+      "title": "Framework Plan Bulletin",
+      "document_era_id": 7,
+      "author_id": 13,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 173,
+      "title": "Bulletin Record Memo",
+      "document_era_id": 1,
+      "author_id": 45,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 174,
+      "title": "Assessment",
+      "document_era_id": 5,
+      "author_id": 30,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 175,
+      "title": "Proposal Framework",
+      "document_era_id": 5,
+      "author_id": 23,
+      "format": "digital",
+      "condition": "damaged"
+    },
+    {
+      "id": 176,
+      "title": "Memo Outline",
+      "document_era_id": 1,
+      "author_id": 45,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 177,
+      "title": "Review",
+      "document_era_id": 4,
+      "author_id": 40,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 178,
+      "title": "Memo Strategy",
+      "document_era_id": 1,
+      "author_id": 34,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 179,
+      "title": "Strategy",
+      "document_era_id": 8,
+      "author_id": 17,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 180,
+      "title": "Memo Overview Bulletin",
+      "document_era_id": 6,
+      "author_id": 38,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 181,
+      "title": "Outline Overview Findings",
+      "document_era_id": 6,
+      "author_id": 16,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 182,
+      "title": "Memo Brief",
+      "document_era_id": 10,
+      "author_id": 42,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 183,
+      "title": "Memo Proposal",
+      "document_era_id": 7,
+      "author_id": 26,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 184,
+      "title": "Review Memo Brief",
+      "document_era_id": 2,
+      "author_id": 43,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 185,
+      "title": "Framework Review Analysis",
+      "document_era_id": 5,
+      "author_id": 24,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 186,
+      "title": "Framework Memo Findings",
+      "document_era_id": 8,
+      "author_id": 6,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 187,
+      "title": "Framework",
+      "document_era_id": 8,
+      "author_id": 34,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 188,
+      "title": "Bulletin Overview",
+      "document_era_id": 5,
+      "author_id": 4,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 189,
+      "title": "Bulletin Framework Summary",
+      "document_era_id": 6,
+      "author_id": 20,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 190,
+      "title": "Review Record Memo",
+      "document_era_id": 7,
+      "author_id": 11,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 191,
+      "title": "Overview",
+      "document_era_id": 4,
+      "author_id": 2,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 192,
+      "title": "Brief",
+      "document_era_id": 1,
+      "author_id": 37,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 193,
+      "title": "Evaluation",
+      "document_era_id": 5,
+      "author_id": 40,
+      "format": "microfilm",
+      "condition": "damaged"
+    },
+    {
+      "id": 194,
+      "title": "Findings Guide Brief",
+      "document_era_id": 5,
+      "author_id": 22,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 195,
+      "title": "Analysis",
+      "document_era_id": 7,
+      "author_id": 18,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 196,
+      "title": "Assessment Bulletin Summary",
+      "document_era_id": 7,
+      "author_id": 30,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 197,
+      "title": "Overview",
+      "document_era_id": 9,
+      "author_id": 36,
+      "format": "paper",
+      "condition": "intact"
+    },
+    {
+      "id": 198,
+      "title": "Guide Review",
+      "document_era_id": 3,
+      "author_id": 40,
+      "format": "paper",
+      "condition": "damaged"
+    },
+    {
+      "id": 199,
+      "title": "Evaluation",
+      "document_era_id": 3,
+      "author_id": 27,
+      "format": "paper",
+      "condition": "restored"
+    },
+    {
+      "id": 200,
+      "title": "Record Report Review",
+      "document_era_id": 6,
+      "author_id": 48,
+      "format": "paper",
+      "condition": "damaged"
+    }
+  ],
+  "document_events": [
+    {
+      "id": 1,
+      "document_id": 9,
+      "event_type": "restoration",
+      "event_date": "2022-02-25",
+      "attendee_count": 362
+    },
+    {
+      "id": 2,
+      "document_id": 89,
+      "event_type": "exhibition",
+      "event_date": "2002-11-30",
+      "attendee_count": 269
+    },
+    {
+      "id": 3,
+      "document_id": 14,
+      "event_type": "restoration",
+      "event_date": "2016-02-21",
+      "attendee_count": 140
+    },
+    {
+      "id": 4,
+      "document_id": 86,
+      "event_type": "exhibition",
+      "event_date": "2013-01-29",
+      "attendee_count": 143
+    },
+    {
+      "id": 5,
+      "document_id": 80,
+      "event_type": "exhibition",
+      "event_date": "2016-10-11",
+      "attendee_count": 207
+    },
+    {
+      "id": 6,
+      "document_id": 145,
+      "event_type": "exhibition",
+      "event_date": "2015-02-10",
+      "attendee_count": 149
+    },
+    {
+      "id": 7,
+      "document_id": 109,
+      "event_type": "discovery",
+      "event_date": "2000-10-23",
+      "attendee_count": 61
+    },
+    {
+      "id": 8,
+      "document_id": 3,
+      "event_type": "restoration",
+      "event_date": "2013-12-09",
+      "attendee_count": 254
+    },
+    {
+      "id": 9,
+      "document_id": 162,
+      "event_type": "exhibition",
+      "event_date": "2000-01-10",
+      "attendee_count": 261
+    },
+    {
+      "id": 10,
+      "document_id": 192,
+      "event_type": "restoration",
+      "event_date": "2013-05-12",
+      "attendee_count": 153
+    },
+    {
+      "id": 11,
+      "document_id": 160,
+      "event_type": "restoration",
+      "event_date": "2014-08-21",
+      "attendee_count": 328
+    },
+    {
+      "id": 12,
+      "document_id": 135,
+      "event_type": "restoration",
+      "event_date": "2016-01-26",
+      "attendee_count": 359
+    },
+    {
+      "id": 13,
+      "document_id": 4,
+      "event_type": "restoration",
+      "event_date": "2003-12-22",
+      "attendee_count": 352
+    },
+    {
+      "id": 14,
+      "document_id": 162,
+      "event_type": "exhibition",
+      "event_date": "2016-07-24",
+      "attendee_count": 157
+    },
+    {
+      "id": 15,
+      "document_id": 38,
+      "event_type": "exhibition",
+      "event_date": "2022-11-19",
+      "attendee_count": 284
+    },
+    {
+      "id": 16,
+      "document_id": 102,
+      "event_type": "discovery",
+      "event_date": "2009-11-09",
+      "attendee_count": 231
+    },
+    {
+      "id": 17,
+      "document_id": 26,
+      "event_type": "restoration",
+      "event_date": "2020-10-15",
+      "attendee_count": 296
+    },
+    {
+      "id": 18,
+      "document_id": 120,
+      "event_type": "restoration",
+      "event_date": "2022-09-01",
+      "attendee_count": 314
+    },
+    {
+      "id": 19,
+      "document_id": 129,
+      "event_type": "exhibition",
+      "event_date": "2017-12-01",
+      "attendee_count": 250
+    },
+    {
+      "id": 20,
+      "document_id": 148,
+      "event_type": "exhibition",
+      "event_date": "2012-05-12",
+      "attendee_count": 224
+    },
+    {
+      "id": 21,
+      "document_id": 173,
+      "event_type": "exhibition",
+      "event_date": "2020-04-02",
+      "attendee_count": 225
+    },
+    {
+      "id": 22,
+      "document_id": 51,
+      "event_type": "exhibition",
+      "event_date": "2020-09-28",
+      "attendee_count": 295
+    },
+    {
+      "id": 23,
+      "document_id": 12,
+      "event_type": "restoration",
+      "event_date": "2002-09-23",
+      "attendee_count": 333
+    },
+    {
+      "id": 24,
+      "document_id": 147,
+      "event_type": "restoration",
+      "event_date": "2003-04-19",
+      "attendee_count": 177
+    },
+    {
+      "id": 25,
+      "document_id": 31,
+      "event_type": "exhibition",
+      "event_date": "2009-11-21",
+      "attendee_count": 221
+    },
+    {
+      "id": 26,
+      "document_id": 55,
+      "event_type": "exhibition",
+      "event_date": "2017-08-06",
+      "attendee_count": 395
+    },
+    {
+      "id": 27,
+      "document_id": 179,
+      "event_type": "exhibition",
+      "event_date": "2016-07-07",
+      "attendee_count": 311
+    },
+    {
+      "id": 28,
+      "document_id": 122,
+      "event_type": "exhibition",
+      "event_date": "2011-10-08",
+      "attendee_count": 351
+    },
+    {
+      "id": 29,
+      "document_id": 174,
+      "event_type": "exhibition",
+      "event_date": "2018-01-31",
+      "attendee_count": 232
+    },
+    {
+      "id": 30,
+      "document_id": 55,
+      "event_type": "exhibition",
+      "event_date": "2005-03-09",
+      "attendee_count": 149
+    },
+    {
+      "id": 31,
+      "document_id": 113,
+      "event_type": "discovery",
+      "event_date": "2007-11-10",
+      "attendee_count": 227
+    },
+    {
+      "id": 32,
+      "document_id": 90,
+      "event_type": "restoration",
+      "event_date": "2021-01-22",
+      "attendee_count": 283
+    },
+    {
+      "id": 33,
+      "document_id": 127,
+      "event_type": "discovery",
+      "event_date": "2003-05-28",
+      "attendee_count": 218
+    },
+    {
+      "id": 34,
+      "document_id": 66,
+      "event_type": "exhibition",
+      "event_date": "2015-10-11",
+      "attendee_count": 181
+    },
+    {
+      "id": 35,
+      "document_id": 167,
+      "event_type": "restoration",
+      "event_date": "2001-01-23",
+      "attendee_count": 209
+    },
+    {
+      "id": 36,
+      "document_id": 192,
+      "event_type": "exhibition",
+      "event_date": "2020-12-11",
+      "attendee_count": 240
+    },
+    {
+      "id": 37,
+      "document_id": 86,
+      "event_type": "discovery",
+      "event_date": "2000-01-15",
+      "attendee_count": 248
+    },
+    {
+      "id": 38,
+      "document_id": 75,
+      "event_type": "exhibition",
+      "event_date": "2023-11-14",
+      "attendee_count": 298
+    },
+    {
+      "id": 39,
+      "document_id": 11,
+      "event_type": "discovery",
+      "event_date": "2010-09-05",
+      "attendee_count": 330
+    },
+    {
+      "id": 40,
+      "document_id": 61,
+      "event_type": "restoration",
+      "event_date": "2008-01-23",
+      "attendee_count": 178
+    },
+    {
+      "id": 41,
+      "document_id": 103,
+      "event_type": "restoration",
+      "event_date": "2012-01-27",
+      "attendee_count": 263
+    },
+    {
+      "id": 42,
+      "document_id": 171,
+      "event_type": "exhibition",
+      "event_date": "2022-11-19",
+      "attendee_count": 197
+    },
+    {
+      "id": 43,
+      "document_id": 94,
+      "event_type": "exhibition",
+      "event_date": "2002-10-22",
+      "attendee_count": 283
+    },
+    {
+      "id": 44,
+      "document_id": 199,
+      "event_type": "discovery",
+      "event_date": "2005-11-20",
+      "attendee_count": 350
+    },
+    {
+      "id": 45,
+      "document_id": 20,
+      "event_type": "exhibition",
+      "event_date": "2018-09-28",
+      "attendee_count": 269
+    },
+    {
+      "id": 46,
+      "document_id": 192,
+      "event_type": "restoration",
+      "event_date": "2013-05-06",
+      "attendee_count": 222
+    },
+    {
+      "id": 47,
+      "document_id": 72,
+      "event_type": "exhibition",
+      "event_date": "2016-11-12",
+      "attendee_count": 260
+    },
+    {
+      "id": 48,
+      "document_id": 181,
+      "event_type": "discovery",
+      "event_date": "2008-06-10",
+      "attendee_count": 243
+    },
+    {
+      "id": 49,
+      "document_id": 66,
+      "event_type": "restoration",
+      "event_date": "2020-06-16",
+      "attendee_count": 359
+    },
+    {
+      "id": 50,
+      "document_id": 72,
+      "event_type": "restoration",
+      "event_date": "2005-11-07",
+      "attendee_count": 225
+    },
+    {
+      "id": 51,
+      "document_id": 25,
+      "event_type": "restoration",
+      "event_date": "2023-04-01",
+      "attendee_count": 230
+    },
+    {
+      "id": 52,
+      "document_id": 37,
+      "event_type": "discovery",
+      "event_date": "2006-04-12",
+      "attendee_count": 257
+    },
+    {
+      "id": 53,
+      "document_id": 42,
+      "event_type": "exhibition",
+      "event_date": "2023-06-08",
+      "attendee_count": 271
+    },
+    {
+      "id": 54,
+      "document_id": 142,
+      "event_type": "exhibition",
+      "event_date": "2012-09-13",
+      "attendee_count": 128
+    },
+    {
+      "id": 55,
+      "document_id": 58,
+      "event_type": "exhibition",
+      "event_date": "2006-11-28",
+      "attendee_count": 340
+    },
+    {
+      "id": 56,
+      "document_id": 4,
+      "event_type": "exhibition",
+      "event_date": "2000-12-15",
+      "attendee_count": 323
+    },
+    {
+      "id": 57,
+      "document_id": 76,
+      "event_type": "exhibition",
+      "event_date": "2022-10-26",
+      "attendee_count": 179
+    },
+    {
+      "id": 58,
+      "document_id": 142,
+      "event_type": "exhibition",
+      "event_date": "2012-10-23",
+      "attendee_count": 259
+    },
+    {
+      "id": 59,
+      "document_id": 173,
+      "event_type": "restoration",
+      "event_date": "2011-11-10",
+      "attendee_count": 180
+    },
+    {
+      "id": 60,
+      "document_id": 114,
+      "event_type": "restoration",
+      "event_date": "2009-08-06",
+      "attendee_count": 308
+    },
+    {
+      "id": 61,
+      "document_id": 69,
+      "event_type": "exhibition",
+      "event_date": "2003-12-08",
+      "attendee_count": 147
+    },
+    {
+      "id": 62,
+      "document_id": 191,
+      "event_type": "exhibition",
+      "event_date": "2017-04-11",
+      "attendee_count": 276
+    },
+    {
+      "id": 63,
+      "document_id": 169,
+      "event_type": "exhibition",
+      "event_date": "2020-08-04",
+      "attendee_count": 226
+    },
+    {
+      "id": 64,
+      "document_id": 182,
+      "event_type": "restoration",
+      "event_date": "2019-11-29",
+      "attendee_count": 283
+    },
+    {
+      "id": 65,
+      "document_id": 132,
+      "event_type": "exhibition",
+      "event_date": "2012-10-14",
+      "attendee_count": 258
+    },
+    {
+      "id": 66,
+      "document_id": 178,
+      "event_type": "exhibition",
+      "event_date": "2004-02-15",
+      "attendee_count": 373
+    },
+    {
+      "id": 67,
+      "document_id": 196,
+      "event_type": "exhibition",
+      "event_date": "2016-12-08",
+      "attendee_count": 210
+    },
+    {
+      "id": 68,
+      "document_id": 76,
+      "event_type": "restoration",
+      "event_date": "2022-05-06",
+      "attendee_count": 245
+    },
+    {
+      "id": 69,
+      "document_id": 93,
+      "event_type": "exhibition",
+      "event_date": "2002-12-16",
+      "attendee_count": 261
+    },
+    {
+      "id": 70,
+      "document_id": 56,
+      "event_type": "exhibition",
+      "event_date": "2007-05-21",
+      "attendee_count": 338
+    },
+    {
+      "id": 71,
+      "document_id": 72,
+      "event_type": "restoration",
+      "event_date": "2008-08-06",
+      "attendee_count": 316
+    },
+    {
+      "id": 72,
+      "document_id": 36,
+      "event_type": "exhibition",
+      "event_date": "2014-02-13",
+      "attendee_count": 182
+    },
+    {
+      "id": 73,
+      "document_id": 40,
+      "event_type": "restoration",
+      "event_date": "2007-11-03",
+      "attendee_count": 161
+    },
+    {
+      "id": 74,
+      "document_id": 64,
+      "event_type": "exhibition",
+      "event_date": "2004-10-06",
+      "attendee_count": 368
+    },
+    {
+      "id": 75,
+      "document_id": 34,
+      "event_type": "restoration",
+      "event_date": "2005-02-10",
+      "attendee_count": 160
+    },
+    {
+      "id": 76,
+      "document_id": 84,
+      "event_type": "restoration",
+      "event_date": "2020-10-31",
+      "attendee_count": 217
+    },
+    {
+      "id": 77,
+      "document_id": 61,
+      "event_type": "exhibition",
+      "event_date": "2004-11-10",
+      "attendee_count": 332
+    },
+    {
+      "id": 78,
+      "document_id": 45,
+      "event_type": "exhibition",
+      "event_date": "2004-12-07",
+      "attendee_count": 239
+    },
+    {
+      "id": 79,
+      "document_id": 18,
+      "event_type": "discovery",
+      "event_date": "2021-11-01",
+      "attendee_count": 226
+    },
+    {
+      "id": 80,
+      "document_id": 194,
+      "event_type": "exhibition",
+      "event_date": "2001-10-27",
+      "attendee_count": 327
+    },
+    {
+      "id": 81,
+      "document_id": 197,
+      "event_type": "exhibition",
+      "event_date": "2005-10-21",
+      "attendee_count": 301
+    },
+    {
+      "id": 82,
+      "document_id": 38,
+      "event_type": "exhibition",
+      "event_date": "2016-02-05",
+      "attendee_count": 195
+    },
+    {
+      "id": 83,
+      "document_id": 188,
+      "event_type": "discovery",
+      "event_date": "2009-11-11",
+      "attendee_count": 350
+    },
+    {
+      "id": 84,
+      "document_id": 199,
+      "event_type": "exhibition",
+      "event_date": "2013-05-14",
+      "attendee_count": 274
+    },
+    {
+      "id": 85,
+      "document_id": 188,
+      "event_type": "exhibition",
+      "event_date": "2008-06-30",
+      "attendee_count": 133
+    },
+    {
+      "id": 86,
+      "document_id": 38,
+      "event_type": "restoration",
+      "event_date": "2006-12-15",
+      "attendee_count": 189
+    },
+    {
+      "id": 87,
+      "document_id": 136,
+      "event_type": "exhibition",
+      "event_date": "2015-06-19",
+      "attendee_count": 271
+    },
+    {
+      "id": 88,
+      "document_id": 37,
+      "event_type": "exhibition",
+      "event_date": "2009-10-20",
+      "attendee_count": 327
+    },
+    {
+      "id": 89,
+      "document_id": 107,
+      "event_type": "discovery",
+      "event_date": "2014-11-17",
+      "attendee_count": 269
+    },
+    {
+      "id": 90,
+      "document_id": 68,
+      "event_type": "exhibition",
+      "event_date": "2018-02-28",
+      "attendee_count": 252
+    },
+    {
+      "id": 91,
+      "document_id": 112,
+      "event_type": "exhibition",
+      "event_date": "2007-08-20",
+      "attendee_count": 280
+    },
+    {
+      "id": 92,
+      "document_id": 143,
+      "event_type": "exhibition",
+      "event_date": "2019-12-05",
+      "attendee_count": 274
+    },
+    {
+      "id": 93,
+      "document_id": 50,
+      "event_type": "exhibition",
+      "event_date": "2015-07-28",
+      "attendee_count": 287
+    },
+    {
+      "id": 94,
+      "document_id": 27,
+      "event_type": "exhibition",
+      "event_date": "2014-12-27",
+      "attendee_count": 272
+    },
+    {
+      "id": 95,
+      "document_id": 47,
+      "event_type": "exhibition",
+      "event_date": "2013-08-23",
+      "attendee_count": 368
+    },
+    {
+      "id": 96,
+      "document_id": 170,
+      "event_type": "exhibition",
+      "event_date": "2000-08-24",
+      "attendee_count": 273
+    },
+    {
+      "id": 97,
+      "document_id": 89,
+      "event_type": "exhibition",
+      "event_date": "2013-01-12",
+      "attendee_count": 179
+    },
+    {
+      "id": 98,
+      "document_id": 7,
+      "event_type": "discovery",
+      "event_date": "2014-08-09",
+      "attendee_count": 266
+    },
+    {
+      "id": 99,
+      "document_id": 12,
+      "event_type": "exhibition",
+      "event_date": "2003-12-31",
+      "attendee_count": 207
+    },
+    {
+      "id": 100,
+      "document_id": 49,
+      "event_type": "exhibition",
+      "event_date": "2002-12-19",
+      "attendee_count": 364
+    }
+  ],
+  "document_highlights": [
+    {
+      "id": 1,
+      "document_id": 185,
+      "highlight_text": "The team asked for a change and the booking was rejected. The account owner reported an incomplete issue; the session was refunded. The invoice was closed — repeat case, no further action.",
+      "highlighted_date": "1834-04-07",
+      "importance_level": 4
+    },
+    {
+      "id": 2,
+      "document_id": 40,
+      "highlight_text": "An operator asked for a change and the record was reopened. The session was delayed — unusual case, no further action. The reviewer reported a late issue; the refund was rescheduled.",
+      "highlighted_date": "1823-02-18",
+      "importance_level": 1
+    },
+    {
+      "id": 3,
+      "document_id": 142,
+      "highlight_text": "No response from an operator, so the session was reviewed. The ticket was rescheduled — urgent case, no further action. No response from an operator, so the account was confirmed. The account owner confirmed the details and the order was reviewed.",
+      "highlighted_date": "1879-02-07",
+      "importance_level": 4
+    },
+    {
+      "id": 4,
+      "document_id": 80,
+      "highlight_text": "No response from the supplier, so the item was delayed. The request was resolved — unusual case, no further action. The courier reported a partial issue; the document was rejected.",
+      "highlighted_date": "1872-07-23",
+      "importance_level": 2
+    },
+    {
+      "id": 5,
+      "document_id": 71,
+      "highlight_text": "The customer confirmed the details and the ticket was replaced. No response from the supplier, so the delivery was resolved. The supplier confirmed the details and the transfer was processed. An operator asked for a change and the shipment was confirmed.",
+      "highlighted_date": "1990-01-22",
+      "importance_level": 5
+    },
+    {
+      "id": 6,
+      "document_id": 31,
+      "highlight_text": "The account owner confirmed the details and the refund was refunded. The reviewer confirmed the details and the record was confirmed. The customer reported a repeat issue; the payment was rejected. The courier asked for a change and the session was completed.",
+      "highlighted_date": "1726-06-29",
+      "importance_level": 5
+    },
+    {
+      "id": 7,
+      "document_id": 161,
+      "highlight_text": "The courier asked for a change and the shipment was cancelled. The account was rescheduled — manual case, no further action. The refund was cancelled — routine case, no further action.",
+      "highlighted_date": "1883-09-30",
+      "importance_level": 4
+    },
+    {
+      "id": 8,
+      "document_id": 146,
+      "highlight_text": "The reviewer asked for a change and the transfer was reopened. The courier asked for a change and the claim was refunded. The delivery was resolved — unusual case, no further action. The team confirmed the details and the item was processed.",
+      "highlighted_date": "1788-12-17",
+      "importance_level": 4
+    },
+    {
+      "id": 9,
+      "document_id": 95,
+      "highlight_text": "The team reported a manual issue; the report was delayed. An operator reported an automatic issue; the document was cancelled.",
+      "highlighted_date": "2017-12-06",
+      "importance_level": 1
+    },
+    {
+      "id": 10,
+      "document_id": 69,
+      "highlight_text": "No response from the customer, so the booking was processed. The supplier reported a standard issue; the payment was resolved. Support asked for a change and the booking was resolved. No response from the courier, so the report was processed.",
+      "highlighted_date": "1977-10-23",
+      "importance_level": 5
+    },
+    {
+      "id": 11,
+      "document_id": 68,
+      "highlight_text": "The courier reported a standard issue; the refund was cancelled. No response from an operator, so the transfer was replaced. The team confirmed the details and the account was reopened. The account was completed — urgent case, no further action.",
+      "highlighted_date": "1739-12-02",
+      "importance_level": 4
+    },
+    {
+      "id": 12,
+      "document_id": 79,
+      "highlight_text": "The session was confirmed — standard case, no further action. The refund was replaced — urgent case, no further action. The account owner confirmed the details and the item was reviewed. The reviewer confirmed the details and the request was reviewed.",
+      "highlighted_date": "1918-12-17",
+      "importance_level": 5
+    },
+    {
+      "id": 13,
+      "document_id": 170,
+      "highlight_text": "The account owner asked for a change and the account was resolved. No response from the courier, so the refund was approved. No response from the team, so the transfer was reopened.",
+      "highlighted_date": "1864-07-05",
+      "importance_level": 1
+    },
+    {
+      "id": 14,
+      "document_id": 69,
+      "highlight_text": "The ticket was escalated — automatic case, no further action. Support asked for a change and the request was refunded. The order was delayed — standard case, no further action. The delivery was rejected — minor case, no further action.",
+      "highlighted_date": "1788-11-18",
+      "importance_level": 5
+    },
+    {
+      "id": 15,
+      "document_id": 24,
+      "highlight_text": "The request was rescheduled — standard case, no further action. The team asked for a change and the refund was cancelled.",
+      "highlighted_date": "1799-06-13",
+      "importance_level": 5
+    },
+    {
+      "id": 16,
+      "document_id": 128,
+      "highlight_text": "The reviewer reported a manual issue; the transfer was rejected. The record was updated — urgent case, no further action. The customer reported an automatic issue; the shipment was completed.",
+      "highlighted_date": "1757-01-11",
+      "importance_level": 4
+    },
+    {
+      "id": 17,
+      "document_id": 174,
+      "highlight_text": "The shipment was resolved — automatic case, no further action. No response from an operator, so the claim was rescheduled.",
+      "highlighted_date": "1888-12-14",
+      "importance_level": 3
+    },
+    {
+      "id": 18,
+      "document_id": 139,
+      "highlight_text": "An operator reported a repeat issue; the payment was refunded. The courier confirmed the details and the transfer was rejected.",
+      "highlighted_date": "1815-09-15",
+      "importance_level": 2
+    },
+    {
+      "id": 19,
+      "document_id": 144,
+      "highlight_text": "The document was completed — incomplete case, no further action. No response from the courier, so the booking was completed.",
+      "highlighted_date": "1957-09-19",
+      "importance_level": 2
+    },
+    {
+      "id": 20,
+      "document_id": 96,
+      "highlight_text": "The account owner reported an urgent issue; the document was replaced. An operator confirmed the details and the document was rescheduled. The reviewer confirmed the details and the session was delayed.",
+      "highlighted_date": "1756-12-24",
+      "importance_level": 5
+    },
+    {
+      "id": 21,
+      "document_id": 69,
+      "highlight_text": "The courier asked for a change and the refund was reviewed. No response from the reviewer, so the appointment was resolved. No response from the reviewer, so the appointment was escalated.",
+      "highlighted_date": "1846-11-23",
+      "importance_level": 5
+    },
+    {
+      "id": 22,
+      "document_id": 82,
+      "highlight_text": "The claim was confirmed — standard case, no further action. No response from the supplier, so the claim was replaced.",
+      "highlighted_date": "1949-08-30",
+      "importance_level": 3
+    },
+    {
+      "id": 23,
+      "document_id": 47,
+      "highlight_text": "The courier asked for a change and the item was escalated. The courier reported a routine issue; the session was confirmed. The customer confirmed the details and the transfer was resolved.",
+      "highlighted_date": "1944-01-09",
+      "importance_level": 2
+    },
+    {
+      "id": 24,
+      "document_id": 86,
+      "highlight_text": "No response from the account owner, so the transfer was cancelled. The account owner asked for a change and the invoice was reviewed. The reviewer reported an incomplete issue; the request was rescheduled. An operator confirmed the details and the item was reviewed.",
+      "highlighted_date": "1869-10-10",
+      "importance_level": 4
+    },
+    {
+      "id": 25,
+      "document_id": 188,
+      "highlight_text": "The report was approved — partial case, no further action. The customer asked for a change and the payment was refunded. The shipment was approved — manual case, no further action.",
+      "highlighted_date": "1820-07-08",
+      "importance_level": 3
+    },
+    {
+      "id": 26,
+      "document_id": 172,
+      "highlight_text": "The reviewer confirmed the details and the payment was rescheduled. The claim was processed — incomplete case, no further action. The supplier confirmed the details and the record was rejected. The account owner reported an unusual issue; the appointment was cancelled.",
+      "highlighted_date": "1752-07-04",
+      "importance_level": 1
+    },
+    {
+      "id": 27,
+      "document_id": 162,
+      "highlight_text": "The reviewer confirmed the details and the order was closed. The courier reported an urgent issue; the booking was rejected. No response from the team, so the session was completed. The courier reported an automatic issue; the refund was delayed.",
+      "highlighted_date": "1730-05-30",
+      "importance_level": 2
+    },
+    {
+      "id": 28,
+      "document_id": 35,
+      "highlight_text": "No response from the account owner, so the delivery was completed. The reviewer asked for a change and the payment was closed.",
+      "highlighted_date": "1894-08-04",
+      "importance_level": 2
+    },
+    {
+      "id": 29,
+      "document_id": 40,
+      "highlight_text": "No response from the courier, so the document was replaced. The team confirmed the details and the payment was approved. The transfer was cancelled — urgent case, no further action. The courier asked for a change and the request was confirmed.",
+      "highlighted_date": "1796-05-15",
+      "importance_level": 2
+    },
+    {
+      "id": 30,
+      "document_id": 156,
+      "highlight_text": "The team asked for a change and the shipment was reviewed. The appointment was confirmed — urgent case, no further action. The reviewer asked for a change and the item was approved.",
+      "highlighted_date": "2013-11-03",
+      "importance_level": 3
+    },
+    {
+      "id": 31,
+      "document_id": 6,
+      "highlight_text": "The customer reported an unusual issue; the delivery was rescheduled. The account was approved — minor case, no further action. The courier asked for a change and the delivery was resolved. The delivery was processed — automatic case, no further action.",
+      "highlighted_date": "1792-01-26",
+      "importance_level": 5
+    },
+    {
+      "id": 32,
+      "document_id": 147,
+      "highlight_text": "The reviewer confirmed the details and the document was resolved. The supplier confirmed the details and the order was escalated. The reviewer reported a routine issue; the appointment was escalated. An operator reported an unusual issue; the claim was replaced.",
+      "highlighted_date": "1852-01-10",
+      "importance_level": 5
+    },
+    {
+      "id": 33,
+      "document_id": 168,
+      "highlight_text": "The courier confirmed the details and the item was cancelled. No response from the supplier, so the delivery was refunded.",
+      "highlighted_date": "1839-06-26",
+      "importance_level": 5
+    },
+    {
+      "id": 34,
+      "document_id": 14,
+      "highlight_text": "No response from the reviewer, so the delivery was rescheduled. The courier reported an automatic issue; the order was escalated. An operator asked for a change and the appointment was confirmed. The reviewer asked for a change and the record was escalated.",
+      "highlighted_date": "1947-03-11",
+      "importance_level": 5
+    },
+    {
+      "id": 35,
+      "document_id": 29,
+      "highlight_text": "The supplier asked for a change and the request was cancelled. The session was closed — urgent case, no further action.",
+      "highlighted_date": "1818-10-03",
+      "importance_level": 5
+    },
+    {
+      "id": 36,
+      "document_id": 27,
+      "highlight_text": "The team confirmed the details and the booking was closed. No response from an operator, so the shipment was rescheduled. The supplier asked for a change and the payment was updated. The courier confirmed the details and the session was reviewed.",
+      "highlighted_date": "1799-12-02",
+      "importance_level": 3
+    },
+    {
+      "id": 37,
+      "document_id": 108,
+      "highlight_text": "The team asked for a change and the transfer was completed. An operator reported a partial issue; the claim was rejected. The delivery was refunded — automatic case, no further action.",
+      "highlighted_date": "1704-10-19",
+      "importance_level": 5
+    },
+    {
+      "id": 38,
+      "document_id": 159,
+      "highlight_text": "The team reported an urgent issue; the order was refunded. The team reported a duplicate issue; the refund was refunded. An operator confirmed the details and the refund was cancelled.",
+      "highlighted_date": "1704-01-23",
+      "importance_level": 2
+    },
+    {
+      "id": 39,
+      "document_id": 186,
+      "highlight_text": "Support asked for a change and the item was rescheduled. The customer reported a routine issue; the booking was escalated. The reviewer confirmed the details and the session was escalated. The account was confirmed — standard case, no further action.",
+      "highlighted_date": "1956-09-04",
+      "importance_level": 5
+    },
+    {
+      "id": 40,
+      "document_id": 150,
+      "highlight_text": "The account owner confirmed the details and the booking was processed. The reviewer confirmed the details and the booking was rescheduled. The customer confirmed the details and the session was confirmed.",
+      "highlighted_date": "1752-01-17",
+      "importance_level": 5
+    },
+    {
+      "id": 41,
+      "document_id": 54,
+      "highlight_text": "The courier asked for a change and the record was updated. No response from the supplier, so the booking was completed. The reviewer asked for a change and the shipment was processed.",
+      "highlighted_date": "1771-09-13",
+      "importance_level": 5
+    },
+    {
+      "id": 42,
+      "document_id": 56,
+      "highlight_text": "The reviewer asked for a change and the transfer was closed. The customer confirmed the details and the order was confirmed. No response from an operator, so the delivery was reopened. The ticket was replaced — unusual case, no further action.",
+      "highlighted_date": "1747-12-11",
+      "importance_level": 1
+    },
+    {
+      "id": 43,
+      "document_id": 180,
+      "highlight_text": "No response from the account owner, so the report was processed. No response from the reviewer, so the shipment was refunded.",
+      "highlighted_date": "1877-01-17",
+      "importance_level": 3
+    },
+    {
+      "id": 44,
+      "document_id": 81,
+      "highlight_text": "An operator asked for a change and the claim was replaced. The supplier asked for a change and the report was replaced.",
+      "highlighted_date": "1900-11-20",
+      "importance_level": 1
+    },
+    {
+      "id": 45,
+      "document_id": 141,
+      "highlight_text": "The customer reported a duplicate issue; the account was reopened. The request was confirmed — manual case, no further action. The reviewer reported a repeat issue; the ticket was confirmed.",
+      "highlighted_date": "2019-02-09",
+      "importance_level": 4
+    },
+    {
+      "id": 46,
+      "document_id": 53,
+      "highlight_text": "The reviewer reported a late issue; the document was closed. The account owner reported an urgent issue; the payment was processed. The account owner confirmed the details and the refund was refunded. The reviewer confirmed the details and the delivery was completed.",
+      "highlighted_date": "1806-01-12",
+      "importance_level": 5
+    },
+    {
+      "id": 47,
+      "document_id": 167,
+      "highlight_text": "No response from the supplier, so the session was processed. The report was rescheduled — repeat case, no further action.",
+      "highlighted_date": "1793-09-13",
+      "importance_level": 5
+    },
+    {
+      "id": 48,
+      "document_id": 84,
+      "highlight_text": "No response from the account owner, so the order was confirmed. The courier asked for a change and the order was processed. The document was rejected — partial case, no further action.",
+      "highlighted_date": "2016-10-12",
+      "importance_level": 3
+    },
+    {
+      "id": 49,
+      "document_id": 64,
+      "highlight_text": "The reviewer reported a manual issue; the invoice was reopened. The account owner asked for a change and the account was closed.",
+      "highlighted_date": "1800-11-23",
+      "importance_level": 2
+    },
+    {
+      "id": 50,
+      "document_id": 183,
+      "highlight_text": "The ticket was approved — late case, no further action. The customer asked for a change and the refund was confirmed.",
+      "highlighted_date": "1861-04-29",
+      "importance_level": 1
+    },
+    {
+      "id": 51,
+      "document_id": 199,
+      "highlight_text": "The courier confirmed the details and the refund was reviewed. The supplier asked for a change and the document was closed. An operator asked for a change and the invoice was approved. The courier asked for a change and the request was closed.",
+      "highlighted_date": "1972-03-29",
+      "importance_level": 3
+    },
+    {
+      "id": 52,
+      "document_id": 5,
+      "highlight_text": "The customer confirmed the details and the session was rejected. The appointment was completed — repeat case, no further action.",
+      "highlighted_date": "1970-03-18",
+      "importance_level": 1
+    },
+    {
+      "id": 53,
+      "document_id": 103,
+      "highlight_text": "The invoice was refunded — minor case, no further action. The reviewer confirmed the details and the account was replaced.",
+      "highlighted_date": "2006-09-05",
+      "importance_level": 4
+    },
+    {
+      "id": 54,
+      "document_id": 47,
+      "highlight_text": "The request was escalated — unusual case, no further action. The order was updated — automatic case, no further action.",
+      "highlighted_date": "1843-12-24",
+      "importance_level": 2
+    },
+    {
+      "id": 55,
+      "document_id": 123,
+      "highlight_text": "No response from the customer, so the delivery was reopened. No response from the account owner, so the transfer was replaced. The transfer was reviewed — manual case, no further action. The invoice was escalated — automatic case, no further action.",
+      "highlighted_date": "1812-05-03",
+      "importance_level": 5
+    },
+    {
+      "id": 56,
+      "document_id": 143,
+      "highlight_text": "The shipment was completed — partial case, no further action. An operator asked for a change and the session was cancelled. The courier reported a minor issue; the invoice was confirmed.",
+      "highlighted_date": "2008-05-27",
+      "importance_level": 4
+    },
+    {
+      "id": 57,
+      "document_id": 150,
+      "highlight_text": "The account was updated — late case, no further action. The account owner confirmed the details and the request was completed. The reviewer asked for a change and the request was rescheduled.",
+      "highlighted_date": "1739-01-09",
+      "importance_level": 1
+    },
+    {
+      "id": 58,
+      "document_id": 48,
+      "highlight_text": "The courier reported an unusual issue; the request was closed. The team reported a routine issue; the invoice was reopened.",
+      "highlighted_date": "1748-04-06",
+      "importance_level": 5
+    },
+    {
+      "id": 59,
+      "document_id": 61,
+      "highlight_text": "The account owner confirmed the details and the refund was updated. An operator asked for a change and the item was approved. The supplier confirmed the details and the claim was cancelled.",
+      "highlighted_date": "2008-11-12",
+      "importance_level": 5
+    },
+    {
+      "id": 60,
+      "document_id": 160,
+      "highlight_text": "The customer reported a manual issue; the refund was cancelled. The customer asked for a change and the ticket was escalated.",
+      "highlighted_date": "1807-12-18",
+      "importance_level": 5
+    },
+    {
+      "id": 61,
+      "document_id": 138,
+      "highlight_text": "The supplier asked for a change and the report was refunded. No response from the team, so the document was confirmed. The team reported an unusual issue; the delivery was updated. No response from the courier, so the refund was completed.",
+      "highlighted_date": "1784-03-22",
+      "importance_level": 5
+    },
+    {
+      "id": 62,
+      "document_id": 35,
+      "highlight_text": "No response from the team, so the delivery was delayed. The order was approved — automatic case, no further action.",
+      "highlighted_date": "1771-11-14",
+      "importance_level": 2
+    },
+    {
+      "id": 63,
+      "document_id": 30,
+      "highlight_text": "The team asked for a change and the payment was reopened. No response from the customer, so the payment was escalated.",
+      "highlighted_date": "1878-10-31",
+      "importance_level": 4
+    },
+    {
+      "id": 64,
+      "document_id": 104,
+      "highlight_text": "The team reported a duplicate issue; the invoice was processed. An operator asked for a change and the delivery was confirmed.",
+      "highlighted_date": "1954-06-26",
+      "importance_level": 5
+    },
+    {
+      "id": 65,
+      "document_id": 34,
+      "highlight_text": "The reviewer reported a standard issue; the delivery was processed. The claim was confirmed — duplicate case, no further action.",
+      "highlighted_date": "1886-03-24",
+      "importance_level": 5
+    },
+    {
+      "id": 66,
+      "document_id": 61,
+      "highlight_text": "The item was replaced — duplicate case, no further action. No response from an operator, so the document was delayed.",
+      "highlighted_date": "1973-08-15",
+      "importance_level": 3
+    },
+    {
+      "id": 67,
+      "document_id": 186,
+      "highlight_text": "The account owner reported a routine issue; the transfer was confirmed. The reviewer reported a repeat issue; the claim was delayed.",
+      "highlighted_date": "1967-10-03",
+      "importance_level": 3
+    },
+    {
+      "id": 68,
+      "document_id": 173,
+      "highlight_text": "The appointment was rejected — urgent case, no further action. The supplier confirmed the details and the account was reviewed. The payment was reviewed — manual case, no further action. The supplier confirmed the details and the shipment was resolved.",
+      "highlighted_date": "1722-01-26",
+      "importance_level": 4
+    },
+    {
+      "id": 69,
+      "document_id": 124,
+      "highlight_text": "No response from the customer, so the booking was reviewed. The account owner asked for a change and the delivery was refunded.",
+      "highlighted_date": "1758-07-15",
+      "importance_level": 3
+    },
+    {
+      "id": 70,
+      "document_id": 133,
+      "highlight_text": "The appointment was reopened — routine case, no further action. An operator asked for a change and the order was delayed. No response from an operator, so the refund was delayed.",
+      "highlighted_date": "1833-03-04",
+      "importance_level": 2
+    },
+    {
+      "id": 71,
+      "document_id": 14,
+      "highlight_text": "No response from the reviewer, so the item was reviewed. The reviewer asked for a change and the payment was closed.",
+      "highlighted_date": "1768-12-16",
+      "importance_level": 2
+    },
+    {
+      "id": 72,
+      "document_id": 149,
+      "highlight_text": "The account owner asked for a change and the request was closed. The customer confirmed the details and the refund was processed.",
+      "highlighted_date": "1751-03-25",
+      "importance_level": 1
+    },
+    {
+      "id": 73,
+      "document_id": 50,
+      "highlight_text": "No response from the customer, so the shipment was completed. Support asked for a change and the request was resolved.",
+      "highlighted_date": "1890-04-10",
+      "importance_level": 2
+    },
+    {
+      "id": 74,
+      "document_id": 21,
+      "highlight_text": "The refund was escalated — partial case, no further action. The team asked for a change and the document was processed.",
+      "highlighted_date": "1893-07-17",
+      "importance_level": 1
+    },
+    {
+      "id": 75,
+      "document_id": 135,
+      "highlight_text": "No response from the reviewer, so the document was replaced. The supplier confirmed the details and the transfer was refunded. The supplier asked for a change and the invoice was updated.",
+      "highlighted_date": "1923-12-10",
+      "importance_level": 4
+    },
+    {
+      "id": 76,
+      "document_id": 161,
+      "highlight_text": "No response from the supplier, so the record was processed. The customer confirmed the details and the request was reopened. The supplier reported an urgent issue; the shipment was escalated. The item was delayed — urgent case, no further action.",
+      "highlighted_date": "1935-04-16",
+      "importance_level": 1
+    },
+    {
+      "id": 77,
+      "document_id": 154,
+      "highlight_text": "No response from the customer, so the account was completed. The session was replaced — urgent case, no further action.",
+      "highlighted_date": "1806-02-16",
+      "importance_level": 5
+    },
+    {
+      "id": 78,
+      "document_id": 167,
+      "highlight_text": "The supplier asked for a change and the record was resolved. The customer confirmed the details and the refund was delayed.",
+      "highlighted_date": "1801-11-19",
+      "importance_level": 3
+    },
+    {
+      "id": 79,
+      "document_id": 126,
+      "highlight_text": "The courier asked for a change and the delivery was escalated. The supplier reported a manual issue; the record was reopened. The courier asked for a change and the item was confirmed. No response from the courier, so the account was completed.",
+      "highlighted_date": "1851-07-05",
+      "importance_level": 2
+    },
+    {
+      "id": 80,
+      "document_id": 77,
+      "highlight_text": "The account owner reported an unusual issue; the document was escalated. The reviewer asked for a change and the ticket was rescheduled. The booking was reviewed — duplicate case, no further action. The supplier reported a routine issue; the shipment was cancelled.",
+      "highlighted_date": "1815-09-01",
+      "importance_level": 5
+    },
+    {
+      "id": 81,
+      "document_id": 16,
+      "highlight_text": "The account was replaced — standard case, no further action. The order was escalated — minor case, no further action. No response from the account owner, so the shipment was completed. The account owner reported a minor issue; the request was closed.",
+      "highlighted_date": "1853-07-31",
+      "importance_level": 4
+    },
+    {
+      "id": 82,
+      "document_id": 163,
+      "highlight_text": "The request was rejected — repeat case, no further action. The courier confirmed the details and the document was delayed. An operator asked for a change and the record was delayed.",
+      "highlighted_date": "1947-02-01",
+      "importance_level": 5
+    },
+    {
+      "id": 83,
+      "document_id": 55,
+      "highlight_text": "The courier reported a duplicate issue; the order was reopened. The transfer was approved — urgent case, no further action. An operator reported an incomplete issue; the shipment was delayed.",
+      "highlighted_date": "1846-11-15",
+      "importance_level": 5
+    },
+    {
+      "id": 84,
+      "document_id": 87,
+      "highlight_text": "The claim was resolved — unusual case, no further action. The customer reported a manual issue; the ticket was reopened. The team confirmed the details and the claim was approved. The supplier asked for a change and the transfer was updated.",
+      "highlighted_date": "1924-12-20",
+      "importance_level": 5
+    },
+    {
+      "id": 85,
+      "document_id": 185,
+      "highlight_text": "The supplier reported a late issue; the item was confirmed. The booking was escalated — standard case, no further action. No response from the customer, so the account was replaced.",
+      "highlighted_date": "1876-04-16",
+      "importance_level": 4
+    },
+    {
+      "id": 86,
+      "document_id": 143,
+      "highlight_text": "No response from the courier, so the order was escalated. An operator confirmed the details and the refund was reviewed. The customer reported a partial issue; the request was delayed. The supplier asked for a change and the appointment was escalated.",
+      "highlighted_date": "1906-09-16",
+      "importance_level": 5
+    },
+    {
+      "id": 87,
+      "document_id": 178,
+      "highlight_text": "The delivery was resolved — urgent case, no further action. Support asked for a change and the payment was refunded. The courier asked for a change and the payment was replaced.",
+      "highlighted_date": "1783-12-23",
+      "importance_level": 5
+    },
+    {
+      "id": 88,
+      "document_id": 99,
+      "highlight_text": "The item was rejected — standard case, no further action. The order was reopened — repeat case, no further action.",
+      "highlighted_date": "1896-09-24",
+      "importance_level": 5
+    },
+    {
+      "id": 89,
+      "document_id": 8,
+      "highlight_text": "The shipment was resolved — duplicate case, no further action. The team confirmed the details and the transfer was rejected. The delivery was rejected — repeat case, no further action.",
+      "highlighted_date": "2011-04-04",
+      "importance_level": 4
+    },
+    {
+      "id": 90,
+      "document_id": 58,
+      "highlight_text": "The courier reported a late issue; the document was rescheduled. The report was refunded — standard case, no further action. An operator confirmed the details and the appointment was reopened.",
+      "highlighted_date": "1809-02-08",
+      "importance_level": 4
+    },
+    {
+      "id": 91,
+      "document_id": 172,
+      "highlight_text": "The item was completed — minor case, no further action. The session was refunded — incomplete case, no further action. The booking was rejected — automatic case, no further action. No response from the team, so the account was updated.",
+      "highlighted_date": "1949-04-30",
+      "importance_level": 4
+    },
+    {
+      "id": 92,
+      "document_id": 180,
+      "highlight_text": "The courier confirmed the details and the claim was rejected. The record was updated — repeat case, no further action. No response from the team, so the payment was cancelled.",
+      "highlighted_date": "1970-12-29",
+      "importance_level": 4
+    },
+    {
+      "id": 93,
+      "document_id": 196,
+      "highlight_text": "The supplier asked for a change and the order was cancelled. The reviewer reported an unusual issue; the invoice was closed. No response from the supplier, so the record was closed.",
+      "highlighted_date": "1932-10-12",
+      "importance_level": 2
+    },
+    {
+      "id": 94,
+      "document_id": 16,
+      "highlight_text": "The courier asked for a change and the claim was escalated. An operator asked for a change and the document was approved. Support asked for a change and the refund was refunded.",
+      "highlighted_date": "1997-06-02",
+      "importance_level": 4
+    },
+    {
+      "id": 95,
+      "document_id": 81,
+      "highlight_text": "No response from the account owner, so the claim was resolved. No response from the team, so the session was completed. No response from the reviewer, so the refund was rescheduled. An operator reported a minor issue; the payment was replaced.",
+      "highlighted_date": "1737-08-13",
+      "importance_level": 4
+    },
+    {
+      "id": 96,
+      "document_id": 65,
+      "highlight_text": "The reviewer reported a repeat issue; the document was approved. The supplier reported a standard issue; the item was refunded. No response from an operator, so the document was escalated. The supplier confirmed the details and the refund was approved.",
+      "highlighted_date": "1970-04-24",
+      "importance_level": 1
+    },
+    {
+      "id": 97,
+      "document_id": 50,
+      "highlight_text": "The delivery was updated — manual case, no further action. The account owner asked for a change and the claim was rejected.",
+      "highlighted_date": "1941-06-28",
+      "importance_level": 3
+    },
+    {
+      "id": 98,
+      "document_id": 182,
+      "highlight_text": "The delivery was confirmed — minor case, no further action. The appointment was completed — duplicate case, no further action. An operator confirmed the details and the account was reopened. The courier asked for a change and the record was confirmed.",
+      "highlighted_date": "1818-12-06",
+      "importance_level": 3
+    },
+    {
+      "id": 99,
+      "document_id": 115,
+      "highlight_text": "The supplier confirmed the details and the ticket was reviewed. The customer asked for a change and the item was completed. The supplier reported an unusual issue; the order was approved.",
+      "highlighted_date": "1768-10-26",
+      "importance_level": 3
+    },
+    {
+      "id": 100,
+      "document_id": 101,
+      "highlight_text": "The team reported a duplicate issue; the appointment was approved. The ticket was rescheduled — urgent case, no further action.",
+      "highlighted_date": "1746-01-05",
+      "importance_level": 4
+    },
+    {
+      "id": 101,
+      "document_id": 164,
+      "highlight_text": "No response from the reviewer, so the refund was reviewed. No response from the courier, so the session was completed. No response from the account owner, so the delivery was replaced. The document was closed — duplicate case, no further action.",
+      "highlighted_date": "1767-11-05",
+      "importance_level": 4
+    },
+    {
+      "id": 102,
+      "document_id": 70,
+      "highlight_text": "No response from the courier, so the order was rejected. The reviewer asked for a change and the account was replaced. The account owner reported an unusual issue; the account was reviewed. No response from the account owner, so the invoice was updated.",
+      "highlighted_date": "1851-02-27",
+      "importance_level": 2
+    },
+    {
+      "id": 103,
+      "document_id": 56,
+      "highlight_text": "No response from the courier, so the invoice was confirmed. The courier asked for a change and the claim was escalated.",
+      "highlighted_date": "2012-10-30",
+      "importance_level": 4
+    },
+    {
+      "id": 104,
+      "document_id": 166,
+      "highlight_text": "The supplier reported a minor issue; the appointment was rejected. The account owner asked for a change and the shipment was reopened. The team reported a late issue; the delivery was approved. The claim was delayed — automatic case, no further action.",
+      "highlighted_date": "1892-02-18",
+      "importance_level": 4
+    },
+    {
+      "id": 105,
+      "document_id": 88,
+      "highlight_text": "The shipment was closed — automatic case, no further action. The courier confirmed the details and the request was escalated. The order was resolved — routine case, no further action. The account owner reported a duplicate issue; the booking was rejected.",
+      "highlighted_date": "2013-11-07",
+      "importance_level": 4
+    },
+    {
+      "id": 106,
+      "document_id": 97,
+      "highlight_text": "The supplier confirmed the details and the report was processed. The customer reported a repeat issue; the record was processed. An operator reported a standard issue; the refund was replaced.",
+      "highlighted_date": "1823-09-03",
+      "importance_level": 4
+    },
+    {
+      "id": 107,
+      "document_id": 18,
+      "highlight_text": "No response from the courier, so the session was completed. The supplier asked for a change and the delivery was closed. The account owner reported an unusual issue; the appointment was updated. No response from the reviewer, so the session was resolved.",
+      "highlighted_date": "1922-03-17",
+      "importance_level": 2
+    },
+    {
+      "id": 108,
+      "document_id": 99,
+      "highlight_text": "No response from the courier, so the order was rescheduled. No response from the reviewer, so the account was refunded. No response from the reviewer, so the report was rejected.",
+      "highlighted_date": "1784-06-16",
+      "importance_level": 5
+    },
+    {
+      "id": 109,
+      "document_id": 168,
+      "highlight_text": "The account owner asked for a change and the account was confirmed. The team reported a partial issue; the document was rejected.",
+      "highlighted_date": "1877-09-21",
+      "importance_level": 3
+    },
+    {
+      "id": 110,
+      "document_id": 137,
+      "highlight_text": "The team reported an unusual issue; the order was confirmed. No response from the courier, so the booking was resolved. The customer reported a late issue; the report was processed. The account owner confirmed the details and the item was reviewed.",
+      "highlighted_date": "1902-10-03",
+      "importance_level": 2
+    },
+    {
+      "id": 111,
+      "document_id": 175,
+      "highlight_text": "The courier reported a partial issue; the refund was escalated. The customer asked for a change and the ticket was cancelled.",
+      "highlighted_date": "1713-08-19",
+      "importance_level": 4
+    },
+    {
+      "id": 112,
+      "document_id": 2,
+      "highlight_text": "The account owner confirmed the details and the appointment was closed. The reviewer asked for a change and the report was escalated.",
+      "highlighted_date": "1976-10-05",
+      "importance_level": 5
+    },
+    {
+      "id": 113,
+      "document_id": 71,
+      "highlight_text": "The supplier confirmed the details and the booking was reviewed. The account owner asked for a change and the shipment was updated.",
+      "highlighted_date": "1716-07-17",
+      "importance_level": 4
+    },
+    {
+      "id": 114,
+      "document_id": 114,
+      "highlight_text": "The transfer was confirmed — duplicate case, no further action. An operator asked for a change and the ticket was closed. No response from the account owner, so the record was completed. The supplier asked for a change and the request was escalated.",
+      "highlighted_date": "1898-01-23",
+      "importance_level": 5
+    },
+    {
+      "id": 115,
+      "document_id": 16,
+      "highlight_text": "An operator reported a duplicate issue; the delivery was updated. An operator asked for a change and the request was resolved.",
+      "highlighted_date": "1749-01-11",
+      "importance_level": 2
+    },
+    {
+      "id": 116,
+      "document_id": 97,
+      "highlight_text": "The customer confirmed the details and the ticket was closed. The reviewer asked for a change and the document was closed.",
+      "highlighted_date": "1792-04-27",
+      "importance_level": 1
+    },
+    {
+      "id": 117,
+      "document_id": 105,
+      "highlight_text": "The supplier reported a duplicate issue; the invoice was resolved. The account owner reported a duplicate issue; the request was completed. The account owner confirmed the details and the claim was confirmed.",
+      "highlighted_date": "1789-12-25",
+      "importance_level": 3
+    },
+    {
+      "id": 118,
+      "document_id": 138,
+      "highlight_text": "An operator asked for a change and the ticket was updated. The report was escalated — automatic case, no further action. An operator reported an automatic issue; the appointment was rescheduled. The supplier asked for a change and the account was rescheduled.",
+      "highlighted_date": "1927-01-08",
+      "importance_level": 5
+    },
+    {
+      "id": 119,
+      "document_id": 9,
+      "highlight_text": "No response from the supplier, so the claim was rescheduled. The supplier reported a partial issue; the order was updated. The record was approved — duplicate case, no further action.",
+      "highlighted_date": "1986-10-25",
+      "importance_level": 5
+    },
+    {
+      "id": 120,
+      "document_id": 5,
+      "highlight_text": "An operator confirmed the details and the shipment was closed. No response from the team, so the claim was delayed. The reviewer confirmed the details and the claim was completed.",
+      "highlighted_date": "1898-11-14",
+      "importance_level": 5
+    },
+    {
+      "id": 121,
+      "document_id": 168,
+      "highlight_text": "The account owner reported a manual issue; the report was replaced. The reviewer asked for a change and the delivery was processed. The account owner reported an automatic issue; the shipment was closed.",
+      "highlighted_date": "1887-05-26",
+      "importance_level": 3
+    },
+    {
+      "id": 122,
+      "document_id": 105,
+      "highlight_text": "The reviewer asked for a change and the session was completed. The account owner asked for a change and the payment was replaced. The account owner asked for a change and the appointment was processed.",
+      "highlighted_date": "1971-10-04",
+      "importance_level": 3
+    },
+    {
+      "id": 123,
+      "document_id": 183,
+      "highlight_text": "An operator reported an unusual issue; the transfer was refunded. The record was replaced — urgent case, no further action. The ticket was approved — minor case, no further action.",
+      "highlighted_date": "1996-12-05",
+      "importance_level": 3
+    },
+    {
+      "id": 124,
+      "document_id": 61,
+      "highlight_text": "An operator confirmed the details and the appointment was updated. The courier confirmed the details and the refund was closed. The item was reopened — late case, no further action. The reviewer asked for a change and the refund was processed.",
+      "highlighted_date": "2011-02-28",
+      "importance_level": 2
+    },
+    {
+      "id": 125,
+      "document_id": 114,
+      "highlight_text": "An operator reported an automatic issue; the appointment was refunded. The supplier asked for a change and the order was completed.",
+      "highlighted_date": "1751-07-09",
+      "importance_level": 4
+    },
+    {
+      "id": 126,
+      "document_id": 86,
+      "highlight_text": "An operator asked for a change and the record was resolved. The customer reported an automatic issue; the transfer was reviewed. The account owner confirmed the details and the account was rejected.",
+      "highlighted_date": "1918-10-08",
+      "importance_level": 2
+    },
+    {
+      "id": 127,
+      "document_id": 115,
+      "highlight_text": "The payment was closed — standard case, no further action. The session was completed — unusual case, no further action. The account owner reported a repeat issue; the transfer was refunded. An operator asked for a change and the report was confirmed.",
+      "highlighted_date": "1762-11-01",
+      "importance_level": 5
+    },
+    {
+      "id": 128,
+      "document_id": 138,
+      "highlight_text": "The customer confirmed the details and the document was escalated. No response from the team, so the transfer was processed. The account owner reported a routine issue; the invoice was resolved. The shipment was reviewed — repeat case, no further action.",
+      "highlighted_date": "1830-01-20",
+      "importance_level": 5
+    },
+    {
+      "id": 129,
+      "document_id": 73,
+      "highlight_text": "The courier reported an urgent issue; the record was confirmed. The team reported a standard issue; the request was completed.",
+      "highlighted_date": "1753-01-12",
+      "importance_level": 5
+    },
+    {
+      "id": 130,
+      "document_id": 167,
+      "highlight_text": "An operator asked for a change and the document was approved. The account owner confirmed the details and the invoice was closed. No response from the team, so the report was cancelled. The payment was rejected — routine case, no further action.",
+      "highlighted_date": "1756-11-03",
+      "importance_level": 5
+    },
+    {
+      "id": 131,
+      "document_id": 141,
+      "highlight_text": "The item was rejected — duplicate case, no further action. An operator confirmed the details and the booking was escalated. The reviewer confirmed the details and the transfer was closed.",
+      "highlighted_date": "1872-07-15",
+      "importance_level": 5
+    },
+    {
+      "id": 132,
+      "document_id": 169,
+      "highlight_text": "The team reported an incomplete issue; the appointment was escalated. The account owner asked for a change and the transfer was resolved. The account was resolved — standard case, no further action. No response from the account owner, so the report was delayed.",
+      "highlighted_date": "1885-07-30",
+      "importance_level": 2
+    },
+    {
+      "id": 133,
+      "document_id": 164,
+      "highlight_text": "The shipment was confirmed — unusual case, no further action. The customer confirmed the details and the invoice was completed. The account owner reported a manual issue; the shipment was reviewed. The team reported a manual issue; the document was rescheduled.",
+      "highlighted_date": "1868-03-22",
+      "importance_level": 5
+    },
+    {
+      "id": 134,
+      "document_id": 110,
+      "highlight_text": "The item was delayed — repeat case, no further action. The supplier confirmed the details and the session was resolved. The request was replaced — urgent case, no further action.",
+      "highlighted_date": "2005-09-02",
+      "importance_level": 4
+    },
+    {
+      "id": 135,
+      "document_id": 110,
+      "highlight_text": "The item was cancelled — repeat case, no further action. No response from the supplier, so the transfer was delayed.",
+      "highlighted_date": "1866-02-08",
+      "importance_level": 4
+    },
+    {
+      "id": 136,
+      "document_id": 94,
+      "highlight_text": "The supplier confirmed the details and the document was approved. An operator confirmed the details and the document was delayed. The session was reopened — minor case, no further action.",
+      "highlighted_date": "1804-10-02",
+      "importance_level": 4
+    },
+    {
+      "id": 137,
+      "document_id": 74,
+      "highlight_text": "The account owner confirmed the details and the delivery was replaced. The claim was approved — urgent case, no further action. No response from the account owner, so the appointment was reopened.",
+      "highlighted_date": "1745-06-01",
+      "importance_level": 1
+    },
+    {
+      "id": 138,
+      "document_id": 72,
+      "highlight_text": "No response from the supplier, so the session was escalated. The account owner asked for a change and the account was reopened. The customer reported a late issue; the delivery was rejected.",
+      "highlighted_date": "1834-10-22",
+      "importance_level": 2
+    },
+    {
+      "id": 139,
+      "document_id": 174,
+      "highlight_text": "The supplier asked for a change and the delivery was completed. The delivery was reviewed — late case, no further action.",
+      "highlighted_date": "1736-08-30",
+      "importance_level": 5
+    },
+    {
+      "id": 140,
+      "document_id": 16,
+      "highlight_text": "The payment was approved — duplicate case, no further action. The team reported a manual issue; the report was delayed. No response from the reviewer, so the request was reopened. No response from the account owner, so the request was closed.",
+      "highlighted_date": "1702-09-17",
+      "importance_level": 5
+    },
+    {
+      "id": 141,
+      "document_id": 168,
+      "highlight_text": "The reviewer reported a duplicate issue; the request was confirmed. The account was resolved — incomplete case, no further action. An operator reported a routine issue; the item was approved.",
+      "highlighted_date": "1986-02-25",
+      "importance_level": 4
+    },
+    {
+      "id": 142,
+      "document_id": 123,
+      "highlight_text": "The payment was rescheduled — manual case, no further action. The account owner reported an urgent issue; the invoice was rejected. No response from the team, so the payment was approved. The reviewer confirmed the details and the order was reviewed.",
+      "highlighted_date": "1762-12-12",
+      "importance_level": 5
+    },
+    {
+      "id": 143,
+      "document_id": 44,
+      "highlight_text": "No response from the reviewer, so the appointment was reviewed. The shipment was processed — minor case, no further action.",
+      "highlighted_date": "1778-01-07",
+      "importance_level": 4
+    },
+    {
+      "id": 144,
+      "document_id": 182,
+      "highlight_text": "The team asked for a change and the order was resolved. The order was replaced — partial case, no further action. An operator asked for a change and the ticket was reopened.",
+      "highlighted_date": "1723-05-14",
+      "importance_level": 1
+    },
+    {
+      "id": 145,
+      "document_id": 78,
+      "highlight_text": "The courier confirmed the details and the request was reopened. The session was escalated — urgent case, no further action. The reviewer asked for a change and the shipment was closed. The account owner reported an urgent issue; the invoice was confirmed.",
+      "highlighted_date": "1882-12-17",
+      "importance_level": 4
+    },
+    {
+      "id": 146,
+      "document_id": 115,
+      "highlight_text": "The document was confirmed — minor case, no further action. The team asked for a change and the payment was delayed. The supplier asked for a change and the appointment was rescheduled.",
+      "highlighted_date": "2014-02-27",
+      "importance_level": 4
+    },
+    {
+      "id": 147,
+      "document_id": 193,
+      "highlight_text": "The courier confirmed the details and the account was reopened. The account owner confirmed the details and the claim was reviewed.",
+      "highlighted_date": "1984-04-08",
+      "importance_level": 5
+    },
+    {
+      "id": 148,
+      "document_id": 29,
+      "highlight_text": "The reviewer reported a partial issue; the record was reviewed. The reviewer asked for a change and the request was delayed.",
+      "highlighted_date": "1934-07-25",
+      "importance_level": 5
+    },
+    {
+      "id": 149,
+      "document_id": 155,
+      "highlight_text": "The account owner confirmed the details and the record was rescheduled. The customer reported a partial issue; the request was delayed. The team reported an incomplete issue; the refund was reviewed. The courier reported a repeat issue; the payment was confirmed.",
+      "highlighted_date": "1733-03-12",
+      "importance_level": 2
+    },
+    {
+      "id": 150,
+      "document_id": 36,
+      "highlight_text": "The customer confirmed the details and the order was approved. The customer confirmed the details and the invoice was confirmed. The supplier asked for a change and the request was escalated.",
+      "highlighted_date": "1814-12-27",
+      "importance_level": 4
+    }
+  ]
+}

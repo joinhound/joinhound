@@ -1,0 +1,2 @@
+ARC-0029
+The supplier asked for a change and the request was cancelled. The session was closed — urgent case, no further action.

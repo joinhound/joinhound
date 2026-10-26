@@ -1,0 +1,2 @@
+ARC-0139
+An operator reported a repeat issue; the payment was refunded. The courier confirmed the details and the transfer was rejected.

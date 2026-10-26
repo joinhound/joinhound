@@ -52,3 +52,6 @@ scripts/load_pagila.sh
 ```
 
 Further reading: [configuration](docs/config.md), [JOINHOUND Ossie extension](docs/ossie-extension.md), and [plugins](docs/plugins.md).
+
+The reproducible effectiveness comparison is documented in
+[the library evaluation](docs/eval/library.md).

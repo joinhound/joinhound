@@ -1,0 +1,2 @@
+ARC-0196
+The supplier asked for a change and the order was cancelled. The reviewer reported an unusual issue; the invoice was closed. No response from the supplier, so the record was closed.

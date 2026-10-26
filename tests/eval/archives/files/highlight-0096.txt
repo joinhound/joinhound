@@ -1,0 +1,2 @@
+ARC-0065
+The reviewer reported a repeat issue; the document was approved. The supplier reported a standard issue; the item was refunded. No response from an operator, so the document was escalated. The supplier confirmed the details and the refund was approved.

@@ -1,0 +1,2 @@
+ARC-0141
+The customer reported a duplicate issue; the account was reopened. The request was confirmed — manual case, no further action. The reviewer reported a repeat issue; the ticket was confirmed.

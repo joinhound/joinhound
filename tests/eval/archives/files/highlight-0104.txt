@@ -1,0 +1,2 @@
+ARC-0166
+The supplier reported a minor issue; the appointment was rejected. The account owner asked for a change and the shipment was reopened. The team reported a late issue; the delivery was approved. The claim was delayed — automatic case, no further action.

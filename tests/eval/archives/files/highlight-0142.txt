@@ -1,0 +1,2 @@
+ARC-0123
+The payment was rescheduled — manual case, no further action. The account owner reported an urgent issue; the invoice was rejected. No response from the team, so the payment was approved. The reviewer confirmed the details and the order was reviewed.

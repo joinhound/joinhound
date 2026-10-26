@@ -1,0 +1,2 @@
+ARC-0097
+The supplier confirmed the details and the report was processed. The customer reported a repeat issue; the record was processed. An operator reported a standard issue; the refund was replaced.

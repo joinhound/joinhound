@@ -1,0 +1,2 @@
+ARC-0161
+No response from the supplier, so the record was processed. The customer confirmed the details and the request was reopened. The supplier reported an urgent issue; the shipment was escalated. The item was delayed — urgent case, no further action.

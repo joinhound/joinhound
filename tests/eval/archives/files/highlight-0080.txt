@@ -1,0 +1,2 @@
+ARC-0077
+The account owner reported an unusual issue; the document was escalated. The reviewer asked for a change and the ticket was rescheduled. The booking was reviewed — duplicate case, no further action. The supplier reported a routine issue; the shipment was cancelled.

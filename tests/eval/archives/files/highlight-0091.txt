@@ -1,0 +1,2 @@
+ARC-0172
+The item was completed — minor case, no further action. The session was refunded — incomplete case, no further action. The booking was rejected — automatic case, no further action. No response from the team, so the account was updated.

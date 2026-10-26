@@ -1,0 +1,2 @@
+ARC-0088
+The shipment was closed — automatic case, no further action. The courier confirmed the details and the request was escalated. The order was resolved — routine case, no further action. The account owner reported a duplicate issue; the booking was rejected.

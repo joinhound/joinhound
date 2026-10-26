@@ -1,0 +1,2 @@
+ARC-0061
+The account owner confirmed the details and the refund was updated. An operator asked for a change and the item was approved. The supplier confirmed the details and the claim was cancelled.
