@@ -9,6 +9,7 @@ import json
 import os
 import random
 import re
+import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict
 from pathlib import Path
@@ -23,7 +24,7 @@ from joinhound.core.config import EngineConfig, PostgresSourceConfig
 from joinhound.core.models import IndexedPassage, LinkDraft
 from joinhound.core.protocols import LinkMatcher
 from joinhound.core.uri import S3Uri, build_uri
-from joinhound.engine.context import get_context
+from joinhound.engine.context import expand, get_context, read_record
 from joinhound.engine.dictionary import ValueDictionary, build_dictionary
 from joinhound.engine.evaluate import overlap_scores
 from joinhound.engine.passages import lexical_rank
@@ -36,7 +37,6 @@ from joinhound.profiler.profile import link_id
 Arm = Literal["baseline", "joinhound"]
 
 _READ_ONLY = re.compile(r"^\s*(SELECT|WITH)\b", re.IGNORECASE)
-_QUOTED = re.compile(r"'([^']+)'")
 _FORBIDDEN = re.compile(
     r"\b(ALTER|COPY|CREATE|DELETE|DROP|GRANT|INSERT|REVOKE|TRUNCATE|UPDATE)\b",
     re.IGNORECASE,
@@ -114,6 +114,35 @@ _JOINHOUND_TOOLS: list[dict[str, object]] = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "expand",
+            "description": "Follow one more hop from node URIs returned by get_context.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "node_uris": {"type": "array", "items": {"type": "string"}},
+                    "depth": {"type": "integer", "minimum": 1, "maximum": 3},
+                },
+                "required": ["node_uris"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_record",
+            "description": "Read the full row for one provenance URI.",
+            "parameters": {
+                "type": "object",
+                "properties": {"uri": {"type": "string"}},
+                "required": ["uri"],
+                "additionalProperties": False,
+            },
+        },
+    },
     _SUBMIT_TOOL,
 ]
 
@@ -128,6 +157,7 @@ def main() -> None:
     parser.add_argument("--api-key", default=os.environ.get("LLM_API_KEY"))
     parser.add_argument("--workspace-id", default=os.environ.get("ANTHROPIC_WORKSPACE_ID"))
     parser.add_argument("--mode", choices=("retrieval", "agent", "both"), default="both")
+    parser.add_argument("--suite", choices=("standard", "hard"), default="standard")
     parser.add_argument("--split", choices=("dev", "test"), default="test")
     parser.add_argument("--limit", type=int, default=50)
     parser.add_argument("--max-tool-calls", type=int, default=8)
@@ -137,9 +167,10 @@ def main() -> None:
     if args.mode in {"agent", "both"} and (not args.model or not args.api_key):
         parser.error("--model and --api-key (or JUDGE_MODEL and LLM_API_KEY) are required")
 
+    filename = "hard.json" if args.suite == "hard" else "questions.json"
     available = [
         question
-        for question in load_questions(args.bundle / "questions.json")
+        for question in load_questions(args.bundle / filename)
         if question.split == args.split
     ]
     selected = _stratified(available, args.limit, args.seed)
@@ -201,9 +232,16 @@ def main() -> None:
                             max_tool_calls=args.max_tool_calls,
                         )
                     )
+                    print(
+                        f"{len(results[arm])}/{len(selected)} {arm} {question.kind} "
+                        f"recall={results[arm][-1].answer_recall:.2f}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
 
     payload = {
         "model": args.model,
+        "suite": args.suite,
         "split": args.split,
         "questions": len(selected),
         "retrieval": retrieval,
@@ -286,25 +324,37 @@ class _JoinhoundTools:
         self._passages = passages
 
     def execute(self, name: str, arguments: Mapping[str, object]) -> str:
-        if name != "get_context":
-            return self._baseline.execute(name, arguments)
-        result = get_context(
-            str(arguments.get("query", "")),
-            self._source,
-            self._links,
-            self._matchers,
-            EngineConfig(
-                seeds_k=10,
-                max_depth=5,
-                beam_width=30,
-                fanout=25,
-                budget_tokens=8_000,
-                timeout_ms=30_000,
-            ),
-            dictionary=self._dictionary,
-            passages=self._passages,
-        )
-        return result.model_dump_json()
+        if name == "get_context":
+            result = get_context(
+                str(arguments.get("query", "")),
+                self._source,
+                self._links,
+                self._matchers,
+                _engine(5),
+                dictionary=self._dictionary,
+                passages=self._passages,
+            )
+            return result.model_dump_json()
+        if name == "expand":
+            raw = arguments.get("node_uris", [])
+            uris = [str(uri) for uri in raw] if isinstance(raw, list) else []
+            depth = min(max(int(arguments.get("depth", 1)), 1), 3)
+            result = expand(
+                uris,
+                self._source,
+                self._links,
+                self._matchers,
+                _engine(depth),
+                depth=depth,
+                budget_tokens=2_000,
+            )
+            return result.model_dump_json()
+        if name == "get_record":
+            try:
+                return read_record(str(arguments.get("uri", "")), self._source).model_dump_json()
+            except ValueError as error:
+                return json.dumps({"error": str(error)})
+        return self._baseline.execute(name, arguments)
 
 
 def _passages(root: Path) -> list[IndexedPassage]:
@@ -391,6 +441,20 @@ def _agent_by_kind(
     return {kind: _summary(group) for kind, group in sorted(grouped.items())}
 
 
+def _engine(depth: int) -> EngineConfig:
+    """Use the same path budget for both retrieval arms."""
+    return EngineConfig(
+        seeds_k=4,
+        max_depth=depth,
+        beam_width=20,
+        fanout=8,
+        child_fanout=1,
+        max_paths=6,
+        budget_tokens=2_000,
+        timeout_ms=30_000,
+    )
+
+
 def _retrieval(
     questions: Sequence[EvalQuestion],
     source: PostgresSource,
@@ -401,30 +465,14 @@ def _retrieval(
 ) -> dict[str, object]:
     samples: dict[str, list[dict[str, float]]] = {"flat": [], "joinhound": []}
     settings = {
-        "flat": EngineConfig(
-            seeds_k=10,
-            max_depth=1,
-            beam_width=30,
-            fanout=25,
-            budget_tokens=8_000,
-            timeout_ms=30_000,
-        ),
-        "joinhound": EngineConfig(
-            seeds_k=10,
-            max_depth=5,
-            beam_width=30,
-            fanout=25,
-            budget_tokens=8_000,
-            timeout_ms=30_000,
-        ),
+        "flat": _engine(1),
+        "joinhound": _engine(5),
     }
     per_kind: dict[str, dict[str, list[dict[str, float]]]] = {arm: {} for arm in settings}
     for question in questions:
-        quoted = _QUOTED.search(question.query)
-        retrieval_query = quoted.group(1) if quoted else question.query
         for arm, config in settings.items():
             response = get_context(
-                retrieval_query,
+                question.query,
                 source,
                 links,
                 matchers,
@@ -465,12 +513,13 @@ def _retrieval_summary(items: Sequence[Mapping[str, float]]) -> dict[str, float]
 
 
 def _stratified(questions: Sequence[EvalQuestion], limit: int, seed: int) -> list[EvalQuestion]:
-    if limit <= 0 or limit % 5:
-        raise ValueError("--limit must be a positive multiple of five")
-    each = limit // 5
+    kinds = list(dict.fromkeys(question.kind for question in questions))
+    if not kinds or limit <= 0 or limit % len(kinds):
+        raise ValueError(f"--limit must be a positive multiple of {len(kinds) or 5}")
+    each = limit // len(kinds)
     rng = random.Random(seed)
     selected: list[EvalQuestion] = []
-    for kind in ("database", "document", "cross_member", "cross_book", "cross_branch"):
+    for kind in kinds:
         group = [question for question in questions if question.kind == kind]
         rng.shuffle(group)
         if len(group) < each:
@@ -483,13 +532,22 @@ def _stratified(questions: Sequence[EvalQuestion], limit: int, seed: int) -> lis
 _SCHEMA = """
 The PostgreSQL database contains:
 - eval_cases(id PK, case_ref UNIQUE, loan_id UNIQUE FK -> loans.id)
-- loans(id PK, copy_id FK -> copies.id, membership_id FK -> memberships.id, staff_id)
+- loans(
+    id PK,
+    copy_id FK -> copies.id,
+    membership_id FK -> memberships.id,
+    staff_id FK -> staff_profiles.id
+  )
 - memberships(id PK, card_number UNIQUE, library_id FK -> libraries.id, user_id FK -> users.id)
 - users(id PK, first_name, last_name, email, phone)
 - copies(id PK, barcode UNIQUE, book_id FK -> books.id, library_id FK -> libraries.id)
-- books(id PK, title, isbn UNIQUE)
+- books(id PK, title, isbn UNIQUE, publisher_id FK -> publishers.id)
+- publishers(id PK, name)
 - libraries(id PK, name, email, phone)
+- staff_profiles(id PK, user_id UNIQUE FK -> users.id, library_id)
 Case-note files contain a Reference value equal to eval_cases.case_ref.
+A note may also name a person who did not borrow the copy. That name is not the member,
+the staff member who recorded the loan, or the answer.
 """.strip()
 
 

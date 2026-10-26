@@ -48,12 +48,16 @@ def cache_key(
     links: Sequence[LinkDraft],
     roles: Sequence[str] | None,
     passages: Sequence[IndexedPassage],
+    max_paths: int = 0,
+    child_fanout: int = 0,
 ) -> str:
     """Identify one get_context call. The key expires with the cache entry."""
     payload = {
         "query": query,
         "budget": budget,
         "depth": depth,
+        "max_paths": max_paths,
+        "child_fanout": child_fanout,
         "scope": list(scope or []),
         "deployment": deployment,
         "roles": list(roles or []),

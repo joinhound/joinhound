@@ -5,10 +5,14 @@
 from __future__ import annotations
 
 import json
+import re
 import time
+import unicodedata
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, cast
+
+from rapidfuzz import fuzz
 
 from joinhound.core.config import EngineConfig
 from joinhound.core.models import IndexedPassage, Link, LinkDraft, Match, QueryContext, Record
@@ -30,7 +34,16 @@ from joinhound.engine.response import (
     ContextStats,
     RecordResult,
 )
-from joinhound.engine.score import content_tokens, path_score, relevance
+from joinhound.engine.score import (
+    content_tokens,
+    has_novel_text,
+    mentions_collection,
+    mentions_phrase,
+    mentions_value,
+    path_score,
+    relevance,
+    truncate_text,
+)
 
 _EXACT = frozenset({"declared_fk", "exact"})
 _WALK = _EXACT | {"normalized", "fuzzy", "semantic"}
@@ -43,6 +56,7 @@ class _Edge:
     relation: str
     match_type: str
     score: float
+    reverse: bool = False
 
 
 @dataclass
@@ -58,6 +72,8 @@ class _Node:
     edge_scores: tuple[float, ...]
     clipped: bool = False
     kind: Literal["row", "passage"] = "row"
+    relevance: float = 0.0
+    own_relevance: float = 0.0
     children: list[_Node] = field(default_factory=list)
 
 
@@ -93,6 +109,8 @@ def get_context(
         links=links,
         roles=roles,
         passages=passages,
+        max_paths=config.max_paths,
+        child_fanout=config.child_fanout,
     )
     if cache is not None:
         cached = cache.get(key, now)
@@ -162,7 +180,7 @@ def expand(
         wanted = set(link_ids)
         approved = [link for link in approved if link.link_id in wanted]
     seeds = _nodes_from_uris(source, node_uris)
-    scoring_query = " ".join(_text(node.content) for node in seeds)
+    scoring_query = " ".join(_text(_content(node.record)) for node in seeds)
     return _walk(
         " ".join(node_uris),
         source,
@@ -212,6 +230,7 @@ def _walk(
     started = now()
     deadline = started + config.timeout_ms / 1000
     visited = {node.uri for node in seeds}
+    known = {node.uri: node for node in seeds}
     discovered = list(seeds)
     beam = _frontier(seeds, config.beam_width)
     depth = 0
@@ -226,7 +245,9 @@ def _walk(
             matchers,
             source,
             config.fanout,
+            config.child_fanout,
             visited,
+            known,
             scope,
             scoring_query,
             config.depth_decay,
@@ -240,7 +261,7 @@ def _walk(
     if timed_out or depth >= depth_limit:
         for node in beam:
             node.clipped = True
-    chosen, used, truncated = _fit(discovered, budget)
+    chosen, used, truncated = _select(discovered, budget, config.max_paths, scoring_query)
     if timed_out:
         truncated = True
     nodes, edges, paths, expandable = _assemble(chosen)
@@ -282,10 +303,11 @@ def _seed_nodes(
         vector = embedder.embed([query])
         if vector:
             semantic = semantic_rank(vector[0], passages)
+    lexical = lexical_rank(query, passages)
     fused = reciprocal_rank_fusion(
         [
             [record.uri for record in records],
-            lexical_rank(query, passages),
+            lexical,
             semantic,
         ]
     )
@@ -309,6 +331,20 @@ def _seed_nodes(
             )
         if len(nodes) >= seeds_k:
             break
+    if lexical and lexical[0] in passage_by_uri and all(node.uri != lexical[0] for node in nodes):
+        passage = _make_passage(
+            passage_by_uri[lexical[0]],
+            query,
+            (),
+            decay,
+            seed=True,
+            parent=None,
+            edge=None,
+        )
+        if nodes and len(nodes) >= seeds_k:
+            nodes[-1] = passage
+        else:
+            nodes.append(passage)
     return nodes
 
 
@@ -377,7 +413,9 @@ def _expand(
     matchers: Mapping[str, LinkMatcher],
     source: TabularSource,
     fanout: int,
+    child_fanout: int,
     visited: set[str],
+    known: dict[str, _Node],
     scope: Sequence[str] | None,
     query: str,
     decay: float,
@@ -386,6 +424,9 @@ def _expand(
     deployment: Deployment,
 ) -> list[_Node]:
     ordered = sorted(beam, key=lambda node: node.uri)
+    seeds = [node for node in ordered if node.seed]
+    later = [node for node in ordered if not node.seed]
+    reverse_limit = max(min(fanout, child_fanout), 0)
     found: list[_Node] = []
     for link in links:
         if link.match_type == _DOCUMENTS:
@@ -415,6 +456,7 @@ def _expand(
                 source,
                 fanout,
                 visited,
+                known,
                 scope,
                 query,
                 decay,
@@ -425,12 +467,29 @@ def _expand(
         if link.match_type in _EXACT:
             found.extend(
                 _follow(
-                    ordered,
+                    seeds,
                     link,
                     matchers,
                     source,
                     fanout,
                     visited,
+                    known,
+                    scope,
+                    query,
+                    decay,
+                    deployment,
+                    forward=False,
+                )
+            )
+            found.extend(
+                _follow(
+                    later,
+                    link,
+                    matchers,
+                    source,
+                    reverse_limit,
+                    visited,
+                    known,
                     scope,
                     query,
                     decay,
@@ -448,6 +507,7 @@ def _follow(
     source: TabularSource,
     fanout: int,
     visited: set[str],
+    known: dict[str, _Node],
     scope: Sequence[str] | None,
     query: str,
     decay: float,
@@ -541,14 +601,23 @@ def _follow(
             records = prefetched
         for match in chosen:
             record = records.get(_pk_key(match.pk))
-            if record is None or record.uri in visited:
+            if record is None:
                 continue
             if not _in_scope(record.collection_id, scope):
                 continue
-            visited.add(record.uri)
             edge_score = match.score * link.confidence
             parent = parents[0]
-            edge = _Edge(link.link_id, link.relation_name or "", link.match_type, edge_score)
+            edge = _Edge(
+                link.link_id,
+                link.relation_name or "",
+                link.match_type,
+                edge_score,
+                reverse=not forward,
+            )
+            if record.uri in visited:
+                _reparent(known.get(record.uri), parent, edge)
+                continue
+            visited.add(record.uri)
             child = _make_node(
                 record,
                 query,
@@ -559,8 +628,26 @@ def _follow(
                 edge=edge,
             )
             parent.children.append(child)
+            known[record.uri] = child
             created.append(child)
     return created
+
+
+def _reparent(existing: _Node | None, parent: _Node, edge: _Edge) -> None:
+    """Attach a seed discovered again from a stronger seed so the chain stays connected."""
+    if existing is None or existing.parent is not None:
+        return
+    current: _Node | None = parent
+    while current is not None:
+        if current.uri == existing.uri:
+            return
+        current = current.parent
+    root = _root(parent)
+    if root.kind != "passage" and root.score < existing.score:
+        return
+    existing.parent = parent
+    existing.edge = edge
+    parent.children.append(existing)
 
 
 def _follow_documents(
@@ -605,6 +692,8 @@ def _documents_from_rows(
     for node in nodes:
         if node.kind != "row" or node.record.collection_id != link.src_collection:
             continue
+        if _has_passage_ancestor(node):
+            continue
         raw = node.record.values.get(link.src_column)
         if raw is None:
             continue
@@ -646,6 +735,15 @@ def _documents_from_rows(
             parent.children.append(child)
             created.append(child)
     return created
+
+
+def _has_passage_ancestor(node: _Node) -> bool:
+    current = node.parent
+    while current is not None:
+        if current.kind == "passage":
+            return True
+        current = current.parent
+    return False
 
 
 def _rows_from_passages(
@@ -734,23 +832,61 @@ def _make_node(
     parent: _Node | None,
     edge: _Edge | None,
 ) -> _Node:
-    content = _content(record)
+    content = _context_content(record, query)
+    own = relevance(query, _text(content))
+    carried = own if parent is None else max(own, parent.relevance)
     return _Node(
         uri=record.uri,
         record=record,
         content=content,
-        score=path_score(relevance(query, _text(content)), edge_scores, decay),
+        score=path_score(carried, edge_scores, decay),
         seed=seed,
         depth=0 if parent is None else parent.depth + 1,
         parent=parent,
         edge=edge,
         edge_scores=edge_scores,
+        relevance=carried,
+        own_relevance=own,
     )
 
 
 def _frontier(nodes: Sequence[_Node], width: int) -> list[_Node]:
-    ordered = sorted(nodes, key=lambda node: (-node.score, node.uri))
-    chosen = ordered[: max(width, 0)]
+    if width <= 0:
+        for node in nodes:
+            node.clipped = True
+        return []
+    roots = {_root(node).uri: _root(node) for node in nodes}
+    top = {
+        uri
+        for uri, _score in sorted(
+            ((uri, (-root.score, uri)) for uri, root in roots.items()),
+            key=lambda item: item[1],
+        )[:2]
+    }
+    protected = sorted(
+        (
+            node
+            for node in nodes
+            if node.edge is not None and not node.edge.reverse and _root(node).uri in top
+        ),
+        key=lambda node: (-node.score, node.uri),
+    )
+    forward = [node for node in nodes if node.edge is not None and not node.edge.reverse]
+    reverse = [node for node in nodes if node not in forward]
+    ordered = [
+        *protected,
+        *sorted(forward, key=lambda node: (-node.score, node.uri)),
+        *sorted(reverse, key=lambda node: (-node.score, node.uri)),
+    ]
+    chosen: list[_Node] = []
+    seen: set[str] = set()
+    for node in ordered:
+        if node.uri in seen:
+            continue
+        chosen.append(node)
+        seen.add(node.uri)
+        if len(chosen) >= width:
+            break
     kept = {node.uri for node in chosen}
     for node in nodes:
         if node.uri not in kept:
@@ -758,17 +894,284 @@ def _frontier(nodes: Sequence[_Node], width: int) -> list[_Node]:
     return chosen
 
 
-def _fit(nodes: Sequence[_Node], budget: int) -> tuple[list[_Node], int, bool]:
-    ordered = sorted(nodes, key=lambda node: (-node.score, node.uri))
+def _root(node: _Node) -> _Node:
+    current = node
+    while current.parent is not None:
+        current = current.parent
+    return current
+
+
+def _select(
+    nodes: Sequence[_Node],
+    budget: int,
+    max_paths: int,
+    query: str,
+) -> tuple[list[_Node], int, bool]:
+    seeds = sorted((node for node in nodes if node.seed), key=lambda node: (-node.score, node.uri))
     chosen: list[_Node] = []
+    seen: set[str] = set()
     used = 0
-    for node in ordered:
+    truncated = False
+
+    def consider(node: _Node) -> bool:
+        nonlocal used, truncated
+        if node.uri in seen:
+            return True
         cost = content_tokens(node.content)
         if used + cost > budget:
-            return chosen, used, True
+            truncated = True
+            return False
         chosen.append(node)
+        seen.add(node.uri)
         used += cost
-    return chosen, used, False
+        return True
+
+    compact = _compact_chain(nodes, query)
+    if compact is not None:
+        for node in compact:
+            if not consider(node):
+                return chosen, used, True
+        return chosen, used, truncated
+
+    for seed in seeds:
+        if not consider(seed):
+            return chosen, used, True
+    candidates = [node for node in nodes if not node.seed]
+    ranked = _preferred_leaves(candidates, max_paths, query)
+    if max_paths > 0 and len(candidates) > len(ranked):
+        truncated = True
+    for leaf in ranked:
+        chain: list[_Node] = []
+        current: _Node | None = leaf
+        while current is not None:
+            chain.append(current)
+            current = current.parent
+        for node in reversed(chain):
+            if not consider(node):
+                return chosen, used, True
+    return chosen, used, truncated
+
+
+def _preferred_leaves(leaves: Sequence[_Node], limit: int, query: str) -> list[_Node]:
+    ranked = sorted(leaves, key=lambda node: _rank(node, query))
+    if limit <= 0:
+        return ranked
+    roots = {_root(node).uri: _root(node) for node in leaves}
+    top = {
+        uri
+        for uri, _root_node in sorted(roots.items(), key=lambda item: (-item[1].score, item[0]))[:1]
+    }
+    primary = [node for node in ranked if _root(node).uri in top]
+    primary_uris = {node.uri for node in primary}
+    rest = [node for node in ranked if node.uri not in primary_uris]
+    best_match: dict[str, _Node] = {}
+    for node in primary:
+        collection = node.record.collection_id
+        if collection in best_match or not mentions_collection(query, collection):
+            continue
+        best_match[collection] = node
+    direct_candidates = [
+        node
+        for node in primary
+        if node.parent is not None
+        and node.parent.seed
+        and node.edge is not None
+        and not node.edge.reverse
+    ]
+    direct_by_collection: dict[str, _Node] = {}
+    for node in direct_candidates:
+        direct_by_collection.setdefault(node.record.collection_id, node)
+    direct = list(direct_by_collection.values())
+    chosen: list[_Node] = []
+    seen: set[str] = set()
+    for node in sorted([*best_match.values(), *direct], key=lambda item: _rank(item, query)):
+        if node.uri in seen:
+            continue
+        chosen.append(node)
+        seen.add(node.uri)
+        if len(chosen) >= limit:
+            return chosen
+    for node in [*primary, *rest]:
+        if len(chosen) >= limit:
+            break
+        if node.uri in seen:
+            continue
+        chosen.append(node)
+        seen.add(node.uri)
+    return chosen
+
+
+def _rank(node: _Node, query: str) -> tuple[float, float, str]:
+    bonus = 2.0 if has_novel_text(query, _text(node.content)) else 1.0
+    if mentions_collection(query, node.record.collection_id):
+        bonus *= 1.25
+    phrase_match = any(mentions_phrase(query, value) for value in node.content.values())
+    if phrase_match:
+        bonus *= 2.0
+    if node.edge is not None and node.edge.reverse and not phrase_match:
+        bonus *= 0.25
+    return (-node.relevance * bonus, -node.own_relevance, node.uri)
+
+
+_QUOTED = re.compile(r"'[^']*'|\"[^\"]*\"")
+_TOKEN = re.compile(r"[A-Za-z0-9]+")
+_FUZZY_ANCHOR = 0.85
+_LABELS = frozenset({"name", "title", "ambiguous_name"})
+
+
+def _compact_chain(nodes: Sequence[_Node], query: str) -> list[_Node] | None:
+    """Return one chain when the question names a value on the best seed's path."""
+    seeds = [node for node in nodes if node.seed]
+    if not seeds:
+        return None
+    unquoted = _QUOTED.sub(" ", query)
+    best = _best_seed(seeds, unquoted)
+    asked = [
+        node
+        for node in nodes
+        if node.uri != best.uri and _phrase_hit(node, unquoted) and _on_best_seed(node, best)
+    ]
+    if not asked:
+        return None
+    asked.sort(
+        key=lambda node: (
+            -_label_anchor(node, best),
+            -_anchor_length(node, best),
+            *_rank(node, unquoted),
+        )
+    )
+    target = asked[0]
+    chain: list[_Node] = []
+    current: _Node | None = target
+    while current is not None:
+        chain.append(current)
+        current = current.parent
+    kept = [
+        node
+        for node in reversed(chain)
+        if node.uri in {best.uri, target.uri} or _is_label(node)
+    ]
+    for child in target.children:
+        if _is_label(child) and all(child.uri != node.uri for node in kept):
+            kept.append(child)
+    for node in kept:
+        _focus_passage(node, unquoted)
+    return kept
+
+
+def _phrase_hit(node: _Node, query: str) -> bool:
+    return any(mentions_phrase(query, value) for value in node.content.values())
+
+
+def _on_best_seed(node: _Node, best: _Node) -> bool:
+    if _root(node).uri == best.uri:
+        return True
+    return best.kind == "passage" and _label_anchor(node, best) > 0
+
+
+def _best_seed(seeds: Sequence[_Node], query: str) -> _Node:
+    """Prefer the only seed that contains a distinctive phrase from the question."""
+    normalized = {node.uri: _normalized_text(node) for node in seeds}
+    for phrase in _query_phrases(query):
+        holders = [node for node in seeds if phrase in normalized[node.uri]]
+        if len(holders) == 1:
+            return holders[0]
+    return min(seeds, key=lambda node: (-node.score, node.uri))
+
+
+def _query_phrases(query: str) -> list[str]:
+    tokens = _TOKEN.findall(_fold_marks(query))
+    phrases: list[str] = []
+    for size in range(len(tokens), 0, -1):
+        for start in range(0, len(tokens) - size + 1):
+            phrase = " ".join(tokens[start : start + size])
+            if len(phrase) >= 6:
+                phrases.append(phrase)
+    return phrases
+
+
+def _normalized_text(node: _Node) -> str:
+    return " ".join(_TOKEN.findall(_fold_marks(_text(node.record.values))))
+
+
+def _is_label(node: _Node) -> bool:
+    return any(key.casefold() in _LABELS for key in node.record.values)
+
+
+def _focus_passage(node: _Node, query: str) -> None:
+    """Keep the passage sentences that the question itself names."""
+    if node.kind != "passage":
+        return
+    text = node.content.get("text")
+    if not isinstance(text, str):
+        return
+    phrases = _query_phrases(query)
+    kept = [
+        line.strip()
+        for line in text.splitlines()
+        if any(phrase in " ".join(_TOKEN.findall(_fold_marks(line))) for phrase in phrases)
+    ]
+    if kept:
+        node.content = {**node.content, "text": "\n".join(kept)}
+
+
+def _label_anchor(node: _Node, seed: _Node) -> int:
+    """Prefer a path that passes through the same name the seed text displays."""
+    haystack = _fold_marks(_text(seed.record.values))
+    best = 0
+    for value in _path_values(node, seed):
+        rendered = _fold_marks(value[1])
+        if value[0] not in {"name", "title", "ambiguous_name"} or len(rendered) < 4:
+            continue
+        if rendered in haystack:
+            best = max(best, len(rendered))
+    return best
+
+
+def _anchor_length(node: _Node, seed: _Node) -> int:
+    """Prefer a path whose value actually occurs, exactly or approximately, in the seed."""
+    haystack = _fold_marks(_text(seed.record.values))
+    best = 0
+    for _key, raw in _path_values(node, seed):
+        rendered = _fold_marks(raw)
+        if len(rendered) < 4 or not _anchored(rendered, haystack):
+            continue
+        best = max(best, len(rendered))
+    return best
+
+
+def _path_values(node: _Node, seed: _Node) -> list[tuple[str, str]]:
+    found: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    current: _Node | None = node
+    while current is not None and current.uri != seed.uri:
+        _collect_values(current, seen, found)
+        for child in current.children:
+            _collect_values(child, seen, found)
+        current = current.parent
+    return found
+
+
+def _collect_values(node: _Node, seen: set[str], found: list[tuple[str, str]]) -> None:
+    if node.uri in seen:
+        return
+    seen.add(node.uri)
+    for key, value in node.record.values.items():
+        if isinstance(value, str) and value.strip():
+            found.append((key.casefold(), value.strip()))
+
+
+def _anchored(value: str, haystack: str) -> bool:
+    if value in haystack:
+        return True
+    if len(value) < 8:
+        return False
+    return float(fuzz.partial_ratio(value, haystack)) / 100 >= _FUZZY_ANCHOR
+
+
+def _fold_marks(value: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", value.casefold())
+    return "".join(character for character in decomposed if not unicodedata.combining(character))
 
 
 def _assemble(
@@ -829,6 +1232,19 @@ def _path(node: _Node, id_by_uri: Mapping[str, str]) -> list[str] | None:
         return None
     chain.reverse()
     return chain
+
+
+def _context_content(record: Record, query: str) -> dict[str, Any]:
+    content: dict[str, Any] = {}
+    for key, value in _content(record).items():
+        if key == "bbox" or isinstance(value, list | dict):
+            continue
+        if isinstance(value, str):
+            content[key] = truncate_text(value, 80)
+            continue
+        if mentions_value(query, value):
+            content[key] = value
+    return content
 
 
 def _content(record: Record) -> dict[str, Any]:
@@ -902,13 +1318,15 @@ def _nodes_from_uris(source: TabularSource, uris: Sequence[str]) -> list[_Node]:
             _Node(
                 uri=record.uri,
                 record=record,
-                content=_content(record),
+                content=_context_content(record, ""),
                 score=1.0,
                 seed=True,
                 depth=0,
                 parent=None,
                 edge=None,
                 edge_scores=(),
+                relevance=1.0,
+                own_relevance=1.0,
             )
         )
     return nodes

@@ -11,6 +11,9 @@ from joinhound.library_eval import (
     answer_recall,
     archive_phrase,
     case_body,
+    distractor_name,
+    hard_questions,
+    paraphrase,
     questions,
 )
 
@@ -51,6 +54,31 @@ def test_file_has_the_reference_but_not_the_expected_answers() -> None:
     assert case.user_name not in body
     assert case.book_title not in body
     assert case.library_name not in body
+    assert distractor_name(case) in body
+
+
+def test_hard_questions_hide_the_exact_phrase_and_require_longer_paths() -> None:
+    cases = [_linked_case(index) for index in range(1, 11)]
+
+    result = hard_questions(cases, 10)
+
+    assert len(result) == 10
+    assert {item.kind for item in result} == {
+        "paraphrase_member",
+        "paraphrase_book",
+        "conflict_member",
+        "cross_staff",
+        "cross_publisher",
+    }
+    member = next(item for item in result if item.kind == "paraphrase_member")
+    assert archive_phrase(0) not in member.query
+    assert paraphrase(0) in member.query
+    conflict = next(item for item in result if item.kind == "conflict_member")
+    assert distractor_name(cases[0]) not in conflict.query
+    assert conflict.answers == (cases[0].user_name,)
+    publisher = next(item for item in result if item.kind == "cross_publisher")
+    assert cases[0].publisher_name in publisher.answers
+    assert any("publishers" in uri for uri in publisher.evidence)
 
 
 def test_answer_recall_normalizes_case_and_punctuation() -> None:
@@ -61,6 +89,16 @@ def test_answer_recall_normalizes_case_and_punctuation() -> None:
 def test_question_count_rejects_an_unbalanced_value() -> None:
     with pytest.raises(ValueError):
         questions([_case(1)], 11)
+
+
+def _linked_case(index: int) -> LibraryCase:
+    return replace(
+        _case(index),
+        publisher_id=20 + index,
+        publisher_name=f"Publisher {index}",
+        staff_user_id=30 + index,
+        staff_name=f"Staff Member {index}",
+    )
 
 
 def _case(index: int) -> LibraryCase:

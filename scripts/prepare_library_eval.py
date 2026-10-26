@@ -58,13 +58,20 @@ SELECT
   books.title AS book_title,
   libraries.id AS library_id,
   libraries.name AS library_name,
-  memberships.card_number
+  memberships.card_number,
+  publishers.id AS publisher_id,
+  publishers.name AS publisher_name,
+  staff_users.id AS staff_user_id,
+  staff_users.first_name || ' ' || staff_users.last_name AS staff_name
 FROM eval_cases AS cases
 JOIN loans ON loans.id = cases.loan_id
 JOIN memberships ON memberships.id = loans.membership_id
 JOIN users ON users.id = memberships.user_id
 JOIN copies ON copies.id = loans.copy_id
 JOIN books ON books.id = copies.book_id
+JOIN publishers ON publishers.id = books.publisher_id
+JOIN staff_profiles AS staff ON staff.id = loans.staff_id
+JOIN users AS staff_users ON staff_users.id = staff.user_id
 JOIN libraries ON libraries.id = copies.library_id
 ORDER BY cases.id
 """

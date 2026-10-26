@@ -1,0 +1,10 @@
+{
+  "dataset": "AmbER Sets human tuples",
+  "dossiers": 100,
+  "license": "CC0-1.0",
+  "questions": 100,
+  "sets": 50,
+  "source_commit": "fc8415e411998a6232b5cb9f0f71f29b7591b6af",
+  "source_sha256": "fcdb182a4148a40bca9f9ca12a9f0bc599e729d48879869d4695ad13f1225e17",
+  "source_url": "https://raw.githubusercontent.com/anthonywchen/AmbER-Sets/fc8415e411998a6232b5cb9f0f71f29b7591b6af/data/human/amber_set_tuples.jsonl"
+}

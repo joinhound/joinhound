@@ -29,6 +29,41 @@ def path_score(relevance_score: float, edge_scores: tuple[float, ...], depth_dec
     return relevance_score * product * (depth_decay ** len(edge_scores))
 
 
+def has_novel_text(query: str, text: str) -> bool:
+    """Return whether text contains a word that the query did not already state."""
+    query_tokens = set(_counts(query))
+    return any(token not in query_tokens for token in _counts(text))
+
+
+def mentions_value(query: str, value: object) -> bool:
+    """Return whether the rendered value is a whole word in the query."""
+    rendered = str(value).casefold()
+    return bool(rendered) and rendered in _counts(query)
+
+
+def mentions_collection(query: str, collection_id: str) -> bool:
+    """Return whether the query and a collection name share a word stem."""
+    name = collection_id.rstrip("/").rsplit("/", 1)[-1].rsplit(".", 1)[-1]
+    names = set(_counts(name.replace("_", " ")))
+    query_tokens = set(_counts(query))
+    for token in names:
+        if len(token) < 4:
+            continue
+        for other in query_tokens:
+            if len(other) < 4:
+                continue
+            if token.startswith(other) or other.startswith(token):
+                return True
+    return False
+
+
+def mentions_phrase(query: str, value: object) -> bool:
+    """Return whether a non-trivial string value occurs as a phrase in the query."""
+    rendered = " ".join(_TOKEN.findall(str(value).casefold()))
+    normalized_query = " ".join(_TOKEN.findall(query.casefold()))
+    return len(rendered) >= 4 and f" {rendered} " in f" {normalized_query} "
+
+
 def text_tokens(text: str) -> int:
     """Count cl100k tokens in a text the caller would read."""
     return len(_ENCODER.encode(text))

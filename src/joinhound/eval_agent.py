@@ -89,7 +89,7 @@ def run_agent(
             if call.function.name in {"submit_answer", "json"}:
                 return finish(_submitted_answers(_arguments(call.function.arguments)))
             if calls >= max_tool_calls:
-                raise RuntimeError(f"Question {question.id} exceeded {max_tool_calls} tool calls")
+                return finish(())
             arguments = _arguments(call.function.arguments)
             output = execute(call.function.name, arguments)
             outputs.append(output)

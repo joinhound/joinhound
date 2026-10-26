@@ -16,15 +16,21 @@ case note for each case. It also writes 500 balanced questions:
 - 100 file-to-library questions.
 
 The note contains a case reference but none of the expected member, book, or
-library answers. Cross-source questions therefore require a file search followed
-by database traversal.
+library answers. It may name another person who did not borrow the copy.
+Cross-source questions therefore require a file search followed by database
+traversal.
+
+`hard.json` adds 250 questions. Paraphrases do not repeat the stored
+observation. Conflict questions name a person who must be rejected. Staff and
+publisher questions follow four and five approved links. The same files and
+tables are visible to both arms.
 
 The run has two comparisons:
 
 1. Flat, one-hop retrieval versus joinhound traversal, with no model.
 2. One model with `describe_schema` + read-only SQL + full file search in both
-   arms; the joinhound arm additionally receives `get_context`. Both arms receive
-   the same questions, data, maximum tool calls, and model. Their execution order
-   is randomized per question.
+   arms; the joinhound arm additionally receives `get_context`, `expand`, and
+   `get_record`. Both arms receive the same questions, data, maximum tool calls,
+   and model. Their execution order is randomized per question.
 
 The generated bundle and result JSON remain under `cache/library-eval/`.
