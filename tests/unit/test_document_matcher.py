@@ -48,6 +48,59 @@ def test_trigram_resolves_a_near_word() -> None:
     assert 0.6 <= found[0].score < 1.0
 
 
+def test_a_distorted_value_points_back_at_one_row() -> None:
+    source = MemoryTabularSource(
+        {
+            "orders": [
+                {"id": 1, "code": "Södertälje Kings"},
+                {"id": 2, "code": "navy of the United States"},
+            ]
+        }
+    )
+    matcher = DocumentMatcher(source, [])
+
+    found = matcher.mentions(_LINK, "Known team: Sodretalje Kigns", QueryContext())
+
+    assert [match.pk for match in found] == [{"id": 1}]
+    assert found[0].score < 1.0
+
+
+def test_a_long_fuzzy_mention_beats_a_short_exact_token() -> None:
+    source = MemoryTabularSource(
+        {
+            "orders": [
+                {"id": 1, "code": "army"},
+                {"id": 2, "code": "Confederate States Army"},
+            ]
+        }
+    )
+    matcher = DocumentMatcher(source, [])
+
+    found = matcher.mentions(_LINK, "Known branch: Confederaet States Army", QueryContext())
+
+    assert [match.pk for match in found] == [{"id": 2}]
+
+
+def test_a_long_exact_code_beats_a_fuzzy_phrase() -> None:
+    source = MemoryTabularSource(
+        {
+            "orders": [
+                {"id": 1, "code": "CASE-00000001"},
+                {"id": 2, "code": "Northwind Trading Company"},
+            ]
+        }
+    )
+    matcher = DocumentMatcher(source, [])
+
+    found = matcher.mentions(
+        _LINK,
+        "Reference: CASE-00000001 for the Northwind Trading Company shipment",
+        QueryContext(),
+    )
+
+    assert {"id": 1} in [match.pk for match in found]
+
+
 def test_a_fragment_points_back_at_rows() -> None:
     source = MemoryTabularSource(
         {

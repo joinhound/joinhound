@@ -5,11 +5,13 @@
 from __future__ import annotations
 
 import math
+import unicodedata
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
 import ahocorasick  # type: ignore[import-not-found]
+from rapidfuzz import fuzz
 
 from joinhound.core.models import (
     Candidate,
@@ -26,6 +28,9 @@ _DISCOVER_VALUES = 200
 _MIN_FRACTION = 0.3
 _MAX_FREQUENCY = 0.5
 _TRIGRAM = 0.6
+_FUZZY_MENTION = 0.85
+_FUZZY_MIN_LENGTH = 8
+_EXACT_KEEP = 12
 
 
 @dataclass(frozen=True)
@@ -105,7 +110,8 @@ class DocumentMatcher:
         if link.match_type != self.match_type or ctx.limit <= 0 or not passage:
             return []
         values = _column_values(self._source, link.src_collection, link.src_column)
-        hits = _automaton_hits(values, passage)
+        exact = _automaton_hits(values, passage)
+        hits, score = _mention_values(exact, _closest_value(values, passage))
         if not hits:
             return []
         found = self._source.find_values(
@@ -115,7 +121,7 @@ class DocumentMatcher:
             "exact",
             limit=ctx.limit,
         )
-        return [Match(pk=dict(match.pk), value=match.value, score=1.0) for match in found]
+        return [Match(pk=dict(match.pk), value=match.value, score=score) for match in found]
 
 
 def _distinct_sample(source: TabularSource, column: ColumnProfile, limit: int) -> list[str]:
@@ -159,6 +165,40 @@ def _rare(hits: int, total: int) -> bool:
 
 def _phrase_hits(passages: Sequence[Passage], value: str) -> list[Passage]:
     return [passage for passage in passages if _contains_phrase(passage.text, value)]
+
+
+def _mention_values(exact: list[str], fuzzy: tuple[str, float] | None) -> tuple[list[str], float]:
+    """Prefer one long approximate mention over a short exact token such as ``of`` or ``army``."""
+    long_exact = [value for value in exact if len(value) >= _EXACT_KEEP]
+    if long_exact:
+        return long_exact, 1.0
+    if fuzzy is not None and (not exact or len(fuzzy[0]) > max(len(value) for value in exact)):
+        return [fuzzy[0]], fuzzy[1]
+    if not exact:
+        return [], 1.0
+    return exact, 1.0
+
+
+def _closest_value(values: Sequence[str], passage: str) -> tuple[str, float] | None:
+    """Return the one column value that approximately occurs in a fragment."""
+    haystack = _fold_marks(passage)
+    best_value = ""
+    best_score = 0.0
+    for value in values:
+        if len(value) < _FUZZY_MIN_LENGTH:
+            continue
+        score = float(fuzz.partial_ratio(_fold_marks(value), haystack)) / 100
+        if score > best_score:
+            best_score = score
+            best_value = value
+    if best_score < _FUZZY_MENTION or not best_value:
+        return None
+    return best_value, best_score
+
+
+def _fold_marks(value: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", value.casefold())
+    return "".join(character for character in decomposed if not unicodedata.combining(character))
 
 
 def _contains_phrase(text: str, value: str) -> bool:

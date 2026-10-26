@@ -9,15 +9,22 @@ case rows and 10,000 text case notes. A case note contains a unique natural
 phrase and a case reference, but not the member, book, or branch that answers a
 cross-source question.
 
-There are two baselines:
+The hard suite adds paraphrases, a rejected name inside the note, the staff
+member who recorded the loan, and the book's publisher. The publisher is five
+approved links away from the note. Flat retrieval stops after one hop, so it
+can find the note without reaching that publisher. Both agent arms still see
+the same files, schema, and read-only SQL.
+
+The comparison has two baselines:
 
 1. One-hop retrieval uses the same value dictionary and passage search, but
    stops before multi-hop traversal. This isolates the traversal effect without
    involving a model.
 2. Both agent arms receive schema inspection, unrestricted read-only `SELECT`,
    and lexical search over every file. The joinhound arm additionally receives
-   `get_context`. Arm order is randomized per question. The model, questions,
-   tool-call limit, database, and files are identical.
+   `get_context`, `expand`, and `get_record`. Arm order is randomized per
+   question. The model, questions, tool-call limit, database, and files are
+   identical.
 
 Answer recall, confirmed-answer rate, tool calls, latency, and token use are
 reported. Retrieval also reports evidence precision and recall. Results are

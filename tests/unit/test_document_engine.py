@@ -6,7 +6,7 @@ from joinhound.core.config import EngineConfig
 from joinhound.core.models import IndexedPassage, LinkDraft
 from joinhound.core.protocols import Embedder
 from joinhound.engine.context import get_context
-from joinhound.engine.passages import reciprocal_rank_fusion
+from joinhound.engine.passages import lexical_rank, reciprocal_rank_fusion
 from joinhound.matchers.documents import DocumentMatcher, Passage
 from joinhound.testing.memory import MemoryTabularSource
 
@@ -17,6 +17,41 @@ _SECRET = "s3://finance/secret.txt#page=1&bbox=0.0,0.0,1.0,1.0"
 class _Direction(Embedder):
     def embed(self, texts: list[str]) -> list[list[float]]:
         return [[1.0 if "beta" in text else 0.0, 1.0 if "alpha" in text else 0.0] for text in texts]
+
+
+def test_lexical_rank_keeps_a_note_when_the_question_adds_words() -> None:
+    passages = [
+        _passage("s3://docs/other.txt", "s3://docs/", "Circulation case note"),
+        _passage(
+            "s3://docs/match.txt", "s3://docs/", "Observation: amber anchor beside the arcade"
+        ),
+    ]
+
+    ranked = lexical_rank(
+        "Which publisher issued the book connected to 'arcade observation amber anchor'?",
+        passages,
+    )
+
+    assert ranked == ["s3://docs/match.txt"]
+
+
+def test_lexical_rank_prefers_words_that_sit_together() -> None:
+    passages = [
+        _passage(
+            "s3://docs/scattered.txt",
+            "s3://docs/",
+            "Observation was filed. Amber was discussed. Much later an anchor beside the arcade.",
+        ),
+        _passage(
+            "s3://docs/tight.txt",
+            "s3://docs/",
+            "Observation: amber anchor beside the arcade.",
+        ),
+    ]
+
+    ranked = lexical_rank("arcade observation amber anchor", passages)
+
+    assert ranked == ["s3://docs/tight.txt"]
 
 
 def test_fusion_adds_reciprocal_ranks() -> None:
@@ -81,6 +116,36 @@ def test_an_inaccessible_passage_never_appears() -> None:
     assert len(reached) == 1
     assert reached[0].kind == "passage"
     assert reached[0].seed is False
+
+
+def test_a_passage_does_not_spread_to_other_documents_through_a_shared_value() -> None:
+    source = MemoryTabularSource(
+        {"films": [{"id": 1, "title": "ACADEMY DINOSAUR", "code": "ACME-1"}]}
+    )
+    first = _passage("s3://docs/first.txt", "s3://docs/", "alpha note for ACME-1")
+    second = _passage("s3://docs/second.txt", "s3://docs/", "unrelated note for ACME-1")
+    passages = [first, second]
+    matcher = DocumentMatcher(
+        source,
+        [
+            Passage(first.collection_id, {"uri": first.uri}, first.text),
+            Passage(second.collection_id, {"uri": second.uri}, second.text),
+        ],
+    )
+
+    result = get_context(
+        "alpha note",
+        source,
+        [_document_link()],
+        {"column_documents": matcher},
+        EngineConfig(fanout=10, budget_tokens=100_000),
+        max_depth=2,
+        passages=passages,
+        clock=_frozen,
+    )
+
+    assert first.uri in {node.uri for node in result.nodes}
+    assert second.uri not in {node.uri for node in result.nodes}
 
 
 def _passage(

@@ -28,6 +28,7 @@ _SUMMARY_TOKENS = 2000
 
 _GET_CONTEXT = (
     "Find records related to a question and return a bounded graph. Call this first. "
+    "When the question names a property, the graph contains that property's value. "
     "Each node carries a source uri. If truncated is true, call expand with the uri of "
     "each expandable node. expandable lists node ids, not uris. "
     "This server retrieves related records. It does not count, aggregate, or run SQL."

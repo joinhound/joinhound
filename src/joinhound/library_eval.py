@@ -99,8 +99,34 @@ _PLACES = (
 )
 
 
-QuestionKind = Literal["database", "document", "cross_member", "cross_book", "cross_branch"]
+QuestionKind = Literal[
+    "database",
+    "document",
+    "cross_member",
+    "cross_book",
+    "cross_branch",
+    "paraphrase_member",
+    "paraphrase_book",
+    "conflict_member",
+    "cross_staff",
+    "cross_publisher",
+]
 QuestionSplit = Literal["dev", "test"]
+STANDARD_KINDS: tuple[QuestionKind, ...] = (
+    "database",
+    "document",
+    "cross_member",
+    "cross_book",
+    "cross_branch",
+)
+HARD_KINDS: tuple[QuestionKind, ...] = (
+    "paraphrase_member",
+    "paraphrase_book",
+    "conflict_member",
+    "cross_staff",
+    "cross_publisher",
+)
+HARD_QUESTIONS = 250
 
 
 @dataclass(frozen=True)
@@ -119,6 +145,10 @@ class LibraryCase:
     library_id: int
     library_name: str
     card_number: str
+    publisher_id: int = 0
+    publisher_name: str = ""
+    staff_user_id: int = 0
+    staff_name: str = ""
 
 
 @dataclass(frozen=True)
@@ -144,8 +174,8 @@ class EvalManifest:
     questions: int
 
 
-def archive_phrase(index: int) -> str:
-    """Return a unique, natural-looking phrase for a case file."""
+def phrase_parts(index: int) -> tuple[str, str, str]:
+    """Return the color, object, and place encoded by one case index."""
     capacity = len(_COLORS) * len(_OBJECTS) * len(_PLACES)
     if index < 0 or index >= capacity:
         raise ValueError(f"Case index must be below {capacity}")
@@ -153,7 +183,19 @@ def archive_phrase(index: int) -> str:
     rest = index // len(_COLORS)
     item = _OBJECTS[rest % len(_OBJECTS)]
     place = _PLACES[(rest // len(_OBJECTS)) % len(_PLACES)]
+    return color, item, place
+
+
+def archive_phrase(index: int) -> str:
+    """Return a unique, natural-looking phrase for a case file."""
+    color, item, place = phrase_parts(index)
     return f"{color} {item} beside the {place}"
+
+
+def paraphrase(index: int) -> str:
+    """Describe the same observation with words that occur in the note, reordered."""
+    color, item, place = phrase_parts(index)
+    return f"{place} observation {color} {item}"
 
 
 def case_body(case: LibraryCase) -> str:
@@ -162,8 +204,33 @@ def case_body(case: LibraryCase) -> str:
         "Circulation case note\n"
         f"Reference: {case.case_ref}\n"
         f"Observation: {archive_phrase(case.case_id - 1)}.\n"
+        f"{distractor_name(case)} was discussed, but that person did not borrow the copy.\n"
         "The patron asked staff to verify the linked circulation record.\n"
     )
+
+
+def distractor_name(case: LibraryCase) -> str:
+    """Return a personal name that is not an answer for this case."""
+    forbidden = {
+        value.casefold()
+        for value in (
+            case.user_name,
+            case.book_title,
+            case.library_name,
+            case.publisher_name,
+            case.staff_name,
+        )
+        if value
+    }
+    capacity = len(_COLORS) * len(_OBJECTS) * len(_PLACES)
+    for shift in range(capacity):
+        color, item, _place = phrase_parts((case.case_id * 17 + shift) % capacity)
+        name = f"{color.title()} {item.title()}"
+        if name.casefold() not in forbidden and not any(
+            name.casefold() in answer or answer in name.casefold() for answer in forbidden
+        ):
+            return name
+    raise ValueError(f"No distractor name is distinct for {case.case_ref}")
 
 
 def case_key(case: LibraryCase) -> str:
@@ -241,6 +308,80 @@ def questions(cases: list[LibraryCase], count: int = DEFAULT_QUESTIONS) -> list[
     return result
 
 
+def hard_questions(cases: list[LibraryCase], count: int = HARD_QUESTIONS) -> list[EvalQuestion]:
+    """Build questions that need a paraphrase, a rejected name, or a longer path."""
+    if count <= 0 or count % 5:
+        raise ValueError("Question count must be a positive multiple of five")
+    each = count // 5
+    if each % 2:
+        raise ValueError("Questions per kind must be even for the dev/test split")
+    eligible = [
+        case
+        for case in cases
+        if case.staff_name
+        and case.publisher_name
+        and case.staff_name.casefold() != case.user_name.casefold()
+        and case.publisher_name.casefold() != case.library_name.casefold()
+    ]
+    if len(eligible) < each:
+        raise ValueError("Not enough cases for the hard questions")
+    half = each // 2
+    selected = eligible[:half] + eligible[-half:]
+    result: list[EvalQuestion] = []
+    for offset, case in enumerate(selected):
+        split: QuestionSplit = "dev" if offset < half else "test"
+        wording = paraphrase(case.case_id - 1)
+        prefix = f"hard-{split}-{case.case_id:05d}"
+        file_uri = case_uri(case)
+        result.extend(
+            [
+                EvalQuestion(
+                    f"{prefix}-member",
+                    split,
+                    "paraphrase_member",
+                    f"Which member borrowed the copy described by '{wording}'?",
+                    (case.user_name,),
+                    (file_uri, _row_uri("users", case.user_id)),
+                ),
+                EvalQuestion(
+                    f"{prefix}-book",
+                    split,
+                    "paraphrase_book",
+                    f"Which book is connected to the note '{wording}'?",
+                    (case.book_title,),
+                    (file_uri, _row_uri("books", case.book_id)),
+                ),
+                EvalQuestion(
+                    f"{prefix}-conflict",
+                    split,
+                    "conflict_member",
+                    f"Which member borrowed the copy in the note '{wording}'? "
+                    "Ignore any person the note says did not borrow.",
+                    (case.user_name,),
+                    (file_uri, _row_uri("users", case.user_id)),
+                ),
+                EvalQuestion(
+                    f"{prefix}-staff",
+                    split,
+                    "cross_staff",
+                    f"Which staff member recorded the loan for the note '{wording}'? "
+                    "Use the staff record linked from the loan, not the borrowing member.",
+                    (case.staff_name,),
+                    (file_uri, _row_uri("users", case.staff_user_id)),
+                ),
+                EvalQuestion(
+                    f"{prefix}-publisher",
+                    split,
+                    "cross_publisher",
+                    f"Which publisher issued the book connected to the note '{wording}'?",
+                    (case.publisher_name,),
+                    (file_uri, _row_uri("publishers", case.publisher_id)),
+                ),
+            ]
+        )
+    return result
+
+
 def write_bundle(
     root: Path,
     cases: list[LibraryCase],
@@ -254,6 +395,10 @@ def write_bundle(
         path.write_text(case_body(case), encoding="utf-8")
     _write_json(
         root / "questions.json", {"questions": [asdict(item) for item in selected_questions]}
+    )
+    _write_json(
+        root / "hard.json",
+        {"questions": [asdict(item) for item in hard_questions(cases)]},
     )
     manifest = EvalManifest(
         dataset_url=DATASET_URL,
@@ -324,6 +469,6 @@ def _split(value: object) -> QuestionSplit:
 
 
 def _kind(value: object) -> QuestionKind:
-    if value not in {"database", "document", "cross_member", "cross_book", "cross_branch"}:
+    if value not in {*STANDARD_KINDS, *HARD_KINDS}:
         raise ValueError(f"Unknown question kind: {value}")
     return value

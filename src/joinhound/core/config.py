@@ -117,6 +117,8 @@ class EngineConfig(BaseModel):
     max_depth: int = 3
     beam_width: int = 20
     fanout: int = 25
+    child_fanout: int = 2
+    max_paths: int = 16
     depth_decay: float = 0.8
     budget_tokens: int = 4000
     timeout_ms: int = 10000

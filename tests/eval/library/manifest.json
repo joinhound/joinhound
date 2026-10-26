@@ -5,6 +5,7 @@
   "dataset_sha256": "104b9998bb85c55d0e8190b125cb0a1dff62d4bf628c266013b7568668befa3d",
   "dataset_url": "https://database-sample-website.s3.eu-north-1.amazonaws.com/datasets/library-sample-database/v2/flagship/100k/postgres.sql.gz",
   "documents": 10000,
+  "hard_questions": 250,
   "questions": 500,
-  "version": 1
+  "version": 2
 }
