@@ -1047,9 +1047,7 @@ def _compact_chain(nodes: Sequence[_Node], query: str) -> list[_Node] | None:
         chain.append(current)
         current = current.parent
     kept = [
-        node
-        for node in reversed(chain)
-        if node.uri in {best.uri, target.uri} or _is_label(node)
+        node for node in reversed(chain) if node.uri in {best.uri, target.uri} or _is_label(node)
     ]
     for child in target.children:
         if _is_label(child) and all(child.uri != node.uri for node in kept):
